@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Quixlab - Bootstrap Admin Dashboard Template by Themefisher.com</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <!-- Custom Stylesheet -->
+    <link href="/static/admin/plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.css" rel="stylesheet">
+    
+
+</head>
+
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {{template "adminheader.html" .}}
+    <!--**********************************
+            Content body start
+        ***********************************-->
+    <div class="content-body">
+
+        <div class="row page-titles mx-0">
+            <div class="col p-md-0">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Home</a></li>
+                </ol>
+            </div>
+        </div>
+        <!-- row -->
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Data Table</h4>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered zero-configuration">
+                                    <thead>
+                                        <tr>
+                                            <th>Customers</th>
+                                            <th>Email</th>
+                                            <th>Phone Number</th>
+                                            <th>Status</th>
+                                            <th>Registration date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {{range .Users}}
+                                        <tr>
+                                            <!-- <td><img src="/static/admin/images/avatar/{{.ID}}.jpg"
+                                                        class="rounded-circle mr-3" alt="{{.Username}}"></td> -->
+                                            <td>{{.Username}}</td>
+                                            <td>{{.Email}}</td>
+                                            <td>{{.Number}}</td>
+                                            <td>
+                                                {{if eq .Status "active"}}
+                                                <span class="label label-success">{{.Status}}</span>
+                                                {{else}}
+                                                <span class="label label-danger">{{.Status}}</span>
+                                                {{end}}
+                                            </td>
+                                            <td>{{.CreatedAt.Format "2006-01-02 15:04:05"}}</td>
+                                            <td>
+                                                {{if eq .Status "active"}}
+                                                <a href="/admin/update-status?user_id={{.ID}}">
+                                                    <button type="button"
+                                                        class="btn mb-1 btn-outline-warning btn-xs"><span
+                                                            class="btn-icon"><i class="fa fa-close"></i></span>block
+                                                        &nbsp; </button>
+                                                </a>
+                                                {{else}}
+                                                <a href="/admin/update-status?user_id={{.ID}}">
+                                                    <button type="button"
+                                                        class="btn mb-1 btn-outline-success btn-xs"><span
+                                                            class="btn-icon"><i
+                                                                class="fa fa-check"></i></span>active</button>
+                                                </a>
+                                                {{end}}
+
+                                                <br>
+
+                                                <button type="button"
+                                                    class="btn mb-1 btn-outline-danger btn-xs delete-btn"
+                                                    data-id="{{.ID}}">
+                                                    <span class="btn-icon"><i class="fa fa-trash"></i></span>Delete
+                                                </button>
+
+                                            </td>
+                                        </tr>
+                                        {{end}}
+                                    </tbody>
+                                 
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- #/ container -->
+    </div>
+    <!--**********************************
+            Content body end
+        ***********************************-->
+
+
+    <!--**********************************
+            Footer start
+        ***********************************-->
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright &copy; Designed & Developed by <a href="https://themeforest.net/user/quixlab">Quixlab</a> 2018
+            </p>
+        </div>
+    </div>
+    <!--**********************************
+            Footer end
+        ***********************************-->
+    </div>
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <script>
+        // $(document).ready(function () {
+        //     // Initialize DataTable with specific column sorting
+        //     $('#myTable').DataTable({
+        //         "lengthMenu": [5, 10, 25, 50], // Specify the available entries options
+        //         "pageLength": 5, // Set the default number of entries per page
+        //         "columnDefs": [
+        //             { "orderable": false, "targets": 5 }
+        //             // Disable sorting for the third column (index 2)
+        //         ]
+        //     });
+
+            // Attach a click event handler to the button with the delete-btn class
+            $('.delete-btn').on('click', function () {
+                var customerId = $(this).data('id');
+
+                console.log('Sending AJAX request with ID:', customerId);
+
+                $.ajax({
+                    url: '/admin/customers',
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id: customerId }),
+                    success: function (response) {
+                        console.log('Success:', response);
+                        window.location.reload();
+                        // Optionally, you can redirect the user or update the UI
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+      
+    </script>
+
+
+    <script src="/static/admin/plugins/common/common.min.js"></script>
+    <script src="/static/admin/js/custom.min.js"></script>
+    <script src="/static/admin/js/settings.js"></script>
+    <script src="/static/admin/js/gleek.js"></script>
+    <script src="/static/admin/js/styleSwitcher.js"></script>
+
+    <script src="/static/admin/plugins/tables/js/jquery.dataTables.min.js"></script>
+    <script src="/static/admin/plugins/tables/js/datatable/dataTables.bootstrap4.min.js"></script>
+    <script src="/static/admin/plugins/tables/js/datatable-init/datatable-basic.min.js"></script>
+
+    
+
+
+</body>
+
+</html>

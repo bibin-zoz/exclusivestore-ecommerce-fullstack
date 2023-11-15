@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Product Details - Quixlab</title>
+    <!-- Add your favicon link here -->
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <!-- Add your custom stylesheet link here -->
+    <link href="/static/admin/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    {{template "adminheader.html" .}}
+
+    <div class="content-body">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-validation">
+                                <form class="form-valide" action="/update-product/{{.ProductID}}" method="post">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="val-product-name">Product Name <span class="text-danger">*</span></label>
+                                        <div class="col-lg-6">
+                                            <input type="text" class="form-control" id="val-product-name" name="ProductName" placeholder="{{.ProductName}}" value="{{.ProductName}}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="val-category-name">Category Name <span class="text-danger">*</span></label>
+                                        <div class="col-lg-6">
+                                            <input type="text" class="form-control" id="val-category-name" name="CategoryName" placeholder="Enter category name" value="{{.CategoryName}}">
+                                        </div>
+                                    </div>
+                                    <!-- Repeat similar blocks for other fields (ProductDetails, Status, Ram, Storage, Stock, Price, etc.) -->
+
+                                    <div class="form-group row">
+                                        <div class="col-lg-8 ml-auto">
+                                            <button type="submit" class="btn btn-primary">Update Product</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright &copy; Designed & Developed by <a href="https://themeforest.net/user/quixlab">Quixlab</a> 2018</p>
+        </div>
+    </div>
+
+    <!-- Include your scripts -->
+    <script src="/static/admin/plugins/common/common.min.js"></script>
+    <script src="/static/admin/js/custom.min.js"></script>
+    <script src="/static/admin/js/settings.js"></script>
+    <script src="/static/admin/js/gleek.js"></script>
+    <script src="/static/admin/js/styleSwitcher.js"></script>
+
+    <script src="/static/admin/plugins/validation/jquery.validate.min.js"></script>
+    <script src="/static/admin/plugins/validation/jquery.validate-init.js"></script>
+</body>
+
+</html>

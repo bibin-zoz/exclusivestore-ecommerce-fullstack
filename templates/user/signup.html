@@ -1,0 +1,77 @@
+{{template "header.html" .}}
+
+    <section class="forms">
+        <div class="container">
+            
+            <div class="forms-grid">
+
+                
+
+                <!-- register -->
+                <div class="register">
+                    <span class="fas fa-user-circle"></span>
+                    <strong>Create account!</strong>
+                    <form method="POST" action="/signup" class="register-form">
+                        <fieldset>
+                            <div class="form">
+                                <div class="form-row">
+                                    <span class="fas fa-user"></span>
+                                    <label class="form-label" for="input">UserName</label>
+                                    <input type="text" class="form-text" name="username">
+                                    <p class="error-text">{{.NameError}}</p>
+                                </div>
+                                <div class="form-row">
+                                    <span class="fas fa-envelope"></span>
+                                    <label class="form-label" for="input">E-mail</label>
+                                    <input type="email" class="form-text" name="email">
+                                    <p class="error-text">{{.EmailError}}</p>
+                                </div>
+                                <div class="form-row">
+                                    <span class="fas fa-envelope"></span>
+                                    <label class="form-label" for="input">Number</label>
+                                    <input type="text" class="form-text" name="number">
+                                    <p class="error-text">{{.NumberError}}</p>
+                                </div>
+                                <div class="form-row">
+                                    <span class="fas fa-lock"></span>
+                                    <label class="form-label" for="input">Password</label>
+                                    <input type="password" class="form-text" name="password">
+                                    
+                                    
+                            
+                                </div>
+                                <div class="form-row">
+                                    <span class="fas fa-lock"></span>
+                                    <label class="form-label" for="input">confirmPassword</label>
+                                    <input type="password" class="form-text" name="confirmPassword">
+                                    <p class="error-text">{{.PasswordError}}</p>
+                                    
+                                    
+                                    
+                                </div>
+                                <div class="form-row button-login">
+                                    <button type="submit" class="btn btn-login">Create <span
+                                            class="fas fa-arrow-right"></span></button>
+                                </div>
+                            </div>
+                        </fieldset>
+                        </form>
+
+                        <span class="create-account">Or create account using social media!</span>
+
+                        <div class="social-media">
+                            <a href="#facebook" class="fb"><span class="fab fa-facebook"></span></a>
+                            <a href="#twitter" class="tw"><span class="fab fa-twitter"></span></a>
+                            <a href="#pinterest" class="pi"><span class="fab fa-pinterest"></span></a>
+                        </div>
+                </div>
+                <!-- //register -->
+            </div>
+
+            
+        </div>
+    </section>
+
+</body>
+
+</html>
