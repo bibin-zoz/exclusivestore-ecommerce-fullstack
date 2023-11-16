@@ -358,7 +358,8 @@ func DeleteProductHandler(c *gin.Context) {
 func ProductDetailsHandler(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Query("id"))
 
-	var product []models.Productview
+	var Product models.Productview
+	var Category []models.Categories
 
 	query := fmt.Sprintf(`
 		SELECT products.*, categories.category_name
@@ -368,19 +369,30 @@ func ProductDetailsHandler(c *gin.Context) {
 	`, ID)
 
 	// Execute the raw SQL query
-	db.DB.Raw(query).Scan(&product)
+	db.DB.Raw(query).Scan(&Product)
+	db.DB.Find(&Category)
 
-	log.Println(product)
+	log.Println(Product)
 
-	// Return the result as JSON
-	if c.Request.Header.Get("Accept") == "application/json" {
-		// Return JSON if the client accepts JSON
-		c.JSON(http.StatusOK, gin.H{"Products": product})
-	} else {
-		// Return HTML if the client accepts HTML or doesn't specify a preference
-		c.HTML(http.StatusOK, "productedit.html", gin.H{
-			"Products": product,
-		})
-	}
+	c.HTML(http.StatusOK, "productedit.html", gin.H{
+		"Product":  Product,
+		"Category": Category,
+	})
+
+	// // Return the result as JSON
+	// if c.Request.Header.Get("Accept") == "application/json" {
+	// 	// Return JSON if the client accepts JSON
+	// 	c.JSON(http.StatusOK, gin.H{"Products": product})
+	// } else {
+	// 	// Return HTML if the client accepts HTML or doesn't specify a preference
+	// 	c.HTML(http.StatusOK, "productedit.html", gin.H{
+	// 		"Products": product,
+	// 	})
+	// }
+
+}
+
+func ProductUpdateHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, "asnasnkasj")
 
 }
