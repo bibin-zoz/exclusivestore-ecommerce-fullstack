@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -383,4 +385,94 @@ func ProductDetailsHandler(c *gin.Context) {
 		})
 	}
 
+}
+
+func UploadHandler(c *gin.Context) {
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB limit
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error parsing form data"})
+		return
+	}
+
+	// Extract form values
+	productName := c.Request.FormValue("productName")
+	productDetails := c.Request.FormValue("productDetails")
+	storage := c.Request.FormValue("storage")
+	ram := c.Request.FormValue("ram")
+	stock := c.Request.FormValue("stock")
+	price := c.Request.FormValue("price")
+
+	// Convert stock and price to appropriate types
+	stockInt, err := strconv.Atoi(stock)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid stock value"})
+		return
+	}
+
+	priceFloat, err := strconv.ParseFloat(price, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price value"})
+		return
+	}
+
+	// Create a new product
+	newProduct := models.Products{
+		ProductName:    productName,
+		ProductDetails: productDetails,
+		Storage:        storage,
+		Ram:            ram,
+		Stock:          stockInt,
+		Price:          priceFloat,
+	}
+
+	// Save the product to the database
+	if err := db.DB.Create(&newProduct).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create product"})
+		return
+	}
+
+	// Get the ID of the newly created product
+	productID := newProduct.ID
+
+	// Handle file uploads
+	files := c.Request.MultipartForm.File["images"]
+	for _, file := range files {
+		// Save the file to the uploads directory
+		filePath := filepath.Join("uploads", file.Filename)
+		if err := c.SaveUploadedFile(file, filePath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save the file"})
+			return
+		}
+
+		// Replace backslashes with forward slashes in the file path
+		filePath = strings.Replace(filePath, `\`, "/", -1)
+
+		// Create a new image record in the database
+		newImage := models.Image{
+			ProductID: productID,
+			FilePath:  filePath,
+		}
+
+		// Save the image record to the database
+		if err := db.DB.Create(&newImage).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create image record"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Product created successfully"})
+}
+
+// GetImagesHandler retrieves and displays images from the database
+func GetImagesHandler(c *gin.Context) {
+	var images []models.Image
+	if err := db.DB.Find(&images).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to query the database"})
+		return
+	}
+
+	// Replace forward slashes with backslashes in file paths
+	fmt.Println("img", images)
+
+	c.HTML(http.StatusOK, "images.html", gin.H{"images": images})
 }

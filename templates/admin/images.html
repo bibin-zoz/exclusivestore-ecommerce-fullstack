@@ -1,0 +1,17 @@
+<!-- views/images.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Images</title>
+</head>
+<body>
+    <h2>Uploaded Images</h2>
+    {{ range .images }}
+        <img src="{{ .FilePath }}" alt="Image">
+       
+        <h2>{{ .FilePath }}</h2>
+    {{ end }}
+</body>
+</html>

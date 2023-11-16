@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Products struct {
 	ID             uint    `json:"id" gorm:"unique;not null"`
@@ -13,6 +15,11 @@ type Products struct {
 	Stock          int     `json:"stock"`
 	Status         string  `json:"status" gorm:"default:'listed'"`
 	Price          float64 `json:"price"`
+}
+type Image struct {
+	ID        uint   `json:"id" gorm:"unique;not null"`
+	ProductID uint   `json:"productID" gorm:"foreignkey:ProductID;constraint:OnDelete:CASCADE"`
+	FilePath  string `json:"filepath" gorm:"not null"`
 }
 
 //	type Category struct {

@@ -44,5 +44,6 @@ func InitDB() {
 
 		panic(err)
 	}
+	DB.AutoMigrate(&models.Image{})
 
 }

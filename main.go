@@ -4,6 +4,7 @@ import (
 	db "ecommercestore/database"
 	handlers "ecommercestore/handlers"
 	"ecommercestore/middleware"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,6 +55,12 @@ func main() {
 
 	//product edit
 	router.GET("/admin/product", middleware.AdminAuth(), handlers.ProductDetailsHandler)
+
+	router.POST("/upload", handlers.UploadHandler)
+	router.GET("/upload-form", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "upload.html", nil)
+	})
+	router.GET("/images", handlers.GetImagesHandler)
 
 	router.Run(":8080")
 
