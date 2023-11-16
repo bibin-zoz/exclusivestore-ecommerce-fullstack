@@ -22,48 +22,81 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="form-validation">
-                                <form class="form-valide" id="updateForm">
+                                <form class="form-valide" id="updateForm" action="/admin/product?id={{.Product.ID}}"
+                                    method="PUT" enctype="multipart/form-data">
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-name">Product Name <span class="text-danger">*</span></label>
+                                        <label class="col-lg-4 col-form-label" for="val-product-name">Product Name <span
+                                                class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="val-product-name" name="ProductName" placeholder="{{.Product.ProductName}}" value="{{.Product.ProductName}}">
+                                            <input type="text" class="form-control" id="val-product-name"
+                                                name="product_name" placeholder="{{.Product.ProductName}}"
+                                                value="{{.Product.ProductName}}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-category-name">Category Name <span class="text-danger">*</span></label>
+                                        <label class="col-lg-4 col-form-label" for="val-category-name">Category Name
+                                            <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <select  class="form-control" id="val-category-name" name="CategoryName" placeholder="{{.Product.CategoryName}}" >
+                                            <select class="form-control" id="val-category-name" name="categoryID">
                                                 {{range .Category}}
+                                                {{ if eq .CategoryName $.Product.CategoryName }}
+                                                <option value="{{.ID}}" selected>{{.CategoryName}}</option>
+                                                {{ else }}
                                                 <option value="{{.ID}}">{{.CategoryName}}</option>
+                                                {{ end }}
                                                 {{end}}
                                             </select>
+                                        </div>
+                                    </div>
 
-                                        </div>
-                                    </div>
-                                   
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-details">Product Details <span class="text-danger">*</span></label>
+                                        <label class="col-lg-4 col-form-label" for="val-product-details">Product Details
+                                            <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="val-product-details" name="ProductName" placeholder="{{.Product.ProductDetails}}" value="{{.Product.ProductDetails}}">
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-status">Status<span class="text-danger">*</span></label>
-                                        <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="val-product-status" name="ProductName" placeholder="{{.Product.Status}}" value="{{.Product.Status}}">
+                                            <input type="text" class="form-control" id="val-product-details"
+                                                name="product_details" placeholder="{{.Product.ProductDetails}}"
+                                                value="{{.Product.ProductDetails}}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-price">Price<span class="text-danger">*</span></label>
+                                        <label class="col-lg-4 col-form-label" for="val-product-status">Status<span
+                                                class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="val-product-price" name="ProductName" placeholder="{{.Product.Price}}" value="{{.Product.Price}}">
+                                            <input type="text" class="form-control" id="val-product-status"
+                                                name="status" placeholder="{{.Product.Status}}"
+                                                value="{{.Product.Status}}">
                                         </div>
                                     </div>
-                                    <!-- Repeat similar blocks for other fields (ProductDetails, Status, Ram, Storage, Stock, Price, etc.) -->
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="val-product-price">Price<span
+                                                class="text-danger">*</span></label>
+                                        <div class="col-lg-6">
+                                            <input type="text" class="form-control" id="val-product-price" name="price"
+                                                placeholder="{{.Product.Price}}" value="{{.Product.Price}}">
+                                        </div>
+                                    </div>
+                                    <!-- Image upload field
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="val-product-image">Product Image</label>
+                                        <div class="col-lg-6">
+                                            <input type="file" class="form-control" id="val-product-image" name="image">
+                                        </div>
+                                    </div> -->
+
+                                    <!-- Multiple image upload field -->
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="val-multiple-images">Multiple
+                                            Images</label>
+                                        <div class="col-lg-6">
+                                            <input type="file" class="form-control" id="val-multiple-images"
+                                                name="images" multiple>
+                                        </div>
+                                    </div>
 
                                     <div class="form-group row">
                                         <div class="col-lg-8 ml-auto">
-                                            <button class="btn btn-primary">Update Product</button>
+                                            <button type="button" id="updateButton" class="btn btn-primary">Update
+                                                Product</button>
                                         </div>
                                     </div>
                                 </form>
@@ -77,38 +110,46 @@
 
     <div class="footer">
         <div class="copyright">
-            <p>Copyright &copy; Designed & Developed by <a href="https://themeforest.net/user/quixlab">Quixlab</a> 2018</p>
+            <p>Copyright &copy; Designed & Developed by <a href="https://themeforest.net/user/quixlab">Quixlab</a> 2018
+            </p>
         </div>
     </div>
 
     <!-- Include your scripts -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Capture button click event
-            $('#updateButton').on('click', function() {
-                // Serialize form data
-                var formData = $('#updateForm').serialize();
-    
+            $('#updateButton').on('click', function () {
+               
+                var formData = new FormData($('#updateForm')[0]);
+
                 // Extract product ID from the form action attribute
-                var productId = $('#updateForm').attr('action').split('/').pop();
-    
-                // Send Ajax request
+                var productId = $('#updateForm').attr('action').split('=').pop();
+             
+
+              
                 $.ajax({
-                    type: 'POST',
-                    url: '/update-product/' + productId,
+                    url: '/admin/product?id=' + productId,
+                    type: 'PUT',
                     data: formData,
-                    success: function(response) {
+                    contentType: false, // To ensure jQuery doesn't set the content type
+                    processData: false, // To prevent jQuery from processing the data
+                    success: function (data) {
                         // Handle success response
-                        console.log(response);
+                        console.log(data);
+                        alert('Product updated successfully!');
+                        window.location.href = '/admin/products/';
                     },
-                    error: function(error) {
+                    error: function (error) {
                         // Handle error response
                         console.error(error);
+                        alert('Failed!');
                     }
                 });
             });
         });
+
     </script>
 
     <script src="/static/admin/plugins/common/common.min.js"></script>

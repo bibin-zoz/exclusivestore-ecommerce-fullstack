@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -393,6 +394,56 @@ func ProductDetailsHandler(c *gin.Context) {
 }
 
 func ProductUpdateHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, "asnasnkasj")
+	var Product models.Products
+	var UpdateProduct models.Products
 
+	// Parse the form data, including files
+	if err := c.ShouldBind(&UpdateProduct); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Retrieve the product ID from the URL parameters
+	id, err := strconv.ParseUint(c.Query("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		return
+	}
+
+	// Fetch the existing product
+	if err := db.DB.First(&Product, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		return
+	}
+
+	// Update fields with new data
+	Product.ProductName = UpdateProduct.ProductName
+	Product.CategoryID = UpdateProduct.CategoryID
+	Product.ProductDetails = UpdateProduct.ProductDetails
+	Product.Status = UpdateProduct.Status
+	Product.Price = UpdateProduct.Price
+
+	// Handle file upload
+	file, err := c.FormFile("ProductImage")
+	if err == nil {
+		// Generate a unique filename for the uploaded file
+		filename := fmt.Sprintf("%d_%s", time.Now().Unix(), file.Filename)
+
+		// Save the file to the server
+		if err := c.SaveUploadedFile(file, "/static/products"+filename); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save the uploaded file"})
+			return
+		}
+
+		// Update the image field in the product model with the filename
+		Product.Image = filename
+	}
+
+	// Save the updated product
+	if err := db.DB.Save(&Product).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update product"})
+		return
+	}
+
+	c.JSON(http.StatusOK, Product)
 }
