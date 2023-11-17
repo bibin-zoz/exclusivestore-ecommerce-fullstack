@@ -12,6 +12,30 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Add your custom stylesheet link here -->
     <link href="/static/admin/css/style.css" rel="stylesheet">
+    <style>
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .image-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #file-drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -22,30 +46,40 @@
             <div class="row justify-content-center">
                 <div class="col-lg-12">
                     <div class="card">
-                        <div class="card-body">
-                            <div class="form-validation">
-                                <form class="form-valide" id="updateForm" action="/admin/product?id={{.Product.ID}}"
-                                    method="PUT">
+                        
+                                <form class="form-valide" id="updateForm" enctype="multipart/form-data">
+                                    <div class="card-body">
+                                        <div class="form-validation">
+                                            <div class="alert alert-dismissible fade" role="alert" id="updateAlert">
+                                                <strong>Product Updated!</strong> Your product details have been successfully updated.
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+            
+
+
                                     <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="val-product-name">Product Name
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="val-product-name"
-                                                name="ProductName" placeholder="{{.Product.ProductName}}"
-                                                value="{{.Product.ProductName}}">
+                                            <input type="text" class="form-control" id="productName" name="productName"
+                                                placeholder="{{.Product.ProductName}}" value="{{.Product.ProductName}}">
                                         </div>
                                     </div>
+
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-category-name">Category Name
+                                        <label class="col-lg-4 col-form-label" for="categoryID">Category Name
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <select class="form-control" id="val-category-name" name="CategoryID">
+                                            <select class="form-control" id="categoryID" name="categoryID">
                                                 {{range .Category}}
-                                                    {{ if eq .ID $.Product.CategoryID }}
-                                                        <option value="{{.ID}}" selected>{{.CategoryName}}</option>
-                                                    {{ else }}
-                                                        <option value="{{.ID}}">{{.CategoryName}}</option>
-                                                    {{ end }}
+                                                {{ if eq .ID $.Product.CategoryID }}
+                                                <option value="{{.ID}}" name="categoryID" selected>{{.CategoryName}}
+                                                </option>
+                                                {{ else }}
+                                                <option value="{{.ID}}" name="categoryID">{{.CategoryName}}</option>
+                                                {{ end }}
                                                 {{end}}
                                             </select>
                                         </div>
@@ -53,50 +87,85 @@
                                     <div class="form-group row">
                                         <label class="col-lg-4 col-form-label">Product Images</label>
                                         <div class="col-lg-6">
-                                            <!-- Display existing product images -->
-                                            {{range $index, $image := .Product.Images}}
-                                            <img src="/{{.FilePath}}" alt="Product Image" class="img-thumbnail">
-                                            {{.FilePath}}
-                                            {{end}}
-                                            <!-- Add option to upload or edit images -->
-                                            <input type="file" id="productImages" name="productImages" multiple
-                                                accept="image/*" class="form-control-file">
+                                            <div class="image-preview" id="image-preview">
+                                                {{range $index, $image := .Product.Images}}
+                                                <div class="image-container">
+                                                    <img src="/{{.FilePath}}" alt="Product Image" class="img-thumbnail">
+                                                    <input type="checkbox" name="deleteImages" value="{{.ID}}"> Delete
+                                                </div>
+                                                {{end}}
+                                            </div>
+                                            <div id="file-drop-area" class="text-center">
+                                                <span>Drag and drop files here or click to select</span>
+                                                <input type="file" id="images" name="images[]" multiple accept="image/*"
+                                                    class="form-control-file">
+                                            </div>
                                         </div>
                                     </div>
 
+
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-details">Product Details
+                                        <label class="col-lg-4 col-form-label" for="productDetails">Product Details
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="val-product-details"
-                                                name="ProductDetails" placeholder="{{.Product.ProductDetails}}"
+                                            <input type="text" class="form-control" id="productDetails"
+                                                name="productDetails" placeholder="{{.Product.ProductDetails}}"
                                                 value="{{.Product.ProductDetails}}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-status">Status
+                                        <label class="col-lg-4 col-form-label" for="status">Status
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="val-product-status"
-                                                name="Status" placeholder="{{.Product.Status}}"
-                                                value="{{.Product.Status}}">
+                                            <input type="text" class="form-control" id="status" name="status"
+                                                placeholder="{{.Product.Status}}" value="{{.Product.Status}}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-price">Price
+                                        <label class="col-lg-4 col-form-label" for="ram">Category Name
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="val-product-price" name="Price"
+                                            <select class="form-control" id="ram" name="ram">
+                                                <option value="4GB">4GB</option>
+                                                <option value="8GB">8GB</option>
+                                                <option value="16">16GB</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="storage">Category Name
+                                            <span class="text-danger">*</span></label>
+                                        <div class="col-lg-6">
+                                            <select class="form-control" id="storage" name="storage">
+                                                <option value="256GB">256GB</option>
+                                                <option value="512GB">512GB</option>
+                                                <option value="1TB">1TB</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="stock">stock
+                                            <span class="text-danger">*</span></label>
+                                        <div class="col-lg-6">
+                                            <input type="text" class="form-control" id="stock" name="stock"
+                                                placeholder="{{.Product.Stock}}" value="{{.Product.Stock}}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="price">Price
+                                            <span class="text-danger">*</span></label>
+                                        <div class="col-lg-6">
+                                            <input type="text" class="form-control" id="price" name="price"
                                                 placeholder="{{.Product.Price}}" value="{{.Product.Price}}">
                                         </div>
                                     </div>
                                     <!-- Repeat similar blocks for other fields (ProductDetails, Status, Ram, Storage, Stock, Price, etc.) -->
 
-                                    <div class="form-group row">
-                                        <div class="col-lg-8 ml-auto">
-                                            <button type="button" id="updateButton"
-                                                class="btn btn-primary">Update Product</button>
-                                        </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary" onClick="updateProduct()">Add New
+                                            Product</button>
                                     </div>
                                 </form>
                             </div>
@@ -118,54 +187,103 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        $(document).ready(function () {
-            // Capture button click event
-            $('#updateButton').on('click', function () {
-                // Serialize form data to JSON
-                var productId = $('#updateForm').attr('action').split('=').pop();
-                var categoryID = $('#val-category-name').val();
-                var price = $('#val-product-price').val();
-                var formData = {
-                    id: parseInt(productId),
-                    productName: $('#val-product-name').val(),
-                    productDetails: $('#val-product-details').val(),
-                    status: $('#val-product-status').val(),
-                    categoryID: parseInt(categoryID),
-                    price: parseFloat(price),
-                    images: [], // Initialize images array
-                    // Add other fields as needed
-                };
 
-                // Extract product ID from the form action attribute
-                var productImages = $('#productImages')[0].files;
+async function updateProduct() {
+    var deleteImages = document.querySelectorAll('input[name="deleteImages"]:checked');
+    console.log("Delete Image IDs:", Array.from(deleteImages).map(checkbox => checkbox.value));
+    var id = window.location.href.split('=').pop();
+    var productName = document.getElementById('productName').value;
+    var productDetails = document.getElementById('productDetails').value;
+    var status = document.getElementById('status').value;
+    var ram = document.getElementById('ram').value;
+    var storage = document.getElementById('storage').value;
+    var categoryID = document.getElementById('categoryID').value;
+    var stock = document.getElementById('stock').value;
+    var price = document.getElementById('price').value;
+    var images = document.getElementById('images').files;
 
-                // Add images to formData
-                for (var i = 0; i < productImages.length; i++) {
-                    formData.images.push(productImages[i]);
-                }
+    var formData = new FormData();
 
-                // Send Fetch API request with PUT method
-                fetch('/admin/product?id=' + productId, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(formData),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Handle success response
-                        console.log(data);
-                        alert('Product updated successfully!');
-                        window.location.href = '/admin/products/';
-                    })
-                    .catch(error => {
-                        // Handle error response
-                        console.error(error);
-                    });
-            });
+    // Append text fields to FormData
+    formData.append('id', id);
+    formData.append('productName', productName);
+    formData.append('productDetails', productDetails);
+    formData.append('status', status);
+    formData.append('ram', ram);
+    formData.append('storage', storage);
+    formData.append('categoryID', parseInt(categoryID));
+    formData.append('stock', parseInt(stock));
+    formData.append('price', parseFloat(price));
+
+    deleteImages.forEach(checkbox => {
+        formData.append('deleteImages', checkbox.value);
+    });
+
+    for (var i = 0; i < images.length; i++) {
+        formData.append('images', images[i]);
+    }
+
+    try {
+        var response = await fetch('/admin/product', {
+            method: 'PUT',
+            body: formData,
         });
+
+        // Parse the JSON response
+        var responseData = await response.json();
+
+        if (response.ok) {
+            if (responseData.redirect) {
+                // Show success alert
+                $('#updateAlert').removeClass('alert-danger').addClass('alert-success').fadeIn().delay(3000).fadeOut();
+                window.location.href = responseData.redirect;
+            } else {
+                console.log(responseData);
+            }
+        } else {
+            // Handle HTTP error responses
+            console.error('Error:', response.status, responseData.error);
+            // Show alert for error
+            $('#updateAlert').removeClass('alert-success').addClass('alert-danger').fadeIn().delay(3000).fadeOut();
+        }
+    } catch (error) {
+        // Handle other errors, e.g., network issues
+        console.error('Error:', error);
+    }
+}
+
+
+        $('#file-drop-area').on('dragover', function (e) {
+            e.preventDefault();
+            $(this).addClass('dragover');
+        });
+
+        $('#file-drop-area').on('dragleave', function (e) {
+            e.preventDefault();
+            $(this).removeClass('dragover');
+        });
+
+        $('#file-drop-area').on('drop', function (e) {
+            e.preventDefault();
+            $(this).removeClass('dragover');
+            showImagePreview(e.originalEvent.dataTransfer.files);
+        });
+
+        function showImagePreview(files) {
+            var previewContainer = $('#image-preview');
+            previewContainer.empty();
+
+            for (var i = 0; i < files.length; i++) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = $('<img>').attr('src', e.target.result);
+                    previewContainer.append(img);
+                };
+                reader.readAsDataURL(files[i]);
+            }
+        }
     </script>
+
 
     <script src="/static/admin/plugins/common/common.min.js"></script>
     <script src="/static/admin/js/custom.min.js"></script>

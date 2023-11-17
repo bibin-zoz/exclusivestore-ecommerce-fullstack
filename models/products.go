@@ -15,7 +15,7 @@ type Products struct {
 	Images         []Image `json:"images" gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
 }
 type Image struct {
-	ID        uint   `json:"id" gorm:"unique;not null"`
+	ID        uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	ProductID uint   `json:"productID" gorm:"index"`
 	FilePath  string `json:"filepath" gorm:"not null"`
 }
