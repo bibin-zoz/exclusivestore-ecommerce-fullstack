@@ -8,6 +8,8 @@
     <title>Edit Product Details - Quixlab</title>
     <!-- Add your favicon link here -->
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <!-- Add Bootstrap stylesheet link -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Add your custom stylesheet link here -->
     <link href="/static/admin/css/style.css" rel="stylesheet">
 </head>
@@ -25,8 +27,8 @@
                                 <form class="form-valide" id="updateForm" action="/admin/product?id={{.Product.ID}}"
                                     method="PUT">
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-name">Product Name <span
-                                                class="text-danger">*</span></label>
+                                        <label class="col-lg-4 col-form-label" for="val-product-name">Product Name
+                                            <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
                                             <input type="text" class="form-control" id="val-product-name"
                                                 name="ProductName" placeholder="{{.Product.ProductName}}"
@@ -37,16 +39,28 @@
                                         <label class="col-lg-4 col-form-label" for="val-category-name">Category Name
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <select class="form-control" id="val-category-name" name="CategoryName">
+                                            <select class="form-control" id="val-category-name" name="CategoryID">
                                                 {{range .Category}}
-                                                    {{ if eq .CategoryName $.Product.CategoryName }}
+                                                    {{ if eq .ID $.Product.CategoryID }}
                                                         <option value="{{.ID}}" selected>{{.CategoryName}}</option>
                                                     {{ else }}
                                                         <option value="{{.ID}}">{{.CategoryName}}</option>
                                                     {{ end }}
                                                 {{end}}
-                                                </select>
-
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label">Product Images</label>
+                                        <div class="col-lg-6">
+                                            <!-- Display existing product images -->
+                                            {{range $index, $image := .Product.Images}}
+                                            <img src="/{{.FilePath}}" alt="Product Image" class="img-thumbnail">
+                                            {{.FilePath}}
+                                            {{end}}
+                                            <!-- Add option to upload or edit images -->
+                                            <input type="file" id="productImages" name="productImages" multiple
+                                                accept="image/*" class="form-control-file">
                                         </div>
                                     </div>
 
@@ -60,8 +74,8 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-status">Status<span
-                                                class="text-danger">*</span></label>
+                                        <label class="col-lg-4 col-form-label" for="val-product-status">Status
+                                            <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
                                             <input type="text" class="form-control" id="val-product-status"
                                                 name="Status" placeholder="{{.Product.Status}}"
@@ -69,8 +83,8 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-product-price">Price<span
-                                                class="text-danger">*</span></label>
+                                        <label class="col-lg-4 col-form-label" for="val-product-price">Price
+                                            <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
                                             <input type="text" class="form-control" id="val-product-price" name="Price"
                                                 placeholder="{{.Product.Price}}" value="{{.Product.Price}}">
@@ -80,8 +94,8 @@
 
                                     <div class="form-group row">
                                         <div class="col-lg-8 ml-auto">
-                                            <button type="button" id="updateButton" class="btn btn-primary">Update
-                                                Product</button>
+                                            <button type="button" id="updateButton"
+                                                class="btn btn-primary">Update Product</button>
                                         </div>
                                     </div>
                                 </form>
@@ -94,46 +108,50 @@
     </div>
 
     <div class="footer">
-        <div class="copyright">
-            <p>Copyright &copy; Designed & Developed by <a href="https://themeforest.net/user/quixlab">Quixlab</a> 2018
-            </p>
+        <div class="container">
+            <p class="text-center">Copyright &copy; Designed & Developed by <a
+                    href="https://themeforest.net/user/quixlab">Quixlab</a> 2018</p>
         </div>
     </div>
 
-    <!-- Include your scripts -->
+    <!-- Include Bootstrap and your scripts -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function () {
             // Capture button click event
             $('#updateButton').on('click', function () {
                 // Serialize form data to JSON
                 var productId = $('#updateForm').attr('action').split('=').pop();
-                var categoryID= $('#val-category-name').val();
-                var price= $('#val-product-price').val();
+                var categoryID = $('#val-category-name').val();
+                var price = $('#val-product-price').val();
                 var formData = {
                     id: parseInt(productId),
                     productName: $('#val-product-name').val(),
-
                     productDetails: $('#val-product-details').val(),
                     status: $('#val-product-status').val(),
-
                     categoryID: parseInt(categoryID),
-
                     price: parseFloat(price),
+                    images: [], // Initialize images array
                     // Add other fields as needed
                 };
 
                 // Extract product ID from the form action attribute
+                var productImages = $('#productImages')[0].files;
 
+                // Add images to formData
+                for (var i = 0; i < productImages.length; i++) {
+                    formData.images.push(productImages[i]);
+                }
 
                 // Send Fetch API request with PUT method
                 fetch('/admin/product?id=' + productId, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                })
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData),
+                    })
                     .then(response => response.json())
                     .then(data => {
                         // Handle success response
@@ -148,7 +166,6 @@
             });
         });
     </script>
-
 
     <script src="/static/admin/plugins/common/common.min.js"></script>
     <script src="/static/admin/js/custom.min.js"></script>

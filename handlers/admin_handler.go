@@ -384,11 +384,16 @@ func DeleteProductHandler(c *gin.Context) {
 		return
 	}
 	productID := req.ID
+	fmt.Println(productID)
 
 	var product models.Products
-	result := db.DB.Where("id = ?", productID).Delete(&product)
 
-	if result.Error != nil {
+	if err := db.DB.Preload("Images").First(&product, productID).Error; err != nil {
+		return
+	}
+
+	// Delete the product and its associated images
+	if err := db.DB.Delete(&product).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
 		return
 	}
@@ -398,25 +403,24 @@ func DeleteProductHandler(c *gin.Context) {
 
 func ProductDetailsHandler(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Query("id"))
+	var Product models.Products
+	var category []models.Categories
+	if err := db.DB.Preload("Images").Find(&Product, ID).Error; err != nil {
 
-	var Product models.Productview
-	var Category []models.Categories
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
+		return
+	}
+	if err := db.DB.Find(&category).Error; err != nil {
 
-	query := fmt.Sprintf(`
-		SELECT products.*, categories.category_name
-		FROM products
-		JOIN categories ON products.category_id = categories.id
-		WHERE products.id = %d
-	`, ID)
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
+		return
+	}
 
-	db.DB.Raw(query).Scan(&Product)
-	db.DB.Find(&Category)
-
-	log.Println(Product)
+	log.Println(category)
 
 	c.HTML(http.StatusOK, "productedit.html", gin.H{
 		"Product":  Product,
-		"Category": Category,
+		"Category": category,
 	})
 
 	// // Return the result as JSON
@@ -444,7 +448,7 @@ func ProductUpdateHandler(c *gin.Context) {
 	}
 	id := UpdateProduct.ID
 
-	if err := db.DB.First(&Product, id).Error; err != nil {
+	if err := db.DB.Preload("Images").Find(&Product, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}
