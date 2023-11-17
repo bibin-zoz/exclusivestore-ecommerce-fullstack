@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 
 	"ecommercestore/helpers"
 
@@ -55,7 +56,6 @@ func LoginPost(c *gin.Context) {
 		return
 	}
 
-	// Check if no user is found
 	var count int64
 	if result := db.DB.Model(&models.User{}).Where("email = ?", Newmail).Count(&count); result.Error != nil || count == 0 {
 		data.EmailError = "User not found! Re-check the Mailid"
@@ -239,18 +239,32 @@ func VerifyPost(c *gin.Context) {
 func HomeHandler(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
-	var data models.Invalid
-	data.LoginStatus = true
-	token, _ := c.Cookie("token")
-	helpers.GetUserRoleFromToken(token)
-	c.HTML(http.StatusOK, "home.html", data)
 
+	var products []models.Products
+	db.DB.Preload("Images").Find(&products)
+
+	c.HTML(http.StatusOK, "home.html", gin.H{
+		"Products": products,
+	})
 }
 
 func LogoutHandler(c *gin.Context) {
 
-	// Clear the token from the client-side (e.g., by deleting the cookie)
 	c.SetCookie("token", "", -1, "/", "localhost", false, true)
 
 	c.Redirect(http.StatusSeeOther, "/login")
+}
+
+func ProductViewhandler(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Query("id"))
+
+	var product models.Products
+	if err := db.DB.Preload("Images").Where("ID = ?", ID).First(&product).Error; err != nil {
+
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
+		return
+	}
+
+	c.HTML(http.StatusOK, "userproductdetails.html", gin.H{"Product": product})
+
 }

@@ -44,6 +44,8 @@ func InitDB() {
 
 		panic(err)
 	}
+
+	DB.AutoMigrate(&models.Image{})
 	// if err := DB.AutoMigrate(&models.ProductImage{}); err != nil {
 
 	// 	panic(err)

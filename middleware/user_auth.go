@@ -14,7 +14,7 @@ func LoginAuth() gin.HandlerFunc {
 		token, err := c.Cookie("token")
 
 		if err != nil && path != "/login" {
-			// If token is not present and the path is not /login, redirect to login
+
 			log.Println("Token not present in cookie:", err)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
@@ -22,7 +22,7 @@ func LoginAuth() gin.HandlerFunc {
 		}
 
 		if err == nil && path == "/login" {
-			// If token is present and the path is /login, redirect to home or another appropriate route
+
 			log.Println("User is already logged in.")
 			c.Redirect(http.StatusSeeOther, "/home")
 			c.AbortWithStatus(http.StatusSeeOther)
@@ -30,7 +30,7 @@ func LoginAuth() gin.HandlerFunc {
 		}
 
 		if err != nil && path != "/login" {
-			// If token is not present and the path is not /login, redirect to login
+
 			log.Println("Token not present in cookie:", err)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
@@ -38,7 +38,7 @@ func LoginAuth() gin.HandlerFunc {
 		}
 		role, err := helpers.GetUserRoleFromToken(token)
 		if role != "user" && role != "" {
-			// If token is not present and the path is not /login, redirect to login
+
 			log.Println("Roll mismatch or not exist", err)
 			if role == "admin" {
 				c.Redirect(http.StatusSeeOther, "/admin/home")
@@ -50,7 +50,6 @@ func LoginAuth() gin.HandlerFunc {
 			return
 		}
 
-		// Continue to the next middleware or handler
 		c.Next()
 	}
 }

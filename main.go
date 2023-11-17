@@ -26,6 +26,7 @@ func main() {
 	router.POST("/login", handlers.LoginPost)
 	router.GET("/home", middleware.LoginAuth(), handlers.HomeHandler)
 	router.GET("/logout", handlers.LogoutHandler)
+	router.GET("/product", middleware.LoginAuth(), handlers.ProductViewhandler)
 
 	//admin
 	router.GET("/admin/login", middleware.AdminAuth(), handlers.AdminLogin)
@@ -34,23 +35,23 @@ func main() {
 
 	//customers
 	router.GET("/admin/customers", middleware.AdminAuth(), handlers.CustomerHandler)
-	router.DELETE("/admin/customers", handlers.DeleteCustomerHandler)
+	router.DELETE("/admin/customers", middleware.AdminAuth(), handlers.DeleteCustomerHandler)
 	router.GET("/admin/update-status", middleware.AdminAuth(), handlers.UpdateStatusHandler)
 
 	//category
 	router.GET("/admin/categories", middleware.AdminAuth(), handlers.Categoryhandler)
 	router.GET("/admin/categories/update-status", middleware.AdminAuth(), handlers.UpdateCategoryStatus)
-	router.POST("/admin/categories", handlers.CategoryPost)
-	router.DELETE("/admin/categories", handlers.DeleteCategoryHandler)
+	router.POST("/admin/categories", middleware.AdminAuth(), handlers.CategoryPost)
+	router.DELETE("/admin/categories", middleware.AdminAuth(), handlers.DeleteCategoryHandler)
 
 	//sellers
 	router.GET("/admin/sellers", middleware.AdminAuth(), handlers.SellersHandler)
 
 	//Products
 	router.GET("/admin/products", middleware.AdminAuth(), handlers.ProductsHandler)
-	router.POST("/admin/product", handlers.AddProduct)
+	router.POST("/admin/product", middleware.AdminAuth(), handlers.AddProduct)
 	router.GET("/admin/Products/update-status", middleware.AdminAuth(), handlers.UpdateProductStatus)
-	router.DELETE("/admin/products", handlers.DeleteProductHandler)
+	router.DELETE("/admin/products", middleware.AdminAuth(), handlers.DeleteProductHandler)
 
 	//product edit
 	router.GET("/admin/product", middleware.AdminAuth(), handlers.ProductDetailsHandler)
