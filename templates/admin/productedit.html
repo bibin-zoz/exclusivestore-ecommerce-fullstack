@@ -35,6 +35,36 @@
             text-align: center;
             cursor: pointer;
         }
+        
+      
+    #drop-area {
+      display: none;
+    }
+
+    #preview-container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .preview-image {
+      max-width: 75px;
+      max-height: 75px;
+      margin: 5px;
+      display: none;
+    }
+    .remove-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: #fff;
+      color: #ff0000;
+      border: none;
+      cursor: pointer;
+      padding: 2px;
+      font-size: 12px;
+      line-height: 1;
+    }
+ 
     </style>
 </head>
 
@@ -94,13 +124,22 @@
                                                     <input type="checkbox" name="deleteImages" value="{{.ID}}"> Delete
                                                 </div>
                                                 {{end}}
-                                            </div>
+                                             </div>
+                                            
+    
+                                            
                                             <div id="file-drop-area" class="text-center">
-                                                <span>Drag and drop files here or click to select</span>
                                                 <input type="file" id="images" name="images[]" multiple accept="image/*"
-                                                    class="form-control-file">
+                                                    class="form-control-file" onchange="previewFiles()">
+                                                <div id="preview-container">
+                                                <label for="images">Select files:</label>
+                                                <span>Drag and drop files here or click to select</span>
+                                                
+                                                   
+                                                    </div> 
                                             </div>
-                                        </div>
+                                            
+                                        </div>       
                                     </div>
 
 
@@ -164,8 +203,8 @@
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
                                             data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary" onClick="updateProduct()">Add New
-                                            Product</button>
+                                            <button type="button" class="btn btn-primary" onclick="confirmUpdate()">Update Product</button>
+
                                     </div>
                                 </form>
                             </div>
@@ -184,8 +223,60 @@
     </div>
 
     <!-- Include Bootstrap and your scripts -->
+
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- ... (your existing head section) ... -->
+
+<script>
+    function confirmUpdate() {
+        Swal.fire({
+            title: 'Update Product',
+            text: 'Are you sure you want to update this product?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateProduct(); // Call the updateProduct function if confirmed
+            }
+        });
+    }
+
+    // Your existing script...
+
+</script>
+    <script>
+        function previewFiles() {
+          var images = document.getElementById('images');
+          var files = images.files;
+      
+          if (files.length > 0) {
+            var previewContainer = document.getElementById('preview-container');
+            previewContainer.innerHTML = ''; // Clear previous previews
+      
+            for (var i = 0; i < files.length; i++) {
+              var reader = new FileReader();
+      
+              reader.onloadend = (function (file, reader) {
+                return function () {
+                  var previewImage = document.createElement('img');
+                  previewImage.className = 'preview-image';
+                  previewImage.src = reader.result;
+                  previewContainer.appendChild(previewImage);
+                  previewImage.style.display = 'block';
+                };
+              })(files[i], reader);
+      
+              reader.readAsDataURL(files[i]);
+            }
+          }
+        }
+      </script>
     <script>
 
 async function updateProduct() {
