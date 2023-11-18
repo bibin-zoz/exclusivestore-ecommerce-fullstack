@@ -7,14 +7,19 @@ import (
 type Products struct {
 	ID             uint    `json:"id" gorm:"unique;not null"`
 	CategoryID     int     `json:"categoryID" gorm:"foreignkey:CategoryID;constraint:OnDelete:CASCADE"`
-	ProductName    string  `json:"product_name"`
-	ProductDetails string  `json:"product_details"`
-	Image          string  `json:"image"`
+	ProductName    string  `json:"productName"`
+	ProductDetails string  `json:"productDetails"`
 	Storage        string  `json:"storage"`
 	Ram            string  `json:"ram"`
 	Stock          int     `json:"stock"`
 	Status         string  `json:"status" gorm:"default:'listed'"`
 	Price          float64 `json:"price"`
+	Images         []Image `json:"images" gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
+}
+type Image struct {
+	ID        uint   `json:"id" gorm:"primaryKey;autoIncrement"`
+	ProductID uint   `json:"productID" gorm:"index"`
+	FilePath  string `json:"filepath" gorm:"not null"`
 }
 type Image struct {
 	ID        uint   `json:"id" gorm:"unique;not null"`
@@ -45,4 +50,6 @@ type Productview struct {
 	Storage        string
 	Stock          int
 	Price          float64
+	// Categories     Categories
+	// Image          []Image
 }

@@ -52,8 +52,7 @@
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form action="/upload" method="post" enctype="multipart/form-data"
-                                                        id="addProductForm">
+                                                    <form enctype="multipart/form-data">
                                                         <div class="form-group">
                                                             <label for="productName" class="col-form-label">Product
                                                                 Name:</label>
@@ -67,9 +66,13 @@
                                                                 name="productDetails" required></textarea>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="image" class="col-form-label">Images:</label>
-                                                            <input type="file" class="form-control" name="images"
-                                                                id="images" accept="image/*" multiple required>
+                                                            <label for="status" class="col-form-label">Category</label>
+                                                            <select class="form-control" id="categoryID"
+                                                                name="categoryID" required>
+                                                                {{range .Category}}
+                                                                <option value="{{.ID}}" name="categoryID">{{.CategoryName}}</option>
+                                                                {{end}}
+                                                            </select>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="storage" class="col-form-label">Storage:</label>
@@ -90,6 +93,11 @@
                                                             <label for="price" class="col-form-label">Price:</label>
                                                             <input type="number" class="form-control" id="price"
                                                                 name="price" required>
+
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="images" class="col-form-label">Images:</label>
+                                                            <input type="file" class="form-control" id="images" name="images[]" multiple required>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
@@ -199,69 +207,67 @@
                 $('#addProductForm')[0].reset();
             });
 
-            // Attach a submit event handler to the form
-            $('#addProductForm').on('submit', function (event) {
-                event.preventDefault();
-                addProduct();
-            });
-
-            // ... Other existing script code ...
+           
         });
 
-        // Add or update the addProduct function based on your requirements
         async function addProduct() {
-            // Get form data
-            var productName = document.getElementById('productName').value;
-            var productDetails = document.getElementById('productDetails').value;
-            var status = document.getElementById('status').value;
-            var ram = document.getElementById('ram').value;
-            var storage = document.getElementById('storage').value;
-            var categoryID = document.getElementById('categoryID').value;
-            var stock = document.getElementById('stock').value;
-            var price = document.getElementById('price').value;
+       
+        var productName = document.getElementById('productName').value;
+        var productDetails = document.getElementById('productDetails').value;
+        var status = document.getElementById('status').value;
+        var ram = document.getElementById('ram').value;
+        var storage = document.getElementById('storage').value;
+        var categoryID = document.getElementById('categoryID').value;
+        var stock = document.getElementById('stock').value;
+        var price = document.getElementById('price').value;
+        var images = document.getElementById('images').files;
 
-            var formData = {
-                product_name: productName,
-                product_details: productDetails,
-                status: status,
-                ram: ram,
-                storage: storage,
-                categoryID: parseInt(categoryID),
-                stock: parseInt(stock),
-                price: parseFloat(price),
-            };
+       
+        var formData = new FormData();
 
-            try {
-                // Make a POST request to your server
-                var response = await fetch('/admin/product', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
+        // Append text fields to FormData
+        formData.append('productName', productName);
+        formData.append('productDetails', productDetails);
+        formData.append('status', status);
+        formData.append('ram', ram);
+        formData.append('storage', storage);
+        formData.append('categoryID', parseInt(categoryID));
+        formData.append('stock', parseInt(stock));
+        formData.append('price', parseFloat(price));
 
-                // Parse the JSON response
-                var responseData = await response.json();
-
-                if (response.ok) {
-                    // Check if the 'redirect' property exists in the response
-                    if (responseData.redirect) {
-                        // Redirect to the specified URL
-                        window.location.href = responseData.redirect;
-                    } else {
-                        // Handle other aspects of the response if needed
-                        console.log(responseData);
-                    }
-                } else {
-                    // Handle HTTP error responses
-                    console.error('Error:', response.status, responseData.error);
-                }
-            } catch (error) {
-                // Handle other errors, e.g., network issues
-                console.error('Error:', error);
-            }
+      
+        for (var i = 0; i < images.length; i++) {
+            formData.append('images', images[i]);
         }
+
+        try {
+          
+            var response = await fetch('/admin/product', {
+                method: 'POST',
+                body: formData,
+            });
+
+            // Parse the JSON response
+            var responseData = await response.json();
+
+            if (response.ok) {
+               
+                if (responseData.redirect) {
+                   
+                   window.location.href = responseData.redirect;
+                } else {
+                  
+                    console.log(responseData);
+                }
+            } else {
+                // Handle HTTP error responses
+                console.error('Error:', response.status, responseData.error);
+            }
+        } catch (error) {
+            // Handle other errors, e.g., network issues
+            console.error('Error:', error);
+        }
+    }
 
     </script>
 

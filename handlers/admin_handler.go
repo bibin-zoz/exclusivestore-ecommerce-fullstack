@@ -5,8 +5,10 @@ import (
 	"ecommercestore/helpers"
 	"ecommercestore/models"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -132,11 +134,10 @@ func UpdateStatusHandler(c *gin.Context) {
 }
 
 func DeleteCustomerHandler(c *gin.Context) {
-	// Retrieve the customer ID from the request parameters
+
 	var req DeleteRequest
 	fmt.Println("sas")
 
-	// Bind the JSON data to the struct
 	if err := c.ShouldBindJSON(&req); err != nil {
 		fmt.Println("sas")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -144,7 +145,6 @@ func DeleteCustomerHandler(c *gin.Context) {
 	}
 	customerID := req.ID
 
-	// Perform the delete operation using Gorm
 	var user models.User
 	result := db.DB.Where("id = ?", customerID).Delete(&user)
 
@@ -163,7 +163,6 @@ func SellersHandler(c *gin.Context) {
 	seller := "seller"
 	db.DB.Where("role=?", seller).Find(&sellers)
 
-	// Pass data to the template
 	c.HTML(http.StatusOK, "sellers.html", gin.H{
 		"Sellers": sellers,
 	})
@@ -174,7 +173,6 @@ func Categoryhandler(c *gin.Context) {
 	var category []models.Categories
 	db.DB.Find(&category)
 
-	// Pass data to the template
 	c.HTML(http.StatusOK, "categories.html", gin.H{
 		"Category": category,
 	})
@@ -189,16 +187,14 @@ func CategoryPost(c *gin.Context) {
 		Status:       status,
 	}
 
-	// Insert the new category into the database
 	result := db.DB.Create(&newCategory)
 
 	if result.Error != nil {
-		// Handle the error, e.g., return an error response
+
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
 
-	// Return a success response with JavaScript redirect
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "Category added successfully",
 		"category": newCategory,
@@ -207,17 +203,15 @@ func CategoryPost(c *gin.Context) {
 }
 
 func DeleteCategoryHandler(c *gin.Context) {
-	// Retrieve the customer ID from the request parameters
+
 	var req DeleteRequest
 
-	// Bind the JSON data to the struct
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	categoryID := req.ID
 
-	// Perform the delete operation using Gorm
 	var category models.Categories
 	result := db.DB.Where("id = ?", categoryID).Delete(&category)
 
@@ -266,7 +260,6 @@ func ProductsHandler(c *gin.Context) {
 		Joins("JOIN categories ON products.category_id = categories.id").
 		Find(&products)
 
-	// Pass data to the template
 	c.HTML(http.StatusOK, "productmanage.html", gin.H{
 		"Products": products,
 		"Category": category,
@@ -276,36 +269,85 @@ func ProductsHandler(c *gin.Context) {
 
 func AddProduct(c *gin.Context) {
 
-	newProduct := models.Products{}
-	// newProduct.ProductName = c.PostForm("productName")
-	// newProduct.ProductDetails = c.PostForm("productDetails")
-	// newProduct.Status = c.PostForm("status")
-	// newProduct.Ram = c.PostForm("ram")
-	// newProduct.Storage = c.PostForm("storage")
-	// newProduct.Stock, _ = strconv.Atoi(c.PostForm("stock"))
-	// newProduct.Price, _ = strconv.ParseFloat(c.PostForm("price"), 64)
+	productName := c.PostForm("productName")
+	productDetails := c.PostForm("productDetails")
+	storage := c.PostForm("storage")
+	ram := c.PostForm("ram")
+	stock, _ := strconv.Atoi(c.PostForm("stock"))
+	price, _ := strconv.ParseFloat(c.PostForm("price"), 64)
+	categoryID, _ := strconv.Atoi(c.PostForm("categoryID"))
 
-	// Insert the new category into the database
-	if err := c.ShouldBindJSON(&newProduct); err != nil {
-		fmt.Println("sas")
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB limit
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(newProduct.CategoryID)
+
+	files := c.Request.MultipartForm.File["images"]
+
+	newProduct := models.Products{
+		ProductName:    productName,
+		ProductDetails: productDetails,
+		Storage:        storage,
+		Ram:            ram,
+		Stock:          stock,
+		Price:          price,
+		CategoryID:     categoryID,
+	}
+
 	result := db.DB.Create(&newProduct)
 
 	if result.Error != nil {
-		// Handle the error, e.g., return an error response
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
 
-	// Return a success response with JavaScript redirect
+	// Process each file
+	for _, file := range files {
+		// Open the file
+		src, err := file.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		defer src.Close()
+
+		newImage := models.Image{
+			ProductID: newProduct.ID,
+		}
+
+		imageResult := db.DB.Create(&newImage)
+
+		if imageResult.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": imageResult.Error.Error()})
+			return
+		}
+
+		filename := fmt.Sprintf("%d_%s", newImage.ID, file.Filename)
+		filepath := filepath.Join("static/uploads", filename)
+		filepath = strings.ReplaceAll(filepath, "\\", "/")
+		dst, err := os.Create(filepath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		defer dst.Close()
+
+		if _, err := io.Copy(dst, src); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		newImage.FilePath = filepath
+		db.DB.Save(&newImage)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message":  "Category added successfully",
+		"message":  "Product added successfully",
 		"product":  newProduct,
 		"redirect": "/admin/products",
 	})
+
 }
 
 func UpdateProductStatus(c *gin.Context) {
@@ -335,21 +377,24 @@ func UpdateProductStatus(c *gin.Context) {
 }
 
 func DeleteProductHandler(c *gin.Context) {
-	// Retrieve the customer ID from the request parameters
+
 	var req DeleteRequest
 
-	// Bind the JSON data to the struct
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	productID := req.ID
+	fmt.Println(productID)
 
-	// Perform the delete operation using Gorm
-	var category models.Categories
-	result := db.DB.Where("id = ?", productID).Delete(&category)
+	var product models.Products
 
-	if result.Error != nil {
+	if err := db.DB.Preload("Images").First(&product, productID).Error; err != nil {
+		return
+	}
+
+	// Delete the product and its associated images
+	if err := db.DB.Delete(&product).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
 		return
 	}
@@ -359,26 +404,24 @@ func DeleteProductHandler(c *gin.Context) {
 
 func ProductDetailsHandler(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Query("id"))
+	var Product models.Products
+	var category []models.Categories
+	if err := db.DB.Preload("Images").Find(&Product, ID).Error; err != nil {
 
-	var Product models.Productview
-	var Category []models.Categories
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
+		return
+	}
+	if err := db.DB.Find(&category).Error; err != nil {
 
-	query := fmt.Sprintf(`
-		SELECT products.*, categories.category_name
-		FROM products
-		JOIN categories ON products.category_id = categories.id
-		WHERE products.id = %d
-	`, ID)
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
+		return
+	}
 
-	// Execute the raw SQL query
-	db.DB.Raw(query).Scan(&Product)
-	db.DB.Find(&Category)
-
-	log.Println(Product)
+	log.Println(category)
 
 	c.HTML(http.StatusOK, "productedit.html", gin.H{
 		"Product":  Product,
-		"Category": Category,
+		"Category": category,
 	})
 
 	// // Return the result as JSON
@@ -395,38 +438,106 @@ func ProductDetailsHandler(c *gin.Context) {
 }
 
 func ProductUpdateHandler(c *gin.Context) {
-	var Product models.Products
-	var UpdateProduct models.Products
+	// Get product ID from the form data
+	idStr := c.PostForm("id")
+	id, _ := strconv.Atoi(idStr)
 
-	// Fetch the existing product
-	// var existingProduct models.Product
-	// Bind the JSON data to the existing product
-	if err := c.ShouldBindJSON(&UpdateProduct); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// Parse other form data
+	productName := c.PostForm("productName")
+	productDetails := c.PostForm("productDetails")
+	storage := c.PostForm("storage")
+	ram := c.PostForm("ram")
+	stock, _ := strconv.Atoi(c.PostForm("stock"))
+	price, _ := strconv.ParseFloat(c.PostForm("price"), 64)
+	categoryID, _ := strconv.Atoi(c.PostForm("categoryID"))
+
+	// Update product details
+	result := db.DB.Model(&models.Products{}).Where("id=?", id).Updates(models.Products{
+		ProductName:    productName,
+		ProductDetails: productDetails,
+		Storage:        storage,
+		Ram:            ram,
+		Stock:          stock,
+		Price:          price,
+		CategoryID:     categoryID,
+	})
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
-	id := UpdateProduct.ID
 
-	if err := db.DB.First(&Product, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+	deleteImageIDs := c.PostFormArray("deleteImages")
+	fmt.Println("Delete Image IDs:", deleteImageIDs)
+
+	for _, deleteImageIDStr := range deleteImageIDs {
+		fmt.Println("Deleting Image ID:", deleteImageIDStr)
+		deleteImageID, err := strconv.Atoi(deleteImageIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid image ID"})
+			return
+		}
+
+		// Delete the image record from the database
+		deleteResult := db.DB.Delete(&models.Image{}, deleteImageID)
+		if deleteResult.Error != nil {
+			fmt.Println("Error deleting image:", deleteResult.Error.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": deleteResult.Error.Error()})
+			return
+		}
+
+	}
+
+	// Handle image updates
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB limit
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Update fields with new data
-	Product.ProductName = UpdateProduct.ProductName
-	Product.CategoryID = UpdateProduct.CategoryID
-	Product.ProductDetails = UpdateProduct.ProductDetails
-	Product.Status = UpdateProduct.Status
-	Product.Price = UpdateProduct.Price
+	files := c.Request.MultipartForm.File["images"]
 
-	// Save the updated product
-	if err := db.DB.Save(&Product).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update product"})
-		return
+	for _, file := range files {
+		src, err := file.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		defer src.Close()
+
+		newImage := models.Image{
+			ProductID: uint(id),
+		}
+
+		imageResult := db.DB.Create(&newImage)
+
+		if imageResult.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": imageResult.Error.Error()})
+			return
+		}
+
+		filename := fmt.Sprintf("%d_%s", newImage.ID, file.Filename)
+		filepath := filepath.Join("static/uploads", filename)
+		filepath = strings.ReplaceAll(filepath, "\\", "/")
+		dst, err := os.Create(filepath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		defer dst.Close()
+
+		if _, err := io.Copy(dst, src); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		newImage.FilePath = filepath
+		db.DB.Save(&newImage)
 	}
 
-	c.JSON(http.StatusOK, Product)
-
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Product updated successfully",
+		"redirect": "/admin/products",
+	})
 }
 
 func UploadHandler(c *gin.Context) {
