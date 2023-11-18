@@ -360,7 +360,8 @@ func DeleteProductHandler(c *gin.Context) {
 func ProductDetailsHandler(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Query("id"))
 
-	var product []models.Productview
+	var Product models.Productview
+	var Category []models.Categories
 
 	query := fmt.Sprintf(`
 		SELECT products.*, categories.category_name
@@ -370,20 +371,61 @@ func ProductDetailsHandler(c *gin.Context) {
 	`, ID)
 
 	// Execute the raw SQL query
-	db.DB.Raw(query).Scan(&product)
+	db.DB.Raw(query).Scan(&Product)
+	db.DB.Find(&Category)
 
-	log.Println(product)
+	log.Println(Product)
 
-	// Return the result as JSON
-	if c.Request.Header.Get("Accept") == "application/json" {
-		// Return JSON if the client accepts JSON
-		c.JSON(http.StatusOK, gin.H{"Products": product})
-	} else {
-		// Return HTML if the client accepts HTML or doesn't specify a preference
-		c.HTML(http.StatusOK, "productedit.html", gin.H{
-			"Products": product,
-		})
+	c.HTML(http.StatusOK, "productedit.html", gin.H{
+		"Product":  Product,
+		"Category": Category,
+	})
+
+	// // Return the result as JSON
+	// if c.Request.Header.Get("Accept") == "application/json" {
+	// 	// Return JSON if the client accepts JSON
+	// 	c.JSON(http.StatusOK, gin.H{"Products": product})
+	// } else {
+	// 	// Return HTML if the client accepts HTML or doesn't specify a preference
+	// 	c.HTML(http.StatusOK, "productedit.html", gin.H{
+	// 		"Products": product,
+	// 	})
+	// }
+
+}
+
+func ProductUpdateHandler(c *gin.Context) {
+	var Product models.Products
+	var UpdateProduct models.Products
+
+	// Fetch the existing product
+	// var existingProduct models.Product
+	// Bind the JSON data to the existing product
+	if err := c.ShouldBindJSON(&UpdateProduct); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
+	id := UpdateProduct.ID
+
+	if err := db.DB.First(&Product, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		return
+	}
+
+	// Update fields with new data
+	Product.ProductName = UpdateProduct.ProductName
+	Product.CategoryID = UpdateProduct.CategoryID
+	Product.ProductDetails = UpdateProduct.ProductDetails
+	Product.Status = UpdateProduct.Status
+	Product.Price = UpdateProduct.Price
+
+	// Save the updated product
+	if err := db.DB.Save(&Product).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update product"})
+		return
+	}
+
+	c.JSON(http.StatusOK, Product)
 
 }
 

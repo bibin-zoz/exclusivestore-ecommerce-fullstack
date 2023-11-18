@@ -55,6 +55,7 @@ func main() {
 
 	//product edit
 	router.GET("/admin/product", middleware.AdminAuth(), handlers.ProductDetailsHandler)
+	router.PUT("/admin/product", middleware.AdminAuth(), handlers.ProductUpdateHandler)
 
 	router.POST("/upload", handlers.UploadHandler)
 	router.GET("/upload-form", func(c *gin.Context) {
