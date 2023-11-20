@@ -585,8 +585,8 @@ func ProductUpdateHandler(c *gin.Context) {
 		db.DB.Save(&newImage)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":  "Product updated successfully",
-		"redirect": "/admin/products",
-	})
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"message":  "Product updated successfully",
+	// 	"redirect": "/admin/products",
+	// })
 }
