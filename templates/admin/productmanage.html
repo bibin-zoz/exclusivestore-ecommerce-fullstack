@@ -8,9 +8,20 @@
     <title>Quixlab - Bootstrap Admin Dashboard Template by Themefisher.com</title>
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <!-- Add Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Custom Stylesheet -->
     <link href="/static/admin/plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
+    
     <link href="/static/admin/css/style.css" rel="stylesheet">
+    <style>
+         .modal-dialog {
+        max-height: 90vh; /* Adjust the percentage to your preference */
+        overflow-y: scroll;
+    }
+    </style>
+    
 </head>
 
 <body>
@@ -56,25 +67,36 @@
                                                         <div class="form-group">
                                                             <label for="productName" class="col-form-label">Product
                                                                 Name:</label>
-                                                            <input type="text" class="form-control" id="productName"
+                                                            <input type="text" class="form-control rounded" id="productName"
                                                                 name="productName" required>
+                                                            <p id="productNameError" class="text-danger rounded animate__animated animate__fadeIn" style="display: none;"></p>
                                                         </div>
+
                                                         <div class="form-group">
                                                             <label for="productDetails" class="col-form-label">Product
                                                                 Details:</label>
+<<<<<<< HEAD
                                                             <textarea class="form-control" id="productDetails"
                                                                 name="productDetails" required></textarea>
+=======
+                                                            <input type="text" class="form-control rounded" id="productDetails"
+                                                                name="productDetails" required>
+                                                            <p id="productDetailsError" class="text-danger rounded animate__animated animate__fadeIn" style="display: none;"></p>
+>>>>>>> work
                                                         </div>
+
                                                         <div class="form-group">
                                                             <label for="status" class="col-form-label">Category</label>
-                                                            <select class="form-control" id="categoryID"
+                                                            <select class="form-control rounded" id="categoryID"
                                                                 name="categoryID" required>
                                                                 {{range .Category}}
                                                                 <option value="{{.ID}}" name="categoryID">{{.CategoryName}}</option>
                                                                 {{end}}
                                                             </select>
                                                         </div>
+
                                                         <div class="form-group">
+<<<<<<< HEAD
                                                             <label for="storage" class="col-form-label">Storage:</label>
                                                             <input type="text" class="form-control" id="storage"
                                                                 name="storage" required>
@@ -82,23 +104,62 @@
                                                         <div class="form-group">
                                                             <label for="ram" class="col-form-label">RAM:</label>
                                                             <input type="text" class="form-control" id="ram" name="ram"
+=======
+                                                            <label for="status" class="col-form-label">Status</label>
+                                                            <select class="form-control rounded" id="status" name="status"
+>>>>>>> work
                                                                 required>
                                                         </div>
+
                                                         <div class="form-group">
+<<<<<<< HEAD
                                                             <label for="stock" class="col-form-label">Stock:</label>
                                                             <input type="number" class="form-control" id="stock"
                                                                 name="stock" required>
+=======
+                                                            <label for="status" class="col-form-label">Ram</label>
+                                                            <select class="form-control rounded" id="ram" name="ram" required>
+                                                                <option value="4GB">4GB</option>
+                                                                <option value="8GB">8GB</option>
+                                                                <option value="16">16GB</option>
+                                                            </select>
                                                         </div>
+
                                                         <div class="form-group">
+                                                            <label for="status" class="col-form-label">Storage</label>
+                                                            <select class="form-control rounded" id="storage" name="storage"
+                                                                required>
+                                                                <option value="256GB">256GB</option>
+                                                                <option value="512GB">512GB</option>
+                                                                <option value="1TB">1TB</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="stock" class="col-form-label">Stock</label>
+                                                            <input type="text" class="form-control rounded" id="stock"
+                                                                name="stock" required>
+                                                            <p id="stockError" class="text-danger rounded animate__animated animate__fadeIn" style="display: none;"></p>
+>>>>>>> work
+                                                        </div>
+
+                                                        <div class="form-group">
+<<<<<<< HEAD
                                                             <label for="price" class="col-form-label">Price:</label>
                                                             <input type="number" class="form-control" id="price"
+=======
+                                                            <label for="price" class="col-form-label">Price</label>
+                                                            <input type="text" class="form-control rounded" id="price"
+>>>>>>> work
                                                                 name="price" required>
-
+                                                            <p id="priceError" class="text-danger rounded animate__animated animate__fadeIn" style="display: none;"></p>
                                                         </div>
+
                                                         <div class="form-group">
                                                             <label for="images" class="col-form-label">Images:</label>
-                                                            <input type="file" class="form-control" id="images" name="images[]" multiple required>
+                                                            <input type="file" class="form-control rounded" id="images" name="images[]" multiple required>
                                                         </div>
+
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
                                                                 data-dismiss="modal">Close</button>
@@ -116,7 +177,11 @@
                                 <table class="table table-striped table-bordered zero-configuration">
                                     <thead>
                                         <tr>
+<<<<<<< HEAD
                                             <th>Product id</th>
+=======
+                                            <th>Product id </th>
+>>>>>>> work
                                             <th>product_details</th>
                                             <th>Category</th>
                                             <th>status</th>
@@ -198,9 +263,14 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Add Bootstrap JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Your existing scripts -->
+
     <script>
         $(document).ready(function () {
+<<<<<<< HEAD
             // Attach a click event handler to the "Add New Product" button
             $('#addCategoryModal button[data-target="#addProductModal"]').on('click', function () {
                 // Clear the form fields when the modal is opened
@@ -208,67 +278,128 @@
             });
 
            
+=======
+            // Attach a click event handler to the button with the delete-btn class
+            $('.delete-btn').on('click', function () {
+                var productID = $(this).data('id');
+
+                console.log('Sending AJAX request with ID:', productID);
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You won\'t be able to revert this!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Perform the AJAX request for deletion
+                        $.ajax({
+                            url: '/admin/products',
+                            type: 'DELETE',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ id: productID }),
+                            success: function (response) {
+                                console.log('Success:', response);
+
+                                // Show success toast
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: 'The product has been deleted.',
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false
+                                });
+
+                                // Optionally, you can redirect the user or update the UI
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            },
+                            error: function (error) {
+                                console.error('Error:', error);
+                            }
+                        });
+                    }
+                });
+            });
+>>>>>>> work
         });
 
         async function addProduct() {
        
-        var productName = document.getElementById('productName').value;
-        var productDetails = document.getElementById('productDetails').value;
-        var status = document.getElementById('status').value;
-        var ram = document.getElementById('ram').value;
-        var storage = document.getElementById('storage').value;
-        var categoryID = document.getElementById('categoryID').value;
-        var stock = document.getElementById('stock').value;
-        var price = document.getElementById('price').value;
-        var images = document.getElementById('images').files;
-
-       
-        var formData = new FormData();
-
-        // Append text fields to FormData
-        formData.append('productName', productName);
-        formData.append('productDetails', productDetails);
-        formData.append('status', status);
-        formData.append('ram', ram);
-        formData.append('storage', storage);
-        formData.append('categoryID', parseInt(categoryID));
-        formData.append('stock', parseInt(stock));
-        formData.append('price', parseFloat(price));
+       var productName = document.getElementById('productName').value;
+       var productDetails = document.getElementById('productDetails').value;
+       var status = document.getElementById('status').value;
+       var ram = document.getElementById('ram').value;
+       var storage = document.getElementById('storage').value;
+       var categoryID = document.getElementById('categoryID').value;
+       var stock = document.getElementById('stock').value;
+       var price = document.getElementById('price').value;
+       var images = document.getElementById('images').files;
 
       
-        for (var i = 0; i < images.length; i++) {
-            formData.append('images', images[i]);
-        }
+       var formData = new FormData();
 
-        try {
-          
-            var response = await fetch('/admin/product', {
-                method: 'POST',
-                body: formData,
-            });
+       // Append text fields to FormData
+       formData.append('productName', productName);
+       formData.append('productDetails', productDetails);
+       formData.append('status', status);
+       formData.append('ram', ram);
+       formData.append('storage', storage);
+       formData.append('categoryID', parseInt(categoryID));
+       formData.append('stock', parseInt(stock));
+       formData.append('price', parseFloat(price));
 
-            // Parse the JSON response
-            var responseData = await response.json();
+     
+       for (var i = 0; i < images.length; i++) {
+           formData.append('images', images[i]);
+       }
 
-            if (response.ok) {
-               
-                if (responseData.redirect) {
-                   
+       try {
+           var response = await fetch('/admin/product', {
+               method: 'POST',
+               body: formData,
+           });
+
+           // Parse the JSON response
+           var responseData = await response.json();
+
+           if (response.ok) {
+               if (responseData.redirect) {
                    window.location.href = responseData.redirect;
-                } else {
-                  
-                    console.log(responseData);
-                }
-            } else {
-                // Handle HTTP error responses
-                console.error('Error:', response.status, responseData.error);
-            }
-        } catch (error) {
-            // Handle other errors, e.g., network issues
-            console.error('Error:', error);
-        }
-    }
+               } else {
+                   console.log(responseData);
+               }
+           } else {
+               // Handle HTTP error responses
+               console.error('Error:', response.status, responseData.error);
 
+               // Display error messages based on specific errors
+               const productNameError = document.getElementById('productNameError');
+               const productDetailsError = document.getElementById('productDetailsError');
+               const stockError = document.getElementById('stockError');
+               const priceError = document.getElementById('priceError');
+
+               productNameError.textContent = responseData.Errors.ProductNameError || '';
+               productDetailsError.textContent = responseData.Errors.ProductDetailsError || '';
+               stockError.textContent = responseData.Errors.StockError || '';
+               priceError.textContent = responseData.Errors.PriceError || '';
+
+               // Show the error containers for the corresponding errors
+               productNameError.style.display = productNameError.textContent ? 'block' : 'none';
+               productDetailsError.style.display = productDetailsError.textContent ? 'block' : 'none';
+               stockError.style.display = stockError.textContent ? 'block' : 'none';
+               priceError.style.display = priceError.textContent ? 'block' : 'none';
+
+           }
+       } catch (error) {
+           // Handle other errors, e.g., network issues
+           console.error('Error:', error);
+       }}
     </script>
 
     <script src="/static/admin/plugins/common/common.min.js"></script>
@@ -281,4 +412,8 @@
     <script src="/static/admin/plugins/tables/js/datatable-init/datatable-basic.min.js"></script>
 </body>
 
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> work

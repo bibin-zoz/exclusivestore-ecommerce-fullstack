@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -181,6 +182,15 @@ func Categoryhandler(c *gin.Context) {
 func CategoryPost(c *gin.Context) {
 	categoryName := c.PostForm("categoryName")
 	status := c.PostForm("status")
+	var NameError models.Invalid
+
+	if categoryName == "" {
+		NameError.NameError = "Enter valid Category Name"
+		c.JSON(http.StatusBadRequest, gin.H{
+			"Errors": NameError,
+		})
+		return
+	}
 
 	newCategory := models.Categories{
 		CategoryName: categoryName,
@@ -190,16 +200,22 @@ func CategoryPost(c *gin.Context) {
 	result := db.DB.Create(&newCategory)
 
 	if result.Error != nil {
+		NameError.NameError = "Category Already Exists"
 
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":  result.Error.Error(),
+			"Errors": NameError,
+		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
+
 		"message":  "Category added successfully",
 		"category": newCategory,
 		"redirect": "/admin/categories",
 	})
+
 }
 
 func DeleteCategoryHandler(c *gin.Context) {
@@ -225,7 +241,13 @@ func DeleteCategoryHandler(c *gin.Context) {
 
 func UpdateCategoryStatus(c *gin.Context) {
 
-	ID := c.Query("id")
+	var req DeleteRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ID := req.ID
 
 	var category models.Categories
 	if err := db.DB.Where("id = ?", ID).First(&category).Error; err != nil {
@@ -246,7 +268,10 @@ func UpdateCategoryStatus(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/admin/categories")
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Category Status Updated Successfully",
+		"redirect": "/admin/categories",
+	})
 }
 
 //Products
@@ -267,7 +292,10 @@ func ProductsHandler(c *gin.Context) {
 
 }
 
+// add product
 func AddProduct(c *gin.Context) {
+
+	var Producterror models.Producterror
 
 	productName := c.PostForm("productName")
 	productDetails := c.PostForm("productDetails")
@@ -277,6 +305,29 @@ func AddProduct(c *gin.Context) {
 	price, _ := strconv.ParseFloat(c.PostForm("price"), 64)
 	categoryID, _ := strconv.Atoi(c.PostForm("categoryID"))
 
+	// validation
+	if productName == "" || productDetails == "" || stock <= 0 || price <= 100 {
+		if productName == "" {
+			Producterror.ProductNameError = "invalid productname"
+		}
+		if productDetails == "" {
+			Producterror.ProductDetailsError = "Details Cannot be empty"
+		}
+		if stock <= 0 {
+			Producterror.StockError = "Enter Valid Stock Number"
+		}
+		if math.IsNaN(price) || price <= 100 {
+			Producterror.PriceError = "Invalid price"
+			fmt.Println(Producterror)
+
+		}
+		c.JSON(http.StatusBadRequest, gin.H{
+			"Errors": Producterror,
+		})
+		fmt.Println(Producterror)
+		return
+
+	}
 	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB limit
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -534,10 +585,10 @@ func ProductUpdateHandler(c *gin.Context) {
 		db.DB.Save(&newImage)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":  "Product updated successfully",
-		"redirect": "/admin/products",
-	})
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"message":  "Product updated successfully",
+	// 	"redirect": "/admin/products",
+	// })
 }
 
 func UploadHandler(c *gin.Context) {

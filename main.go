@@ -41,7 +41,7 @@ func main() {
 
 	//category
 	router.GET("/admin/categories", middleware.AdminAuth(), handlers.Categoryhandler)
-	router.GET("/admin/categories/update-status", middleware.AdminAuth(), handlers.UpdateCategoryStatus)
+	router.PATCH("/admin/categories/update-status", middleware.AdminAuth(), handlers.UpdateCategoryStatus)
 	router.POST("/admin/categories", middleware.AdminAuth(), handlers.CategoryPost)
 	router.DELETE("/admin/categories", middleware.AdminAuth(), handlers.DeleteCategoryHandler)
 
