@@ -3,36 +3,37 @@
     <section class="forms">
         <div class="container">
             
-            <div class="forms-grid">
+            <div class="forms-grid mt-4">
 
                 
 
                 <!-- register -->
-                <div class="register">
+                <div class="register  mt-0">
                     <span class="fas fa-user-circle"></span>
                     <strong>Create account!</strong>
-                    <form method="POST" action="/signup" class="register-form">
+                    <form method="POST" action="/signup" class="register-form mt-0">
                         <fieldset>
-                            <div class="form">
-                                <div class="form-row">
+                            <div class="form mt-0">
+                                <div class="form-row mt-0">
                                     <span class="fas fa-user"></span>
                                     <label class="form-label" for="input">UserName</label>
                                     <input type="text" class="form-text" name="username">
-                                    <p class="error-text">{{.NameError}}</p>
+                                  
+                                    <p class="error text-danger">{{.NameError}}</p>
                                 </div>
-                                <div class="form-row">
+                                <div class="form-row mt-0">
                                     <span class="fas fa-envelope"></span>
                                     <label class="form-label" for="input">E-mail</label>
                                     <input type="email" class="form-text" name="email">
-                                    <p class="error-text">{{.EmailError}}</p>
+                                    <p class="error text-danger">{{.EmailError}}</p>
                                 </div>
-                                <div class="form-row">
+                                <div class="form-row mt-0">
                                     <span class="fas fa-envelope"></span>
                                     <label class="form-label" for="input">Number</label>
                                     <input type="text" class="form-text" name="number">
-                                    <p class="error-text">{{.NumberError}}</p>
+                                    <p class="error text-danger">{{.NumberError}}</p>
                                 </div>
-                                <div class="form-row">
+                                <div class="form-row mt-0">
                                     <span class="fas fa-lock"></span>
                                     <label class="form-label" for="input">Password</label>
                                     <input type="password" class="form-text" name="password">
@@ -40,18 +41,18 @@
                                     
                             
                                 </div>
-                                <div class="form-row">
+                                <div class="form-row mt-0">
                                     <span class="fas fa-lock"></span>
                                     <label class="form-label" for="input">confirmPassword</label>
                                     <input type="password" class="form-text" name="confirmPassword">
-                                    <p class="error-text">{{.PasswordError}}</p>
+                                    <p class="error text-danger">{{.PasswordError}}</p>
                                     
                                     
                                     
                                 </div>
-                                <div class="form-row button-login">
-                                    <button type="submit" class="btn btn-login">Create <span
-                                            class="fas fa-arrow-right"></span></button>
+                                <div class="form-row button-login mt-0" >
+                                    <button type="submit" class="btn btn-login" style="background-color: red;">Create <span
+                                            class="fas fa-arrow-right "></span></button>
                                 </div>
                             </div>
                         </fieldset>

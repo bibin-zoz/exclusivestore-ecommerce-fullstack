@@ -1,8 +1,13 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Products struct {
+	gorm.Model
 	ID             uint    `json:"id" gorm:"unique;not null"`
 	CategoryID     int     `json:"categoryID" gorm:"foreignkey:CategoryID;constraint:OnDelete:CASCADE"`
 	ProductName    string  `json:"productName"`
@@ -14,6 +19,13 @@ type Products struct {
 	Price          float64 `json:"price"`
 	Images         []Image `json:"images" gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
 }
+
+type ProductVariants struct {
+	Storage string `json:"storage"`
+	Ram     string `json:"ram"`
+	Stock   int    `json:"stock"`
+}
+
 type Image struct {
 	ID        uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	ProductID uint   `json:"productID" gorm:"index"`

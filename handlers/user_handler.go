@@ -265,6 +265,6 @@ func ProductViewhandler(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "userproductdetails.html", gin.H{"Product": product})
+	c.HTML(http.StatusOK, "productdetail.html", gin.H{"Product": product})
 
 }

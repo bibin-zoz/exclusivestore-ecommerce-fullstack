@@ -82,9 +82,11 @@
                                         <div class="form-validation">
                                             <div class="alert alert-dismissible fade" role="alert" id="updateAlert">
                                                 <strong>Product Updated!</strong> Your product details have been successfully updated.
-                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                             
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" >
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
+                                          
                                             </div>
             
 
@@ -229,6 +231,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- ... (your existing head section) ... -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     function confirmUpdate() {
@@ -320,28 +323,48 @@ async function updateProduct() {
             body: formData,
         });
 
+        console.log("Response Status:", response.status); // Log HTTP status code
+
         // Parse the JSON response
         var responseData = await response.json();
 
+        console.log("Response Data:", responseData); // Log the response data
+
         if (response.ok) {
             if (responseData.redirect) {
-                // Show success alert
-                $('#updateAlert').removeClass('alert-danger').addClass('alert-success').fadeIn().delay(3000).fadeOut();
-                window.location.href = responseData.redirect;
+                // Show success alert using SweetAlert2
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Product Updated!',
+                    text: 'Your product details have been successfully updated.',
+                }).then(() => {
+                    window.location.href = responseData.redirect;
+                });
             } else {
                 console.log(responseData);
             }
         } else {
             // Handle HTTP error responses
             console.error('Error:', response.status, responseData.error);
-            // Show alert for error
-            $('#updateAlert').removeClass('alert-success').addClass('alert-danger').fadeIn().delay(3000).fadeOut();
+            // Show error alert using SweetAlert2
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: responseData.error,
+            });
         }
     } catch (error) {
         // Handle other errors, e.g., network issues
         console.error('Error:', error);
+        // Show error alert using SweetAlert2
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An unexpected error occurred. Please try again later.',
+        });
     }
 }
+
 
 
         $('#file-drop-area').on('dragover', function (e) {

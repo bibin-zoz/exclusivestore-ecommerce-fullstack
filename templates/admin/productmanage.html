@@ -120,21 +120,21 @@
 
                                                         <div class="form-group">
                                                             <label for="stock" class="col-form-label">Stock</label>
-                                                            <input type="text" class="form-control rounded" id="stock"
+                                                            <input type="number" class="form-control rounded" id="stock"
                                                                 name="stock" required>
                                                             <p id="stockError" class="text-danger rounded animate__animated animate__fadeIn" style="display: none;"></p>
                                                         </div>
 
                                                         <div class="form-group">
                                                             <label for="price" class="col-form-label">Price</label>
-                                                            <input type="text" class="form-control rounded" id="price"
+                                                            <input type="number" class="form-control rounded" id="price"
                                                                 name="price" required>
                                                             <p id="priceError" class="text-danger rounded animate__animated animate__fadeIn" style="display: none;"></p>
                                                         </div>
 
                                                         <div class="form-group">
                                                             <label for="images" class="col-form-label">Images:</label>
-                                                            <input type="file" class="form-control rounded" id="images" name="images[]" multiple required>
+                                                            <input type="file" class="form-control rounded" id="images" accept=".img, .jpg, .jpeg, .png, .webp" name="images[]" multiple required>
                                                         </div>
 
                                                         <div class="modal-footer">
@@ -193,24 +193,20 @@
                                                 <!-- <a href="#" data-toggle="tooltip" data-placement="top" title="Close"><i class="fa fa-close color-danger"></i></a>
                                                         
                                                     </button> -->
-                                                <a href="/admin/Products/update-status?id={{.ID}}" data-toggle="tooltip"
-                                                    data-placement="top" title="Unlist">
-                                                    <button type="button" class="btn mb-1 btn-outline-warning btn-xs mx-1">
+                                                    <button type="button" class="btn mb-1 btn-outline-warning btn-xs block-btn" data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
+                                                    title="Unlist">
                                                         <span><i class="fa fa-close color-muted m-r-5"></i></span>
 
                                                     </button>
-                                                </a>
                                                 <!-- </a> -->
                                                 {{else}}
                                                 <!-- <span><a href="/admin/categories/update-status?id={{.ID}}" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash color-muted m-r-5"></i> </a></span> -->
 
-                                                <a href="/admin/Products/update-status?id={{.ID}}" data-toggle="tooltip"
-                                                    data-placement="top" title="List">
-                                                    <button type="button" class="btn mb-1 btn-outline-success btn-xs mx-1">
-                                                        <span><i class="fa fa-check color-muted m-r-5"></i></span>
+                                                <button type="button" class="btn mb-1 btn-outline-success btn-xs block-btn" data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
+                                                title="list">
+                                                    <span><i class="fa fa-check color-muted m-r-5"></i></span>
 
-                                                    </button>
-                                                </a>
+                                                </button>
                                                 {{end}}
 
                                                 <button type="button"
@@ -303,6 +299,40 @@
                     }
                 });
             });
+            $('.block-btn').on('click', function () {
+                var customerId = $(this).data('id');
+
+                console.log('Sending AJAX request with ID:', customerId);
+
+                $.ajax({
+                    url: '/admin/categories/update-status',
+                    type: 'PATCH',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id: customerId }),
+                    success: function (response) {
+                                console.log('Success:', response);
+
+                                // Show success toast
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Status Updated!',
+                                    text: 'The Status has been updated succesfully.',
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false
+                                });
+
+                                // Optionally, you can redirect the user or update the UI
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            },
+                            error: function (error) {
+                                console.error('Error:', error);
+                            }
+                   
+                });
+            });
         });
 
         async function addProduct() {
@@ -369,8 +399,7 @@
                productNameError.style.display = productNameError.textContent ? 'block' : 'none';
                productDetailsError.style.display = productDetailsError.textContent ? 'block' : 'none';
                stockError.style.display = stockError.textContent ? 'block' : 'none';
-               priceError.style.display = priceError.textContent ? 'block' : 'none';
-
+               priceError.style.display = priceError.textContent ? 'block' : 'none';S
            }
        } catch (error) {
            // Handle other errors, e.g., network issues

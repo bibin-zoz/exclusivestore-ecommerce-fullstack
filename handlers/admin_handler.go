@@ -5,7 +5,8 @@ import (
 	"ecommercestore/helpers"
 	"ecommercestore/models"
 	"fmt"
-	"io"
+	"image"
+	"image/jpeg"
 	"log"
 	"math"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nfnt/resize"
 )
 
 type DeleteRequest struct {
@@ -355,9 +357,19 @@ func AddProduct(c *gin.Context) {
 
 	// Process each file
 	for _, file := range files {
-		// Open the file
+		isValid, detectedType := helpers.IsImageFile(file)
+		if !isValid {
+			fmt.Println("Unknown format:", detectedType)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid file format. Only image files are allowed."})
+			return
+		}
+
+		fmt.Println("Valid format:", detectedType)
+
+		// Continue processing the file since it's a valid image
 		src, err := file.Open()
 		if err != nil {
+			fmt.Println("Error opening file:", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -368,8 +380,8 @@ func AddProduct(c *gin.Context) {
 		}
 
 		imageResult := db.DB.Create(&newImage)
-
 		if imageResult.Error != nil {
+			fmt.Println("Error creating new image record:", imageResult.Error)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": imageResult.Error.Error()})
 			return
 		}
@@ -379,12 +391,26 @@ func AddProduct(c *gin.Context) {
 		filepath = strings.ReplaceAll(filepath, "\\", "/")
 		dst, err := os.Create(filepath)
 		if err != nil {
+			fmt.Println("Error creating destination file:", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 		defer dst.Close()
 
-		if _, err := io.Copy(dst, src); err != nil {
+		// Resize the image
+		img, _, err := image.Decode(src)
+		if err != nil {
+			fmt.Println("Error decoding image:", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Resize to your desired width and height
+		resizedImg := resize.Resize(465, 576, img, resize.Lanczos3)
+
+		// Save the resized image
+		if err := jpeg.Encode(dst, resizedImg, nil); err != nil {
+			fmt.Println("Error encoding image:", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -538,7 +564,6 @@ func ProductUpdateHandler(c *gin.Context) {
 
 	}
 
-	// Handle image updates
 	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB limit
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -566,6 +591,13 @@ func ProductUpdateHandler(c *gin.Context) {
 			return
 		}
 
+		// Resize the image
+		resizedImage, err := helpers.ResizeImage(src, 500, 500) // Adjust the dimensions as needed
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error resizing image: " + err.Error()})
+			return
+		}
+
 		filename := fmt.Sprintf("%d_%s", newImage.ID, file.Filename)
 		filepath := filepath.Join("static/uploads", filename)
 		filepath = strings.ReplaceAll(filepath, "\\", "/")
@@ -576,7 +608,8 @@ func ProductUpdateHandler(c *gin.Context) {
 		}
 		defer dst.Close()
 
-		if _, err := io.Copy(dst, src); err != nil {
+		// Save the resized image to the destination file
+		if err := helpers.SaveResizedImage(dst, resizedImage, "jpeg"); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -585,8 +618,8 @@ func ProductUpdateHandler(c *gin.Context) {
 		db.DB.Save(&newImage)
 	}
 
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"message":  "Product updated successfully",
-	// 	"redirect": "/admin/products",
-	// })
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Product updated successfully",
+		"redirect": "/admin/product?id=" + idStr,
+	})
 }

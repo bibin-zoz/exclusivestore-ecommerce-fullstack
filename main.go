@@ -26,7 +26,7 @@ func main() {
 	router.POST("/login", handlers.LoginPost)
 	router.GET("/home", middleware.LoginAuth(), handlers.HomeHandler)
 	router.GET("/logout", handlers.LogoutHandler)
-	router.GET("/product", middleware.LoginAuth(), handlers.ProductViewhandler)
+	router.GET("/product", handlers.ProductViewhandler)
 
 	//admin
 	router.GET("/admin/login", middleware.AdminAuth(), handlers.AdminLogin)
