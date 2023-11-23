@@ -1,42 +1,58 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/gosimple/slug"
 	"gorm.io/gorm"
 )
 
 type Products struct {
 	gorm.Model
-	ID             uint    `json:"id" gorm:"unique;not null"`
-	CategoryID     int     `json:"categoryID" gorm:"foreignkey:CategoryID;constraint:OnDelete:CASCADE"`
-	ProductName    string  `json:"productName"`
-	ProductDetails string  `json:"productDetails"`
-	Storage        string  `json:"storage"`
-	Ram            string  `json:"ram"`
-	Stock          int     `json:"stock"`
-	Status         string  `json:"status" gorm:"default:'listed'"`
-	Price          float64 `json:"price"`
-	Images         []Image `json:"images" gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
+	ID              uint              `json:"id" gorm:"unique;not null"`
+	CategoryID      uint              `json:"categoryID" gorm:"index;foreignKey:CategoryID"`
+	BrandID         uint              `json:"brandID" gorm:"index;foreignKey:BrandID"`
+	ProductName     string            `json:"productName"`
+	ProductDetails  string            `json:"productDetails"`
+	Status          string            `json:"status" gorm:"default:'listed'"`
+	Images          []Image           `json:"images" gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
+	Category        Categories        `json:"category" gorm:"foreignKey:CategoryID"`
+	Brand           Brands            `json:"brand" gorm:"foreignKey:BrandID"`
+	ProductVariants []ProductVariants `json:"product_variants" gorm:"foreignKey:ProductID"`
 }
 
 type ProductVariants struct {
-	Storage string `json:"storage"`
-	Ram     string `json:"ram"`
-	Stock   int    `json:"stock"`
+	gorm.Model
+	ID        uint    `json:"id" gorm:"unique;not null"`
+	ProductID uint    `json:"productID" gorm:"index;foreignKey:ProductID"`
+	Processor string  `json:"processor" `
+	Storage   string  `json:"storage"`
+	Ram       string  `json:"ram"`
+	Stock     int     `json:"stock"`
+	Status    string  `json:"status" gorm:"default:'listed'"`
+	Price     float64 `json:"price"`
+	MaxPrice  float64 `json:"maxprice"`
+	Slug      string  `json:"slug" gorm:"uniqueIndex"`
+}
+
+func (pv *ProductVariants) CreateSlug(productName string) {
+	// Combine relevant fields to form a string
+	slugInput := fmt.Sprintf("%s-%s-%s", productName, pv.Storage, pv.Ram)
+
+	// Generate the slug using gosimple/slug
+	newSlug := slug.MakeLang(slugInput, "en")
+
+	// Set the generated slug to the Slug field
+	pv.Slug = newSlug
+
 }
 
 type Image struct {
 	ID        uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-	ProductID uint   `json:"productID" gorm:"index"`
+	ProductID uint   `json:"productID" gorm:"index;foreignKey:ProductID"`
 	FilePath  string `json:"filepath" gorm:"not null"`
 }
-
-//	type Category struct {
-//		ID       uint   `json:"id" gorm:"unique;not null"`
-//		Category string `json:"category"`
-//		Image    string `json:"category_image"`
-//	}
 type Categories struct {
 	ID           uint   `json:"id" gorm:"unique;not null"`
 	CategoryName string `json:"category" gorm:"unique;not null"`
@@ -44,17 +60,24 @@ type Categories struct {
 	Image        string `json:"category_image"`
 	CreatedAt    time.Time
 }
+type Brands struct {
+	ID        uint   `json:"id" gorm:"unique;not null"`
+	BrandName string `json:"brandname" gorm:"unique;not null"`
+	CreatedAt time.Time
+}
 
 type Productview struct {
-	ID             uint
-	ProductName    string
-	CategoryName   string
-	ProductDetails string
-	Status         string
-	Ram            string
-	Storage        string
-	Stock          int
-	Price          float64
-	// Categories     Categories
-	// Image          []Image
+	ID              uint
+	ProductName     string
+	ProductDetails  string
+	Status          string
+	Ram             string
+	Storage         string
+	Stock           int
+	Price           float64
+	VariantID       uint
+	Category        Categories
+	Brand           Brands
+	ProductVariants []ProductVariants
+	Images          []Image
 }

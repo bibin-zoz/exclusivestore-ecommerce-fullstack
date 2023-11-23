@@ -237,14 +237,26 @@ func VerifyPost(c *gin.Context) {
 }
 
 func HomeHandler(c *gin.Context) {
+	type ProductView struct {
+		models.ProductVariants
+		models.Products
+	}
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
 
-	var products []models.Products
-	db.DB.Preload("Images").Find(&products)
+	var productViews []ProductView
+	result := db.DB.
+		Table("product_variants").
+		Select("product_variants.*, products.*").
+		Joins("JOIN products ON product_variants.product_id = products.id").
+		Scan(&productViews)
+	fmt.Println("sas", productViews)
+	if result.Error != nil {
+		return
+	}
 
 	c.HTML(http.StatusOK, "home.html", gin.H{
-		"Products": products,
+		"Products": productViews,
 	})
 }
 
@@ -258,7 +270,8 @@ func LogoutHandler(c *gin.Context) {
 func ProductViewhandler(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Query("id"))
 
-	var product models.Products
+	var product []models.Productview
+
 	if err := db.DB.Preload("Images").Where("ID = ?", ID).First(&product).Error; err != nil {
 
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})

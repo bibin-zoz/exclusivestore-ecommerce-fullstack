@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gosimple/slug"
 	"github.com/nfnt/resize"
 )
 
@@ -279,17 +280,19 @@ func UpdateCategoryStatus(c *gin.Context) {
 //Products
 
 func ProductsHandler(c *gin.Context) {
-	var products []models.Productview
+	var products []models.Products
 	var category []models.Categories
+	var brand []models.Brands
 	db.DB.Find(&category)
-
-	db.DB.Table("products").Select("products.*, categories.category_name").
-		Joins("JOIN categories ON products.category_id = categories.id").
-		Find(&products)
+	db.DB.Find(&brand)
+	if err := db.DB.Preload("ProductVariants").Preload("Category").Preload("Images").Preload("Brand").Find(&products).Error; err != nil {
+		fmt.Println("failed to load products")
+	}
 
 	c.HTML(http.StatusOK, "productmanage.html", gin.H{
 		"Products": products,
 		"Category": category,
+		"Brands":   brand,
 	})
 
 }
@@ -306,6 +309,7 @@ func AddProduct(c *gin.Context) {
 	stock, _ := strconv.Atoi(c.PostForm("stock"))
 	price, _ := strconv.ParseFloat(c.PostForm("price"), 64)
 	categoryID, _ := strconv.Atoi(c.PostForm("categoryID"))
+	brandID, _ := strconv.Atoi(c.PostForm("brandID"))
 
 	// validation
 	if productName == "" || productDetails == "" || stock <= 0 || price <= 100 {
@@ -341,17 +345,33 @@ func AddProduct(c *gin.Context) {
 	newProduct := models.Products{
 		ProductName:    productName,
 		ProductDetails: productDetails,
-		Storage:        storage,
-		Ram:            ram,
-		Stock:          stock,
-		Price:          price,
-		CategoryID:     categoryID,
+		// Stock:          stock,
+		// Price:          price,
+		CategoryID: uint(categoryID),
+		BrandID:    uint(brandID),
 	}
 
 	result := db.DB.Create(&newProduct)
 
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+	newProductVariant := models.ProductVariants{
+		ProductID: newProduct.ID,
+		Processor: c.PostForm("processor"), // Assuming you get the processor value from the form
+		Storage:   storage,
+		Ram:       ram,
+		Status:    "listed",
+		Stock:     stock, // You can set the default value here or get it from the form
+		MaxPrice:  price, // Assuming max price is the same as the regular price for now
+	}
+	newProductVariant.CreateSlug(productName)
+
+	// Insert the new ProductVariant into the database
+	resultVariant := db.DB.Create(&newProductVariant)
+	if resultVariant.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": resultVariant.Error.Error()})
 		return
 	}
 
@@ -483,11 +503,11 @@ func ProductDetailsHandler(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Query("id"))
 	var Product models.Products
 	var category []models.Categories
-	if err := db.DB.Preload("Images").Find(&Product, ID).Error; err != nil {
-
+	if err := db.DB.Preload("Brand").Preload("ProductVariants").Preload("Images").Find(&Product, ID).Error; err != nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
 		return
 	}
+
 	if err := db.DB.Find(&category).Error; err != nil {
 
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
@@ -520,23 +540,72 @@ func ProductUpdateHandler(c *gin.Context) {
 	id, _ := strconv.Atoi(idStr)
 
 	// Parse other form data
+	variantID, _ := strconv.Atoi(c.PostForm("variantID"))
 	productName := c.PostForm("productName")
 	productDetails := c.PostForm("productDetails")
 	storage := c.PostForm("storage")
 	ram := c.PostForm("ram")
 	stock, _ := strconv.Atoi(c.PostForm("stock"))
 	price, _ := strconv.ParseFloat(c.PostForm("price"), 64)
-	categoryID, _ := strconv.Atoi(c.PostForm("categoryID"))
+	categoryID, _ := strconv.ParseUint(c.PostForm("categoryID"), 10, 64)
+	fmt.Println("variant", variantID)
 
-	// Update product details
+	if variantID == 0 {
+		fmt.Println("variant zero entered")
+		// VariantID is 0, create a new ProductVariants record
+		newProductVariant := models.ProductVariants{
+			ProductID: uint(id),
+			Processor: "tempprocessor", // Assuming you get the processor value from the form
+			Storage:   storage,
+			Ram:       ram,
+			Status:    "listed",
+			Stock:     stock, // You can set the default value here or get it from the form
+			MaxPrice:  price, // Assuming max price is the same as the regular price for now
+		}
+		newProductVariant.CreateSlug(productName)
+
+		// Insert the new ProductVariant into the database
+		result := db.DB.Create(&newProductVariant)
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+			return
+		}
+		if result.Error != nil {
+			fmt.Println("Error creating ProductVariants:", result.Error.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+			return
+		}
+
+		fmt.Println("variant zero existed")
+		c.JSON(http.StatusOK, gin.H{
+			"message":  "variant added successfully",
+			"redirect": "/admin/product?id=" + idStr,
+		})
+		return
+	}
+
 	result := db.DB.Model(&models.Products{}).Where("id=?", id).Updates(models.Products{
 		ProductName:    productName,
 		ProductDetails: productDetails,
-		Storage:        storage,
-		Ram:            ram,
-		Stock:          stock,
-		Price:          price,
-		CategoryID:     categoryID,
+		CategoryID:     uint(categoryID),
+	})
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		log.Println("prodcut model error")
+
+		return
+	}
+
+	slugInput := fmt.Sprintf("%s-%s-%s", productName, storage, ram)
+	newSlug := slug.MakeLang(slugInput, "en")
+	db.DB.Where("slug=?", newSlug)
+
+	result = db.DB.Model(&models.ProductVariants{}).Where("id=?", variantID).Updates(models.ProductVariants{
+		Storage: storage,
+		Ram:     ram,
+		Stock:   stock,
+		Price:   price,
+		Slug:    newSlug,
 	})
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})

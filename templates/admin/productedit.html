@@ -158,46 +158,61 @@
                                         <label class="col-lg-4 col-form-label" for="status">Status
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="status" name="status"
-                                                placeholder="{{.Product.Status}}" value="{{.Product.Status}}">
+                                            <select  class="form-control" id="status" name="status">
+                                                <option value="listed" >Listed</option>
+                                                <option value="unlisted" >unlisted</option>
+                                            </select>
+                                            <!-- <input type="text" class="form-control" id="status" name="status"
+                                                placeholder="{{.Product.Status}}" value="{{.Product.Status}}"> -->
                                         </div>
                                     </div>
-                                    <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="ram">Category Name
+                                     <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="Variants">Variants
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <select class="form-control" id="ram" name="ram">
-                                                <option value="4GB">4GB</option>
-                                                <option value="8GB">8GB</option>
-                                                <option value="16">16GB</option>
+                                            <select class="variant-dropdown" id="slug" onchange="updateVariantDetails(this)">
+                                                <option value="0" >Create New Variant</option>
+                                                {{range .Product.ProductVariants}}
+                                                
+                                                <option value="{{.ID}}"  data-ram="{{.Ram}}" data-storage="{{.Storage}}" data-stock="{{.Stock}}" data-price="{{.Price}}">
+                                                    {{.Slug}}
+                                                </option>
+                                               
+                                                {{end}}
                                             </select>
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="storage">Category Name
+                                        <label class="col-lg-4 col-form-label" for="ram">Ram
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <select class="form-control" id="storage" name="storage">
-                                                <option value="256GB">256GB</option>
-                                                <option value="512GB">512GB</option>
-                                                <option value="1TB">1TB</option>
-                                            </select>
+                                            <input type="text" class="form-control" id="ram" name="ram"
+                                                placeholder="{{.Ram}}" value="{{.Ram}}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="stock">stock
+                                        <label class="col-lg-4 col-form-label" for="storage">Storage
+                                            <span class="text-danger">*</span></label>
+                                        <div class="col-lg-6">
+                                            <input type="text" class="form-control" id="storage" name="storage"
+                                                placeholder="{{.Storage}}" value="{{.Storage}}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="stock">Stock
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
                                             <input type="text" class="form-control" id="stock" name="stock"
-                                                placeholder="{{.Product.Stock}}" value="{{.Product.Stock}}">
+                                                placeholder="{{.Stock}}" value="{{.Stock}}">
                                         </div>
                                     </div>
+                                   
                                     <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="price">Price
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
                                             <input type="text" class="form-control" id="price" name="price"
-                                                placeholder="{{.Product.Price}}" value="{{.Product.Price}}">
+                                                placeholder="{{.Price}}" value="{{.Price}}">
                                         </div>
                                     </div>
                                     <!-- Repeat similar blocks for other fields (ProductDetails, Status, Ram, Storage, Stock, Price, etc.) -->
@@ -234,6 +249,25 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    
+    function updateVariantDetails(selectedVariant) {
+    var selectedOption = selectedVariant.options[selectedVariant.selectedIndex];
+    var stockInput = document.getElementById('stock');
+    var priceInput = document.getElementById('price');
+    var ramInput = document.getElementById('ram');
+    var storageInput = document.getElementById('storage');
+
+    // Set placeholder and default value based on the selected variant's data attributes
+    stockInput.placeholder = selectedOption.getAttribute('data-stock');
+    stockInput.value = selectedOption.getAttribute('data-stock');
+
+    priceInput.placeholder = selectedOption.getAttribute('data-price');
+    priceInput.value = selectedOption.getAttribute('data-price');
+    ramInput.placeholder = selectedOption.getAttribute('data-ram');
+    ramInput.value = selectedOption.getAttribute('data-ram');
+    storageInput.placeholder = selectedOption.getAttribute('data-storage');
+    storageInput.value = selectedOption.getAttribute('data-storage');
+}
     function confirmUpdate() {
         Swal.fire({
             title: 'Update Product',
@@ -250,7 +284,8 @@
         });
     }
 
-    // Your existing script...
+
+
 
 </script>
     <script>
@@ -289,6 +324,8 @@ async function updateProduct() {
     var productName = document.getElementById('productName').value;
     var productDetails = document.getElementById('productDetails').value;
     var status = document.getElementById('status').value;
+
+    var variantID=document.getElementById('slug').value;
     var ram = document.getElementById('ram').value;
     var storage = document.getElementById('storage').value;
     var categoryID = document.getElementById('categoryID').value;
@@ -308,6 +345,7 @@ async function updateProduct() {
     formData.append('categoryID', parseInt(categoryID));
     formData.append('stock', parseInt(stock));
     formData.append('price', parseFloat(price));
+    formData.append('variantID', parseFloat(variantID));
 
     deleteImages.forEach(checkbox => {
         formData.append('deleteImages', checkbox.value);
