@@ -51,4 +51,9 @@ func InitDB() {
 	// 	panic(err)
 	// }
 
+	if err := DB.AutoMigrate(&models.Cart{}); err != nil {
+
+		panic(err)
+	}
+
 }

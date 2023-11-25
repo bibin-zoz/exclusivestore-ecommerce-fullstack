@@ -28,6 +28,10 @@ func main() {
 	router.GET("/logout", handlers.LogoutHandler)
 	router.GET("/product", handlers.ProductViewhandler)
 
+	//user cart
+	router.GET("/cart", handlers.GetCarthandler)
+	router.POST("/cart", handlers.AddToCarthandler)
+
 	//admin
 	router.GET("/admin/login", middleware.AdminAuth(), handlers.AdminLogin)
 	router.POST("/admin/login", handlers.AdminLoginPost)

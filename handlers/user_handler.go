@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strconv"
 
 	"ecommercestore/helpers"
 
@@ -236,27 +235,33 @@ func VerifyPost(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User created successfully. Please log in."})
 }
 
-func HomeHandler(c *gin.Context) {
-	type ProductView struct {
-		models.ProductVariants
-		models.Products
-	}
-	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
-	c.Header("Expires", "0")
+// func HomeHandler(c *gin.Context) {
+// 	var products []models.Products
 
-	var productViews []ProductView
-	result := db.DB.
-		Table("product_variants").
-		Select("product_variants.*, products.*").
-		Joins("JOIN products ON product_variants.product_id = products.id").
-		Scan(&productViews)
-	fmt.Println("sas", productViews)
-	if result.Error != nil {
+// 	if err := db.DB.Preload("Images").Find(&products).Error; err != nil {
+
+// 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
+// 		return
+// 	}
+
+// 	c.HTML(http.StatusOK, "home.html", gin.H{
+// 		// "Productvariants": ProductVariants,
+// 		"Products": products,
+// 	})
+// }
+
+func HomeHandler(c *gin.Context) {
+	var products []models.ProductVariants
+
+	if err := db.DB.Preload("Product").Preload("Product.Images").Find(&products).Error; err != nil {
+		fmt.Println("Error fetching product variant with product and images:", err)
 		return
 	}
+	fmt.Println("hi", products)
 
 	c.HTML(http.StatusOK, "home.html", gin.H{
-		"Products": productViews,
+		// "Productvariants": ProductVariants,
+		"ProductVariants": products,
 	})
 }
 
@@ -268,16 +273,19 @@ func LogoutHandler(c *gin.Context) {
 }
 
 func ProductViewhandler(c *gin.Context) {
-	ID, _ := strconv.Atoi(c.Query("id"))
+	slug := c.Query("Variant")
+	var product models.ProductVariants
 
-	var product []models.Productview
-
-	if err := db.DB.Preload("Images").Where("ID = ?", ID).First(&product).Error; err != nil {
-
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
+	if err := db.DB.Preload("Product").Preload("Product.Images").Where("Slug=?", slug).Find(&product).Error; err != nil {
+		fmt.Println("Error fetching product variant with product and images:", err)
 		return
 	}
 
-	c.HTML(http.StatusOK, "productdetail.html", gin.H{"Product": product})
+	// Iterate through product variants to find unique Ram values
+
+	c.HTML(http.StatusOK, "productdetail.html", gin.H{
+		// "Productvariants": ProductVariants,
+		"Product": product,
+	})
 
 }

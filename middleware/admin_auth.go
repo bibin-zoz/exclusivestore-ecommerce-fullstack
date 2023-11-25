@@ -36,7 +36,7 @@ func AdminAuth() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
-		role, err := helpers.GetUserRoleFromToken(token)
+		role, _, err := helpers.GetUserRoleFromToken(token)
 		if role != "admin" && role != "" {
 
 			log.Println("Roll mismatch or not exist", err)

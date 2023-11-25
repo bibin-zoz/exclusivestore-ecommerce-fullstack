@@ -82,7 +82,7 @@ func VerifyOTP(otp string, email string, c *gin.Context) bool {
 }
 
 func CreateToken(c *gin.Context, user models.Compare) {
-	expirationTime := time.Now().Add(15 * time.Minute) // Adjust as needed
+	expirationTime := time.Now().Add(2400 * time.Hour) // Adjust as needed
 	claims := &models.Claims{
 		Username: user.Username,
 		Role:     user.Role,
@@ -107,26 +107,63 @@ func CreateToken(c *gin.Context, user models.Compare) {
 	c.Status(http.StatusOK)
 
 }
+func GetUserRoleFromToken(tokenString string) (string, string, error) {
+	secretKey := []byte(os.Getenv("jwtKey"))
 
-func GetUserRoleFromToken(tokenString string) (string, error) {
-	secretKey = []byte(os.Getenv("jwtKey"))
+	// Parse the token
 	claims := &models.Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		fmt.Println("tokenhjjhjhjj", token)
+		// Check the signing method and key
+		if token.Method.Alg() != jwt.SigningMethodHS256.Alg() {
+			fmt.Println("tokenerrorghhhfj", token)
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Method.Alg())
+		}
 		return secretKey, nil
 	})
 
+	// Check if the token is valid
 	if err != nil {
-		return "", err
+		fmt.Println("err!1st", err)
+		return "", "", fmt.Errorf("error parsing JWT: %v", err)
 	}
 
-	if claims, ok := token.Claims.(*models.Claims); ok && token.Valid {
-		fmt.Println("", claims.Role)
-		return claims.Role, nil
+	// Check if the token is valid
+	if !token.Valid {
+		return "", "", fmt.Errorf("invalid token")
 	}
 
-	return "", fmt.Errorf("invalid token")
+	// Extract user role and name from claims
+	userRole := claims.Role     // Assuming you have a Role field in your claims struct
+	userName := claims.Username // Assuming you have a Username field in your claims struct
 
+	return userRole, userName, nil
 }
+
+// func GetUserRoleFromToken(tokenString string) (string, string, error) {
+// 	fmt.Println("hi", tokenString)
+// 	secretKey = []byte(os.Getenv("jwtKey"))
+// 	fmt.Println("hi", secretKey)
+// 	claims := &models.Claims{}
+// 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+// 		fmt.Println("error", token)
+// 		return secretKey, nil
+// 	})
+
+// 	if err != nil {
+// 		return "", "", err
+// 	}
+// 	fmt.Println("hiii")
+
+// 	if claims, ok := token.Claims.(*models.Claims); ok && token.Valid {
+// 		fmt.Println("sucess", claims)
+// 		fmt.Println("", claims.Role)
+// 		return claims.Role, claims.Username, nil
+// 	}
+// 	fmt.Println("not sucess")
+// 	return "", "", fmt.Errorf("invalid token")
+
+// }
 func IsImageFile(fileHeader *multipart.FileHeader) (bool, string) {
 	// Open the file
 	file, err := fileHeader.Open()
@@ -194,4 +231,15 @@ func SaveResizedImage(dst io.Writer, resizedImg image.Image, format string) erro
 	default:
 		return fmt.Errorf("unsupported image format: %s", format)
 	}
+}
+func ParseToken(token string) (*models.Claims, error) {
+	secretKey := []byte(os.Getenv("jwtKey"))
+	claims := &models.Claims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		if token.Method.Alg() != jwt.SigningMethodHS256.Alg() {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Method.Alg())
+		}
+		return secretKey, nil
+	})
+	return claims, err
 }

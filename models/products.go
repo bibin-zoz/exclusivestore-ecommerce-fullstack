@@ -10,23 +10,23 @@ import (
 
 type Products struct {
 	gorm.Model
-	ID              uint              `json:"id" gorm:"unique;not null"`
-	CategoryID      uint              `json:"categoryID" gorm:"index;foreignKey:CategoryID"`
-	BrandID         uint              `json:"brandID" gorm:"index;foreignKey:BrandID"`
-	ProductName     string            `json:"productName"`
-	ProductDetails  string            `json:"productDetails"`
-	Status          string            `json:"status" gorm:"default:'listed'"`
-	Images          []Image           `json:"images" gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
-	Category        Categories        `json:"category" gorm:"foreignKey:CategoryID"`
-	Brand           Brands            `json:"brand" gorm:"foreignKey:BrandID"`
-	ProductVariants []ProductVariants `json:"product_variants" gorm:"foreignKey:ProductID"`
+	ID             uint              `json:"id" gorm:"unique;not null"`
+	CategoryID     uint              `json:"categoryID" gorm:"index;foreignKey:CategoryID"`
+	BrandID        uint              `json:"brandID" gorm:"index;foreignKey:BrandID"`
+	ProductName    string            `json:"productName"`
+	ProductDetails string            `json:"productDetails"`
+	Status         string            `json:"status" gorm:"default:'listed'"`
+	Category       Categories        `json:"category" gorm:"foreignKey:CategoryID"`
+	Brand          Brands            `json:"brand" gorm:"foreignKey:BrandID"`
+	Images         []Image           `json:"images" gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
+	Variants       []ProductVariants `json:"product_variants" gorm:"foreignKey:ProductID"`
 }
 
 type ProductVariants struct {
 	gorm.Model
 	ID        uint    `json:"id" gorm:"unique;not null"`
 	ProductID uint    `json:"productID" gorm:"index;foreignKey:ProductID"`
-	Processor string  `json:"processor" `
+	Processor string  `json:"processor"`
 	Storage   string  `json:"storage"`
 	Ram       string  `json:"ram"`
 	Stock     int     `json:"stock"`
@@ -34,6 +34,7 @@ type ProductVariants struct {
 	Price     float64 `json:"price"`
 	MaxPrice  float64 `json:"maxprice"`
 	Slug      string  `json:"slug" gorm:"uniqueIndex"`
+	Product   Products
 }
 
 func (pv *ProductVariants) CreateSlug(productName string) {
@@ -52,6 +53,7 @@ type Image struct {
 	ID        uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	ProductID uint   `json:"productID" gorm:"index;foreignKey:ProductID"`
 	FilePath  string `json:"filepath" gorm:"not null"`
+	Product   Products
 }
 type Categories struct {
 	ID           uint   `json:"id" gorm:"unique;not null"`
@@ -67,17 +69,10 @@ type Brands struct {
 }
 
 type Productview struct {
-	ID              uint
-	ProductName     string
-	ProductDetails  string
-	Status          string
-	Ram             string
-	Storage         string
-	Stock           int
-	Price           float64
-	VariantID       uint
-	Category        Categories
-	Brand           Brands
-	ProductVariants []ProductVariants
-	Images          []Image
+	ID             uint
+	ProductID      uint `json:"productID" gorm:"index;foreignKey:ProductID"`
+	ProductName    string
+	ProductDetails string
+
+	Images []Image `json:"images" gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
 }

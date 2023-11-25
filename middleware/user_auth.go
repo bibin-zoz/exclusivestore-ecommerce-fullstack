@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"ecommercestore/helpers"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,34 +13,47 @@ import (
 func LoginAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
-		token, err := c.Cookie("token")
 
-		if err != nil && path != "/login" {
+		// Skip token check for the "/login" path
+		if path == "/login" {
+			c.Next()
+			return
+		}
 
+		Token, err := c.Cookie("token")
+
+		if err != nil {
 			log.Println("Token not present in cookie:", err)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
 
-		if err == nil && path == "/login" {
-
-			log.Println("User is already logged in.")
-			c.Redirect(http.StatusSeeOther, "/home")
+		fmt.Println("claims", Token)
+		claims, err := helpers.ParseToken(Token)
+		if err != nil {
+			log.Println("Error parsing token:", err)
+			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
 
-		if err != nil && path != "/login" {
+		if time.Now().Unix() > claims.StandardClaims.ExpiresAt {
+			log.Println("Token has expired")
+			c.Redirect(http.StatusSeeOther, "/login")
+			c.AbortWithStatus(http.StatusSeeOther)
+			return
+		}
 
+		if err != nil {
 			log.Println("Token not present in cookie:", err)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
-		role, err := helpers.GetUserRoleFromToken(token)
+
+		role, _, err := helpers.GetUserRoleFromToken(Token)
 		if role != "user" && role != "" {
-
 			log.Println("Roll mismatch or not exist", err)
 			if role == "admin" {
 				c.Redirect(http.StatusSeeOther, "/admin/home")
