@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"time"
 
 	"ecommercestore/helpers"
 
@@ -189,13 +190,24 @@ func SignupPost(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/verify")
 }
 
-func VerifyHandler(c *gin.Context) {
+var lastOTPSendTime time.Time
 
-	c.HTML(http.StatusOK, "verify.html", nil)
+func VerifyHandler(c *gin.Context) {
+	// Check if it has been at least 60 seconds since the last OTP was sent
+	if time.Since(lastOTPSendTime) < 60*time.Second {
+		c.HTML(http.StatusOK, "verify.html", gin.H{"Message": "Please wait before requesting a new OTP"})
+		return
+	}
+
+	c.HTML(http.StatusOK, "verify.html", gin.H{"Message": "OTP sented"})
+
 	otp := helpers.GenerateOTP()
 	helpers.SendOTP(otp, user.Email)
 
+	// Update the last OTP send time
+	lastOTPSendTime = time.Now()
 }
+
 func VerifyPost(c *gin.Context) {
 	var verifyData models.VerifyData
 
@@ -281,11 +293,18 @@ func ProductViewhandler(c *gin.Context) {
 		return
 	}
 
+	result := make([]int, 0)
+	for i := 1; i <= product.Stock; i++ {
+		result = append(result, i)
+	}
+	fmt.Println("result", result)
+
 	// Iterate through product variants to find unique Ram values
 
 	c.HTML(http.StatusOK, "productdetail.html", gin.H{
 		// "Productvariants": ProductVariants,
-		"Product": product,
+		"Product":  product,
+		"Quantity": result,
 	})
 
 }

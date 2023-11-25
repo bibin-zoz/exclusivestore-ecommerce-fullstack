@@ -8,6 +8,7 @@ type Cart struct {
 	ProductID uint   `json:"productID" gorm:"index;foreignKey:ProductID"`
 	VariantID uint   `json:"variantID" gorm:"index;foreignKey:VariantID"`
 	UserName  string `json:"userName" gorm:"index;foreignKey:UserName"`
+	Quantity  uint   `json:"quantity" gorm:"not null"`
 	Product   Products
 	Variant   ProductVariants
 	// Image     []Image `gorm:"foreignKey:ProductID"`
