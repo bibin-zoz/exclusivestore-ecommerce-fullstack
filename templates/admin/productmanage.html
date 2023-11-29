@@ -205,7 +205,7 @@
                                             </td>
                                             <td>
                                                 <select class="variant-dropdown" onchange="updateVariantDetails(this)">
-                                                    {{range .ProductVariants}}
+                                                    {{range .Variants}}
                                                     <option value="{{.Slug}}" data-ram="{{.Ram}}" data-storage="{{.Storage}}" data-stock="{{.Stock}}" data-price="{{.Price}}">
                                                         {{.Slug}}
                                                     </option>

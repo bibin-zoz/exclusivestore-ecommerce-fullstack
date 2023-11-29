@@ -29,32 +29,38 @@
 						<div class="wrap-slick3-dots"></div>
 						<div class="wrap-slick3-arrows flex-sb-m flex-w"></div>
 						<div class="slick3 gallery-lb">
-							<div class="item-slick3" data-thumb="{{with index .Product.Product.Images 0}}{{.FilePath}}{{end}}">
+							<div class="item-slick3"
+								data-thumb="{{with index .Product.Product.Images 0}}{{.FilePath}}{{end}}">
 								<div class="wrap-pic-w pos-relative">
-									<img src="{{with index .Product.Product.Images 0}}{{.FilePath}}{{end}}" alt="IMG-PRODUCT">
-						
+									<img src="{{with index .Product.Product.Images 0}}{{.FilePath}}{{end}}"
+										alt="IMG-PRODUCT">
+
 									<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04"
 										href="{{with index .Product.Product.Images 0}}{{.FilePath}}{{end}}">
 										<i class="fa fa-expand"></i>
 									</a>
 								</div>
 							</div>
-						
-							<div class="item-slick3" data-thumb="{{with index .Product.Product.Images 1}}{{.FilePath}}{{end}}">
+
+							<div class="item-slick3"
+								data-thumb="{{with index .Product.Product.Images 1}}{{.FilePath}}{{end}}">
 								<div class="wrap-pic-w pos-relative">
-									<img src="{{with index .Product.Product.Images 1}}{{.FilePath}}{{end}}" alt="IMG-PRODUCT">
-						
+									<img src="{{with index .Product.Product.Images 1}}{{.FilePath}}{{end}}"
+										alt="IMG-PRODUCT">
+
 									<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04"
 										href="{{with index .Product.Product.Images 1}}{{.FilePath}}{{end}}">
 										<i class="fa fa-expand"></i>
 									</a>
 								</div>
 							</div>
-						
-							<div class="item-slick3" data-thumb="{{with index .Product.Product.Images 2}}{{.FilePath}}{{end}}">
+
+							<div class="item-slick3"
+								data-thumb="{{with index .Product.Product.Images 2}}{{.FilePath}}{{end}}">
 								<div class="wrap-pic-w pos-relative">
-									<img src="{{with index .Product.Product.Images 2}}{{.FilePath}}{{end}}" alt="IMG-PRODUCT">
-						
+									<img src="{{with index .Product.Product.Images 2}}{{.FilePath}}{{end}}"
+										alt="IMG-PRODUCT">
+
 									<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04"
 										href="{{with index .Product.Product.Images 2}}{{.FilePath}}{{end}}">
 										<i class="fa fa-expand"></i>
@@ -91,10 +97,11 @@
 
 							<div class="size-204 respon6-next">
 								<div class="rs1-select2 bor8 bg0">
+									
 									<select class="js-select2" name="time">
-										
+
 										<option>{{.Product.Slug}}</option>
-										
+
 									</select>
 									<div class="dropDownSelect2"></div>
 								</div>
@@ -107,8 +114,8 @@
 
 							<div class="size-204 respon6-next">
 								<div class="rs1-select2 bor8 bg0">
-									<li  class="list-group-item">Ram: {{.Product.Ram}}</li>
-										<div class="dropDownSelect2"></div>
+									<li class="list-group-item">Ram: {{.Product.Ram}}</li>
+									<div class="dropDownSelect2"></div>
 								</div>
 							</div>
 						</div>
@@ -119,8 +126,8 @@
 
 							<div class="size-204 respon6-next">
 								<div class="rs1-select2 bor8 bg0">
-									<li  class="list-group-item">Storage: {{.Product.Storage}}</li>
-										<div class="dropDownSelect2"></div>
+									<li class="list-group-item">Storage: {{.Product.Storage}}</li>
+									<div class="dropDownSelect2"></div>
 								</div>
 							</div>
 						</div>
@@ -128,38 +135,41 @@
 							<div class="size-203 flex-c-m respon6">
 								Price
 							</div>
-
+						
 							<div class="size-204 respon6-next">
 								<div class="rs1-select2 bor8 bg0">
-									<li  class="list-group-item">Price: ${{.Product.Price}}</li>
-										<div class="dropDownSelect2"></div>
+									<li class="list-group-item" id="price">Price: ${{.Product.Price}}</li>
+									<div class="dropDownSelect2"></div>
 								</div>
 							</div>
 						</div>
+						
 						<div class="flex-w flex-r-m p-b-10">
 							<div class="size-203 flex-c-m respon6">
 								Stock
 							</div>
-
+						
 							<div class="size-204 respon6-next">
 								<div class="rs1-select2 bor8 bg0">
-									<li  class="list-group-item">Available Stock:{{.Product.Stock}}</li>
-										<div class="dropDownSelect2"></div>
+									<li class="list-group-item">Available Stock:{{.Product.Stock}}</li>
+									<div class="dropDownSelect2"></div>
 								</div>
 							</div>
 						</div>
 						
-						
-
 						<div class="flex-w flex-r-m p-b-10">
 							<div class="size-204 flex-w flex-m respon6-next">
-								Select Quantity
-								<select class="form-select">
-									
-								  </select>
-								
+								<label for="quantity">Quantity:</label>
+								<select id="quantity" name="quantity" onchange="updatePrice()">
+									{{ range .Quantity }}
+									<option value="{{ . }}">{{ . }}</option>
+									{{ end }}
+								</select>
+						
+
 								<button
-									class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail" id="AddCart">
+									class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail"
+									id="AddCart">
 									Add to cart
 								</button>
 							</div>
@@ -238,7 +248,7 @@
 								<ul class="p-lr-28 p-lr-15-sm">
 									<li class="flex-w flex-t p-b-7">
 										<span class="stext-102 cl3 size-205">
-											Processor: 
+											Processor:
 										</span>
 
 										<span class="stext-102 cl6 size-206">
@@ -884,6 +894,14 @@
 <!--===============================================================================================-->
 <script src="/static/userside/vendor/MagnificPopup/jquery.magnific-popup.min.js"></script>
 <script>
+    function updatePrice() {
+        var quantity = document.getElementById("quantity").value;
+        var price = "{{.Product.Price}}";
+        var totalPrice = quantity * price;
+        document.getElementById("price").innerText = "Price: $" + totalPrice.toFixed(2);
+    }
+</script>
+<script>
 	$('.gallery-lb').each(function () { // the containers for all your galleries
 		$(this).magnificPopup({
 			delegate: 'a', // the selector for gallery item
@@ -931,28 +949,29 @@
 		var nameProduct = $(this).parent().parent().parent().parent().find('.js-name-detail').html();
 		$(this).on('click', function () {
 
-			   var postData = {
-                variantID: parseInt("{{.Product.ID}}"),
-                productID:parseInt("{{.Product.Product.ID}}")
-            };
+			var postData = {
+				variantID: parseInt("{{.Product.ID}}"),
+				productID: parseInt("{{.Product.Product.ID}}"),
+				quantity: parseInt(document.getElementById("quantity").value)
+			};
 
 			$.ajax({
-                type: 'POST',
-                url: '/cart', // Update with your server endpoint
-                data: JSON.stringify(postData),
-                contentType: 'application/json',
-                success: function(response) {
+				type: 'POST',
+				url: '/cart', // Update with your server endpoint
+				data: JSON.stringify(postData),
+				contentType: 'application/json',
+				success: function (response) {
 					swal(nameProduct, "is added to cart !", "success");
-                    console.log('Success:', response);
-                    // You can update the page or perform any other action based on the response
-                },
-                error: function(error) {
-                    console.error('Error:', error);
-                    // Handle the error, if any
-                }
-            });
-      
-			
+					console.log('Success:', response);
+					// You can update the page or perform any other action based on the response
+				},
+				error: function (error) {
+					console.error('Error:', error);
+					// Handle the error, if any
+				}
+			});
+
+
 		});
 	});
 

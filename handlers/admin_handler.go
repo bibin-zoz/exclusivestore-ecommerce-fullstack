@@ -285,7 +285,7 @@ func ProductsHandler(c *gin.Context) {
 	var brand []models.Brands
 	db.DB.Find(&category)
 	db.DB.Find(&brand)
-	if err := db.DB.Preload("ProductVariants").Preload("Category").Preload("Images").Preload("Brand").Find(&products).Error; err != nil {
+	if err := db.DB.Preload("Variants").Preload("Category").Preload("Images").Preload("Brand").Find(&products).Error; err != nil {
 		fmt.Println("failed to load products")
 	}
 

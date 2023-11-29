@@ -294,7 +294,7 @@ func ProductViewhandler(c *gin.Context) {
 	}
 
 	result := make([]int, 0)
-	for i := 1; i <= product.Stock; i++ {
+	for i := 1; i <= product.Stock && i <= 5; i++ {
 		result = append(result, i)
 	}
 	fmt.Println("result", result)

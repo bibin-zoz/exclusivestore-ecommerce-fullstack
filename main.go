@@ -13,6 +13,7 @@ func main() {
 	router := gin.Default()
 
 	db.InitDB()
+
 	// router.LoadHTMLGlob("templates/*.html")
 	// router.LoadHTMLGlob("templates/*")
 	router.LoadHTMLGlob("templates/**/*.html")

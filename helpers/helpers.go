@@ -25,7 +25,7 @@ import (
 // var twilioSID = "ACde3aa36171cc3d73b605996e0d73ed6f"
 // var twilioAuthToken = "188a1c697848e8854a397ce5bdb69c64"
 // var twilioFromNumber = "+12563882106"
-var secretKey []byte
+// var secretKey []byte
 
 var otpMap = make(map[string]string)
 

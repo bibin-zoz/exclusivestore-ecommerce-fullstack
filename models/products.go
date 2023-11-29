@@ -20,6 +20,7 @@ type Products struct {
 	Brand          Brands            `json:"brand" gorm:"foreignKey:BrandID"`
 	Images         []Image           `json:"images" gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
 	Variants       []ProductVariants `json:"product_variants" gorm:"foreignKey:ProductID"`
+	Carts          []Cart            `gorm:"foreignKey:ProductID"`
 }
 
 type ProductVariants struct {
@@ -35,6 +36,7 @@ type ProductVariants struct {
 	MaxPrice  float64 `json:"maxprice"`
 	Slug      string  `json:"slug" gorm:"uniqueIndex"`
 	Product   Products
+	Carts     []Cart `gorm:"foreignKey:VariantID"`
 }
 
 func (pv *ProductVariants) CreateSlug(productName string) {

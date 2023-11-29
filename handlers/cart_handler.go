@@ -20,7 +20,8 @@ func GetCarthandler(c *gin.Context) {
 		fmt.Println("Error fetching carts:", err)
 		return
 	}
-	fmt.Println("Cart", Cart)
+
+	
 	c.HTML(http.StatusOK, "cart.html", gin.H{
 		// "Productvariants": ProductVariants,
 		"Cart": Cart,
@@ -29,9 +30,10 @@ func GetCarthandler(c *gin.Context) {
 }
 
 func AddToCarthandler(c *gin.Context) {
+
 	Token, _ := c.Cookie("token")
 	_, Username, _ := helpers.GetUserRoleFromToken(Token)
-	fmt.Println("user:v", Username)
+
 	var Cart models.GetCart
 
 	if err := c.ShouldBindJSON(&Cart); err != nil {
@@ -39,13 +41,19 @@ func AddToCarthandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println("cart", Cart)
+	var variant models.ProductVariants
+	db.DB.First(&variant, Cart.VariantID)
 
-	result := db.DB.Create(&models.Cart{
+	UpdateCart := &models.Cart{
 		UserName:  Username,
 		VariantID: Cart.VariantID,
 		ProductID: Cart.ProductID,
-	})
+		Price:     variant.Price,
+		Quantity:  Cart.Quantity,
+	}
+
+	result := db.DB.Create(UpdateCart)
+
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
