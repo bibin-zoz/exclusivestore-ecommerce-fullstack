@@ -2,9 +2,12 @@ package middleware
 
 import (
 	"ecommercestore/helpers"
+	"ecommercestore/models"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,38 +15,69 @@ import (
 
 func LoginAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		path := c.Request.URL.Path
-
-		// Skip token check for the "/login" path
-		if path == "/login" {
-			c.Next()
-			return
-		}
-
-		Token, err := c.Cookie("token")
-
+		// Retrieve the auth cookie
+		authCookie, err := c.Cookie("auth")
 		if err != nil {
-			log.Println("Token not present in cookie:", err)
+			// Redirect to login if the auth cookie is not present
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
 
-		fmt.Println("claims", Token)
-		claims, err := helpers.ParseToken(Token)
+		// Decode the JSON content of the auth cookie
+		var token models.TokenUser
+		err = json.NewDecoder(strings.NewReader(authCookie)).Decode(&token)
+		if err != nil {
+			// Redirect to login if there's an error decoding the auth cookie
+			c.Redirect(http.StatusSeeOther, "/login")
+			c.AbortWithStatus(http.StatusSeeOther)
+			return
+		}
+		fmt.Println("token", token.AccessToken)
+		fmt.Println("token", token.RefreshToken)
+
+		claims, err := helpers.ParseToken(token.AccessToken)
 		if err != nil {
 			log.Println("Error parsing token:", err)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
-
-		if time.Now().Unix() > claims.StandardClaims.ExpiresAt {
-			log.Println("Token has expired")
+		refreshTokenClaims, err := helpers.ParseToken(token.RefreshToken)
+		if err != nil {
+			log.Println("Error parsing token:", err)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
+		if time.Now().Unix() > claims.StandardClaims.ExpiresAt {
+			if time.Now().Unix() > refreshTokenClaims.StandardClaims.ExpiresAt {
+				log.Println("Token has expired")
+				c.Redirect(http.StatusSeeOther, "/login")
+				c.AbortWithStatus(http.StatusSeeOther)
+				return
+
+			} else {
+				c.SetCookie("auth", "", -1, "/", "localhost", true, true)
+				accessToken, err := helpers.GenerateAccessToken(*claims)
+				if err != nil {
+					log.Println("Error creating access token token:", err)
+					c.Redirect(http.StatusSeeOther, "/login")
+					c.AbortWithStatus(http.StatusSeeOther)
+					return
+				}
+				UserAuth := &models.TokenUser{
+					// Users:        claims,
+					AccessToken:  accessToken,
+					RefreshToken: token.RefreshToken,
+				}
+				userDetailsJSON := helpers.CreateJson(UserAuth)
+
+				c.SetCookie("auth", string(userDetailsJSON), 0, "/", "localhost", true, true)
+			}
+
+		}
+		fmt.Println("user", claims)
 
 		if err != nil {
 			log.Println("Token not present in cookie:", err)
@@ -51,20 +85,18 @@ func LoginAuth() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
-
-		role, _, err := helpers.GetUserRoleFromToken(Token)
-		if role != "user" && role != "" {
-			log.Println("Roll mismatch or not exist", err)
-			if role == "admin" {
-				c.Redirect(http.StatusSeeOther, "/admin/home")
-			} else if role == "staff" {
-				c.Redirect(http.StatusSeeOther, "/staff/home")
-			}
-
+		if claims.Role != "user" && claims.Role != "" {
+			log.Println("User not logined In")
+			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
-
+		if claims.Status != "active" {
+			log.Println("User is blocked")
+			c.Redirect(http.StatusSeeOther, "/login")
+			c.AbortWithStatus(http.StatusSeeOther)
+			return
+		}
 		c.Next()
 	}
 }

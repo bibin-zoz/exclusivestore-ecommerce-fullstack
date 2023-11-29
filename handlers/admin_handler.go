@@ -86,14 +86,43 @@ func AdminLoginPost(c *gin.Context) {
 		data.StatusError = "User is blocked"
 		c.HTML(http.StatusBadRequest, "adminlogin.html", data)
 		return
-	} else {
-		helpers.CreateToken(c, compare)
-		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
-		c.Header("Expires", "0")
-		c.Redirect(http.StatusFound, "/admin/home")
-		return
-
 	}
+	claims := models.Claims{
+		ID:       compare.ID,
+		Username: compare.Username,
+		Email:    compare.Email,
+		Role:     compare.Role,
+		Status:   compare.Status,
+	}
+
+	accessToken, err := helpers.GenerateAccessToken(claims)
+	if err != nil {
+		fmt.Println("Error generating access token:", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
+
+	refreshToken, err := helpers.GenerateRefreshToken(claims)
+	if err != nil {
+		fmt.Println("Error generating refresh token:", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
+
+	UserLoginDetails := &models.TokenUser{
+		// Users:        claims,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+	userDetailsJSON := helpers.CreateJson(UserLoginDetails)
+
+	c.SetCookie("adminAuth", string(userDetailsJSON), 0, "/", "localhost", true, true)
+
+	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+	c.Header("Expires", "0")
+
+	// Redirect to home only after successful token generation
+	c.Redirect(http.StatusFound, "/admin/home")
 }
 
 // customer

@@ -32,8 +32,8 @@ func LoginHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "login.html", data)
 
 }
-func LoginPost(c *gin.Context) {
 
+func LoginPost(c *gin.Context) {
 	Newmail := c.Request.FormValue("email")
 	Newpassword := c.Request.FormValue("password")
 	var compare models.Compare
@@ -45,12 +45,12 @@ func LoginPost(c *gin.Context) {
 		return
 	}
 	if Newpassword == "" {
-		data.PasswordError = "password should not be empty"
+		data.PasswordError = "Password should not be empty"
 		c.HTML(http.StatusBadRequest, "login.html", data)
 		return
 	}
-	if err := db.DB.Raw("SELECT password, username,role,status FROM users WHERE email=$1", Newmail).Scan(&compare).Error; err != nil {
-		fmt.Println(err)
+	if err := db.DB.Raw("SELECT ID, password, username,email, role, status FROM users WHERE email=$1", Newmail).Scan(&compare).Error; err != nil {
+		fmt.Println("Error querying the database:", err)
 		data.EmailError = "An error occurred while querying the database"
 		c.HTML(http.StatusInternalServerError, "login.html", data)
 		return
@@ -63,12 +63,12 @@ func LoginPost(c *gin.Context) {
 		return
 	}
 	if compare.Password != Newpassword {
-		data.PasswordError = "check password again"
+		data.PasswordError = "Check password again"
 		c.HTML(http.StatusBadRequest, "login.html", data)
 		return
 	}
 	if compare.Role != "user" {
-		data.RoleError = "click here for admin login -->"
+		data.RoleError = "Click here for admin login -->"
 		c.HTML(http.StatusBadRequest, "login.html", data)
 		return
 	}
@@ -76,16 +76,52 @@ func LoginPost(c *gin.Context) {
 		data.StatusError = "User is blocked"
 		c.HTML(http.StatusBadRequest, "login.html", data)
 		return
-	} else {
-		helpers.CreateToken(c, compare)
-		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
-		c.Header("Expires", "0")
-		c.Redirect(http.StatusFound, "/home")
+	}
+	claims := models.Claims{
+		ID:       compare.ID,
+		Username: compare.Username,
+		Email:    compare.Email,
+		Role:     compare.Role,
+		Status:   compare.Status,
+	}
+
+	accessToken, err := helpers.GenerateAccessToken(claims)
+	if err != nil {
+		fmt.Println("Error generating access token:", err)
+		// Handle the error (e.g., return an error response)
 		return
+	}
+
+	refreshToken, err := helpers.GenerateRefreshToken(claims)
+	if err != nil {
+		fmt.Println("Error generating refresh token:", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
+
+	UserLoginDetails := &models.TokenUser{
+		// Users:        claims,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+	userDetailsJSON := helpers.CreateJson(UserLoginDetails)
+
+	if claims.Role == "admin" {
+		c.SetCookie("adminAuth", string(userDetailsJSON), 0, "/", "localhost", true, true)
+
+	} else {
+		c.SetCookie("auth", string(userDetailsJSON), 0, "/", "localhost", true, true)
 
 	}
 
+	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+	c.Header("Expires", "0")
+
+	// Redirect to home only after successful token generation
+	c.Redirect(http.StatusFound, "/home")
 }
+
+// ... (your other functions)
 
 func SignupHandler(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -269,7 +305,6 @@ func HomeHandler(c *gin.Context) {
 		fmt.Println("Error fetching product variant with product and images:", err)
 		return
 	}
-	fmt.Println("hi", products)
 
 	c.HTML(http.StatusOK, "home.html", gin.H{
 		// "Productvariants": ProductVariants,
@@ -279,7 +314,7 @@ func HomeHandler(c *gin.Context) {
 
 func LogoutHandler(c *gin.Context) {
 
-	c.SetCookie("token", "", -1, "/", "localhost", false, true)
+	c.SetCookie("auth", "", -1, "/", "localhost", false, true)
 
 	c.Redirect(http.StatusSeeOther, "/login")
 }

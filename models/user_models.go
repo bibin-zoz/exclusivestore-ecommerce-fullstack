@@ -20,3 +20,8 @@ type User struct {
 	Status    string `gorm:"default:'active'"`
 	CreatedAt time.Time
 }
+type TokenUser struct {
+	Users        Claims
+	AccessToken  string
+	RefreshToken string
+}

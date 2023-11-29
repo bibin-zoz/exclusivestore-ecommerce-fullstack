@@ -5,10 +5,20 @@ import (
 )
 
 type Claims struct {
+	ID       int    `json:"id"`
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	Role     string `json:"role"`
+	Status   string `json:"status"`
 	jwt.StandardClaims
 }
+
+// type AuthUserClaims struct {
+// 	Email string `json:"email"`
+// 	Role  string `json:"role"`
+// 	jwt.StandardClaims
+// }
+
 type VerifyData struct {
 	OTP string `json:"otp"`
 }
@@ -25,9 +35,11 @@ type Invalid struct {
 }
 
 type Compare struct {
+	ID       int
 	Password string
 	Role     string
 	Username string
+	Email    string
 	Status   string
 }
 

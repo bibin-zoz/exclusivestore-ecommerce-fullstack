@@ -4,24 +4,37 @@ import (
 	db "ecommercestore/database"
 	"ecommercestore/helpers"
 	"ecommercestore/models"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetCarthandler(c *gin.Context) {
-	Token, _ := c.Cookie("token")
-	_, Username, _ := helpers.GetUserRoleFromToken(Token)
+	authCookie, _ := c.Cookie("auth")
+	var token models.TokenUser
+	err := json.NewDecoder(strings.NewReader(authCookie)).Decode(&token)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
+	Claims, err := helpers.ParseToken(token.AccessToken)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
 
 	var Cart []models.Cart
 
-	if err := db.DB.Preload("Product").Preload("Variant").Preload("Product.Images").Where("user_name=?", Username).Find(&Cart).Error; err != nil {
+	if err := db.DB.Preload("Product").Preload("Variant").Preload("Product.Images").Where("user_name=?", Claims.Username).Find(&Cart).Error; err != nil {
 		fmt.Println("Error fetching carts:", err)
 		return
 	}
 
-	
 	c.HTML(http.StatusOK, "cart.html", gin.H{
 		// "Productvariants": ProductVariants,
 		"Cart": Cart,
@@ -31,8 +44,20 @@ func GetCarthandler(c *gin.Context) {
 
 func AddToCarthandler(c *gin.Context) {
 
-	Token, _ := c.Cookie("token")
-	_, Username, _ := helpers.GetUserRoleFromToken(Token)
+	authCookie, _ := c.Cookie("auth")
+	var token models.TokenUser
+	err := json.NewDecoder(strings.NewReader(authCookie)).Decode(&token)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
+	Claims, err := helpers.ParseToken(token.AccessToken)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
 
 	var Cart models.GetCart
 
@@ -45,7 +70,7 @@ func AddToCarthandler(c *gin.Context) {
 	db.DB.First(&variant, Cart.VariantID)
 
 	UpdateCart := &models.Cart{
-		UserName:  Username,
+		UserName:  Claims.Username,
 		VariantID: Cart.VariantID,
 		ProductID: Cart.ProductID,
 		Price:     variant.Price,

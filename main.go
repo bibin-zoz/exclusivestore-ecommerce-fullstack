@@ -19,22 +19,22 @@ func main() {
 	router.LoadHTMLGlob("templates/**/*.html")
 	router.Static("/static", "./static")
 
-	router.GET("/signup", handlers.SignupHandler)
+	router.GET("/signup", middleware.IsLogin(), handlers.SignupHandler)
 	router.POST("/signup", handlers.SignupPost)
-	router.GET("/verify", handlers.VerifyHandler)
+	router.GET("/verify", middleware.IsLogin(), handlers.VerifyHandler)
 	router.POST("/verify", handlers.VerifyPost)
-	router.GET("/login", middleware.LoginAuth(), handlers.LoginHandler)
+	router.GET("/login", middleware.IsLogin(), handlers.LoginHandler)
 	router.POST("/login", handlers.LoginPost)
 	router.GET("/home", middleware.LoginAuth(), handlers.HomeHandler)
 	router.GET("/logout", handlers.LogoutHandler)
 	router.GET("/product", handlers.ProductViewhandler)
 
 	//user cart
-	router.GET("/cart", handlers.GetCarthandler)
-	router.POST("/cart", handlers.AddToCarthandler)
+	router.GET("/cart", middleware.LoginAuth(), handlers.GetCarthandler)
+	router.POST("/cart", middleware.LoginAuth(), handlers.AddToCarthandler)
 
 	//admin
-	router.GET("/admin/login", middleware.AdminAuth(), handlers.AdminLogin)
+	router.GET("/admin/login", middleware.IsLogin(), handlers.AdminLogin)
 	router.POST("/admin/login", handlers.AdminLoginPost)
 	router.GET("/admin/home", middleware.AdminAuth(), handlers.AdminHome)
 
