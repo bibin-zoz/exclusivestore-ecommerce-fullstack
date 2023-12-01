@@ -5,12 +5,16 @@ import (
 )
 
 type Claims struct {
-	ID       int    `json:"id"`
+	ID       uint   `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Role     string `json:"role"`
 	Status   string `json:"status"`
 	jwt.StandardClaims
+}
+type Pagination struct {
+	Offset int `json:"offset"`
+	Limit  int `json:"limit"`
 }
 
 // type AuthUserClaims struct {
@@ -35,7 +39,7 @@ type Invalid struct {
 }
 
 type Compare struct {
-	ID       int
+	ID       uint
 	Password string
 	Role     string
 	Username string
@@ -55,9 +59,9 @@ type Compare struct {
 // 	Image  *string `json:"image"`
 // }
 
-// type Category struct {
-// 	gorm.Model
-// 	CategoryName string `gorm:"unique;not null"`
-// 	Status       string `gorm:"default:'listed'"`
-// 	CreatedAt    time.Time
-// }
+//	type Category struct {
+//		gorm.Model
+//		CategoryName string `gorm:"unique;not null"`
+//		Status       string `gorm:"default:'listed'"`
+//		CreatedAt    time.Time
+//	}

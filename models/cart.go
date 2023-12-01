@@ -9,7 +9,7 @@ type Cart struct {
 	ID        uint            `json:"id" gorm:"unique;not null"`
 	ProductID uint            `json:"productID" gorm:"index;foreignKey:ProductID"`
 	VariantID uint            `json:"variantID" gorm:"index;foreignKey:VariantID"`
-	UserName  string          `json:"userName" gorm:"index;foreignKey:UserName"`
+	UserID    uint            `json:"userID" gorm:"index;foreignKey:userID"`
 	Quantity  uint            `json:"quantity" gorm:"not null"`
 	Price     float64         `json:"price" gorm:"not null"`
 	Total     float64         `json:"Total" gorm:"not null"`

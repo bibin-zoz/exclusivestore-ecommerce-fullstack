@@ -3,10 +3,12 @@ package handlers
 import (
 	db "ecommercestore/database"
 	"ecommercestore/models"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"ecommercestore/helpers"
@@ -56,12 +58,12 @@ func LoginPost(c *gin.Context) {
 		return
 	}
 
-	var count int64
-	if result := db.DB.Model(&models.User{}).Where("email = ?", Newmail).Count(&count); result.Error != nil || count == 0 {
-		data.EmailError = "User not found! Re-check the Mailid"
-		c.HTML(http.StatusBadRequest, "login.html", data)
-		return
-	}
+	// var count int64
+	// if result := db.DB.Model(&models.User{}).Where("email = ?", Newmail).Count(&count); result.Error != nil || count == 0 {
+	// 	data.EmailError = "User not found! Re-check the Mailid"
+	// 	c.HTML(http.StatusBadRequest, "login.html", data)
+	// 	return
+	// }
 	if compare.Password != Newpassword {
 		data.PasswordError = "Check password again"
 		c.HTML(http.StatusBadRequest, "login.html", data)
@@ -332,7 +334,6 @@ func ProductViewhandler(c *gin.Context) {
 	for i := 1; i <= product.Stock && i <= 5; i++ {
 		result = append(result, i)
 	}
-	fmt.Println("result", result)
 
 	// Iterate through product variants to find unique Ram values
 
@@ -342,4 +343,199 @@ func ProductViewhandler(c *gin.Context) {
 		"Quantity": result,
 	})
 
+}
+
+func UserDashboardHandler(c *gin.Context) {
+	var products []models.ProductVariants
+
+	if err := db.DB.Preload("Product").Preload("Product.Images").Find(&products).Error; err != nil {
+		fmt.Println("Error fetching product variant with product and images:", err)
+		return
+	}
+
+	c.HTML(http.StatusOK, "userdashboard.html", gin.H{
+		// "Productvariants": ProductVariants,
+		"ProductVariants": products,
+	})
+
+}
+
+func UserAddressHandler(c *gin.Context) {
+	var userAddress []models.UserAddress
+
+	usercookie, _ := c.Cookie("auth")
+	var token models.TokenUser
+	err := json.NewDecoder(strings.NewReader(usercookie)).Decode(&token)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
+	Claims, err := helpers.ParseToken(token.AccessToken)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+
+	}
+	// fmt.Println("claims", Claims)
+	db.DB.Where("user_id=?", Claims.ID).Find(&userAddress)
+	// fmt.Println("useradd", userAddress)
+	c.JSON(http.StatusOK, userAddress)
+
+}
+func DeleteAddressHandler(c *gin.Context) {
+	var req DeleteRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	cartID := req.ID
+
+	var address models.UserAddress
+	result := db.DB.Where("id = ?", cartID).Delete(&address)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove address"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "address removed successfully"})
+}
+
+func NewAddressHandler(c *gin.Context) {
+	var address models.UserAddress
+
+	usercookie, _ := c.Cookie("auth")
+	var token models.TokenUser
+	err := json.NewDecoder(strings.NewReader(usercookie)).Decode(&token)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
+	Claims, err := helpers.ParseToken(token.AccessToken)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+
+	}
+	if err := c.ShouldBind(&address); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	fmt.Println("address", address)
+	address.UserID = Claims.ID
+
+	result := db.DB.Create(&address)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove address"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Address saved successfully"})
+
+}
+
+// profile
+func GetUserProfileHandler(c *gin.Context) {
+	var userdetails models.User
+	usercookie, _ := c.Cookie("auth")
+	var token models.TokenUser
+	err := json.NewDecoder(strings.NewReader(usercookie)).Decode(&token)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+	}
+	Claims, err := helpers.ParseToken(token.AccessToken)
+	if err != nil {
+		fmt.Println("Error fetching  UserDetails :", err)
+		// Handle the error (e.g., return an error response)
+		return
+
+	}
+	result := db.DB.Where("id=?", Claims.ID).Find(&userdetails)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove address"})
+		return
+
+	}
+	c.JSON(http.StatusOK, userdetails)
+
+}
+
+func UpdateUserProfileHandler(c *gin.Context) {
+	var userdetails models.UserDetail
+	ID, err := helpers.GetID(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+
+	}
+
+	if err := c.ShouldBind(&userdetails); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result := db.DB.Exec("UPDATE users SET username = ?, email = ?, number = ? WHERE id = ?", userdetails.UserName, userdetails.Email, userdetails.PhoneNumber, ID)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user details"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Updated user details successfully"})
+}
+
+func UpdatePasswordHandler(c *gin.Context) {
+	var comparePassword models.UpdatePassword
+
+	ID, err := helpers.GetID(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := c.ShouldBind(&comparePassword); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if comparePassword.NewPassword != comparePassword.ConfirmPassword {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Passwords don't match"})
+		return
+	}
+
+	if comparePassword.NewPassword == comparePassword.Password {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "New password is the same as the current password"})
+		return
+	}
+
+	var currentPassword string
+	result := db.DB.Raw("SELECT password FROM users WHERE id=?", ID).Scan(&currentPassword)
+
+	if result.Error != nil {
+		fmt.Println("Error fetching current password:", result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch current password"})
+		return
+	}
+
+	if currentPassword != comparePassword.Password {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Current password is incorrect"})
+		return
+	}
+
+	result = db.DB.Exec("UPDATE users SET password = ? WHERE id = ?", comparePassword.NewPassword, ID)
+
+	if result.Error != nil {
+		fmt.Println("Error updating password:", result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
 }

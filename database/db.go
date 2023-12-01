@@ -55,5 +55,9 @@ func InitDB() {
 
 		panic(err)
 	}
+	if err := DB.AutoMigrate(&models.UserAddress{}); err != nil {
+
+		panic(err)
+	}
 
 }

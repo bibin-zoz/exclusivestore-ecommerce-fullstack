@@ -11,7 +11,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!-- Custom Stylesheet -->
-        <link href="/static/admin/plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
+    
     
     <link href="/static/admin/css/style.css" rel="stylesheet">
     <style>
@@ -21,7 +21,7 @@
     }
     </style>
      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.11.7/js/jquery.dataTables.min.js"></script>
+ 
    
   
 </head>
@@ -48,7 +48,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="topsection d-flex justify-content-between">
+                            <div class="topsection d-flex justify-content-between mb-2">
                                 <h4 class="card-title">Data Table</h4>
                                 <div class="bootstrap-modal">
                                     <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -174,6 +174,21 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="d-flex flex-row align-items-center mb-2">
+                                <label for="entriesPerPage" class="form-label me-2">Show</label>
+                                <select class="form-select" id="entriesPerPage" onchange="updateEntries()" style="width: auto;">
+                                    <option value="{{.Entries}}">{{.Entries}}</option>
+                                  
+                                    {{ if ne .Entries 5 }}<option value="5">5</option>{{ end }}
+                                    {{ if ne .Entries 10 }}<option value="10">10</option>{{ end }}
+                                    {{ if ne .Entries 20 }}<option value="20">20</option>{{ end }}
+                                    
+                                </select>
+                                
+                                <label class="form-label ms-2">Entries:</label>
+                            </div>
+                            
+                            
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered zero-configuration">
                                     <thead>
@@ -266,13 +281,36 @@
                                     </tbody>
                                   
                                 </table>
+                                <div class="pagination-container mt-4">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                        </li>
+                                        {{range .Pagenumber}}
+                                        {{if eq . $.Currentpage}}
+                                        <li class="page-item active" aria-current="page" value="{{.}}">
+                                            <span class="page-link" id="pagenumber">{{.}} <span class="sr-only">(current)</span></span>
+                                        </li>
+                                        {{else}}
+                                        <li class="page-item " aria-current="page">
+                                            <span class="page-link" id="pagenumber" onclick="updatepage('{{.}}')">{{.}} <span class="sr-only">(current)</span></span>
+                                        </li>
+                                        
+                                        {{end}}
+                                        
+                                        {{end}}
+                                    
+            
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Next</a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
     <!-- Include your footer -->
     <div class="footer">
@@ -291,8 +329,22 @@
    
 
 
-    <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.11.7/js/jquery.dataTables.min.js"></script>
          <script>
+            function updateEntries() {
+                var limit = parseInt(document.getElementById("entriesPerPage").value);
+                var offset = parseInt(document.getElementById("pagenumber").innerHTML);
+               window.location.href=`/admin/products?offset=${offset}&limit=${limit}`
+           }
+           function updatepage(pageNumber) {
+            var limit = parseInt(document.getElementById("entriesPerPage").value);
+            var offset = parseInt(pageNumber);
+            window.location.href=`/admin/products?offset=${offset}&limit=${limit}`
+}
+
+    
+
+
+
         async function updateVariantDetails(select) {
             console.log('Function called');
             var selectedOption = select.options[select.selectedIndex];
@@ -488,9 +540,8 @@
 <script src="/static/admin/js/settings.js"></script>
 <script src="/static/admin/js/gleek.js"></script>
 <script src="/static/admin/js/styleSwitcher.js"></script>
-<script src="/static/admin/plugins/tables/js/jquery.dataTables.min.js"></script>
-<script src="/static/admin/plugins/tables/js/datatable/dataTables.bootstrap4.min.js"></script>
-<script src="/static/admin/plugins/tables/js/datatable-init/datatable-basic.min.js"></script>
+
+
 </body>
 
 </html>

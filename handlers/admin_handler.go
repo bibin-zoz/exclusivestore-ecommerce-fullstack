@@ -309,19 +309,53 @@ func UpdateCategoryStatus(c *gin.Context) {
 //Products
 
 func ProductsHandler(c *gin.Context) {
+
 	var products []models.Products
 	var category []models.Categories
 	var brand []models.Brands
+
+	pgno, err := strconv.Atoi(c.Query("offset"))
+	if err != nil {
+		pgno = 1
+	}
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		limit = 10
+	}
+	offset := (pgno - 1) * limit
+
 	db.DB.Find(&category)
 	db.DB.Find(&brand)
-	if err := db.DB.Preload("Variants").Preload("Category").Preload("Images").Preload("Brand").Find(&products).Error; err != nil {
+	var count int64
+	db.DB.Model(models.Products{}).Count(&count)
+	fmt.Println("count", count)
+	if err := db.DB.Preload("Variants").Preload("Category").Preload("Images").Preload("Brand").Offset(offset).Limit(limit).Find(&products).Error; err != nil {
 		fmt.Println("failed to load products")
 	}
+	if count%2 != 0 {
+		count = count + 1
+	}
+	num := int(count) / (limit)
+	pagenumber := make([]int, 0)
+
+	for i := 1; i <= num; i++ {
+		pagenumber = append(pagenumber, i)
+	}
+	if len(pagenumber) == 0 {
+		pagenumber = append(pagenumber, 1)
+	}
+	fmt.Println("pagenumber", pagenumber)
+
+	// c.JSON(http.StatusOK, products)
+	fmt.Println("pgno", pgno)
 
 	c.HTML(http.StatusOK, "productmanage.html", gin.H{
-		"Products": products,
-		"Category": category,
-		"Brands":   brand,
+		"Products":    products,
+		"Category":    category,
+		"Brands":      brand,
+		"Pagenumber":  pagenumber,
+		"Entries":     limit,
+		"Currentpage": pgno,
 	})
 
 }

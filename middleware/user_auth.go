@@ -4,7 +4,6 @@ import (
 	"ecommercestore/helpers"
 	"ecommercestore/models"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -33,8 +32,8 @@ func LoginAuth() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
-		fmt.Println("token", token.AccessToken)
-		fmt.Println("token", token.RefreshToken)
+		// fmt.Println("token", token.AccessToken)
+		// fmt.Println("token", token.RefreshToken)
 
 		claims, err := helpers.ParseToken(token.AccessToken)
 		if err != nil {
@@ -77,7 +76,7 @@ func LoginAuth() gin.HandlerFunc {
 			}
 
 		}
-		fmt.Println("user", claims)
+		// fmt.Println("user", claims)
 
 		if err != nil {
 			log.Println("Token not present in cookie:", err)

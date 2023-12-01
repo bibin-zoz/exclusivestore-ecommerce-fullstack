@@ -4,7 +4,6 @@ import (
 	"ecommercestore/helpers"
 	"ecommercestore/models"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -32,8 +31,6 @@ func AdminAuth() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
-		fmt.Println("token", token.AccessToken)
-		fmt.Println("token", token.RefreshToken)
 
 		claims, err := helpers.ParseToken(token.AccessToken)
 		if err != nil {

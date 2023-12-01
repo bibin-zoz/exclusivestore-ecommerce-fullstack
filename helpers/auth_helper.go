@@ -5,15 +5,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
 func CreateToken(user models.Claims, expireTime time.Time) (string, error) {
 	expirationTime := expireTime // Adjust as needed
 	claims := &models.Claims{
+		ID:       user.ID,
 		Username: user.Username,
 		Role:     user.Role,
 		Email:    user.Email,
@@ -22,8 +26,8 @@ func CreateToken(user models.Claims, expireTime time.Time) (string, error) {
 			ExpiresAt: expirationTime.Unix(),
 		},
 	}
-	fmt.Println("us", user.Username)
-	fmt.Printf("Claims: %+v\n", claims)
+	// fmt.Println("us", user.Username)
+	// fmt.Printf("Claims: %+v\n", claims)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	jwtKey := []byte(os.Getenv("jwtKey"))
 	fmt.Println("JWT Key:", jwtKey)
@@ -42,6 +46,7 @@ func CreateToken(user models.Claims, expireTime time.Time) (string, error) {
 }
 
 func GenerateAccessToken(user models.Claims) (string, error) {
+
 	expirationTime := time.Now().Add(15 * time.Minute)
 	tokenString, err := CreateToken(user, expirationTime)
 	if err != nil {
@@ -51,6 +56,7 @@ func GenerateAccessToken(user models.Claims) (string, error) {
 }
 
 func GenerateRefreshToken(user models.Claims) (string, error) {
+
 	expirationTime := time.Now().Add(24 * 90 * time.Hour)
 	tokenString, err := CreateToken(user, expirationTime)
 	if err != nil {
@@ -83,9 +89,28 @@ func CreateJson(token *models.TokenUser) (userDetailsJSON []byte) {
 	userDetailsJSON, err := json.Marshal(token)
 	if err != nil {
 		fmt.Println("Error converting UserDetails to JSON:", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 	}
 	return userDetailsJSON
+
+}
+func GetID(c *gin.Context) (*uint, error) {
+	usercookie, _ := c.Cookie("auth")
+	var token models.TokenUser
+	err := json.NewDecoder(strings.NewReader(usercookie)).Decode(&token)
+	if err != nil {
+		fmt.Println("Error fetching UserDetails:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user details"})
+		return nil, err
+	}
+
+	Claims, err := ParseToken(token.AccessToken)
+	if err != nil {
+		fmt.Println("Error fetching UserDetails:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse user details from token"})
+		return nil, err
+	}
+	return &Claims.ID, nil
 
 }
