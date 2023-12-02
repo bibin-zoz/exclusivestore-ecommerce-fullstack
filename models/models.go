@@ -65,3 +65,8 @@ type Compare struct {
 //		Status       string `gorm:"default:'listed'"`
 //		CreatedAt    time.Time
 //	}
+
+type OrderReq struct {
+	CartID    string `json:"cartID"`
+	AddressID string `json:"addressID"`
+}

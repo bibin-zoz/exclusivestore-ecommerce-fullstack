@@ -25,8 +25,9 @@
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders"
-                                            role="tab" aria-controls="orders" aria-selected="false"><i
-                                                class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                            role="tab" aria-controls="orders" aria-selected="false">
+                                            <i class="fi-rs-shopping-bag mr-10"></i>Orders
+                                        </a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab"
@@ -74,7 +75,7 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table">
+                                                <table class="table" id="orders-table">
                                                     <thead>
                                                         <tr>
                                                             <th>Order</th>
@@ -85,30 +86,11 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td>#1357</td>
-                                                            <td>March 45, 2020</td>
-                                                            <td>Processing</td>
-                                                            <td>$125.00 for 2 item</td>
-                                                            <td><a href="#" class="btn-small d-block">View</a></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>#2468</td>
-                                                            <td>June 29, 2020</td>
-                                                            <td>Completed</td>
-                                                            <td>$364.00 for 5 item</td>
-                                                            <td><a href="#" class="btn-small d-block">View</a></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>#2366</td>
-                                                            <td>August 02, 2020</td>
-                                                            <td>Completed</td>
-                                                            <td>$280.00 for 3 item</td>
-                                                            <td><a href="#" class="btn-small d-block">View</a></td>
-                                                        </tr>
+                                                        <!-- This tbody will be populated dynamically by JavaScript -->
                                                     </tbody>
                                                 </table>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -253,9 +235,8 @@
                                                 <div class="row">
                                                     <div class="form-group col-md-12">
                                                         <label>Current Password <span class="required">*</span></label>
-                                                        <input required="" class="form-control square"
-                                                            name="password" type="password"
-                                                            placeholder="Enter current password">
+                                                        <input required="" class="form-control square" name="password"
+                                                            type="password" placeholder="Enter current password">
                                                     </div>
                                                     <div class="form-group col-md-12">
                                                         <label>New Password <span class="required">*</span></label>
@@ -426,6 +407,94 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+
+<script>
+    $(document).ready(function () {
+
+        $.ajax({
+            url: '/order',
+            type: 'GET',
+            dataType: 'json',
+            success: function (orders) {
+
+                displayOrders(orders);
+            },
+            error: function (error) {
+                console.error('Error fetching orders:', error);
+            }
+        });
+    });
+
+
+    // Function to display orders
+    function displayOrders(orders) {
+
+        var tableBody = $('#orders-table tbody');
+
+        tableBody.empty();
+
+        $.each(orders, function (index, order) {
+
+            var formattedDate = new Date(order.CreatedAt).toLocaleString();
+
+            // Create a new row with order details
+            var row = '<tr>' +
+                '<td>#' + order.id + '</td>' +
+                '<td>' + formattedDate + '</td>' +
+                '<td>' + order.status + '</td>' +
+                '<td>$' + order.price + ' for ' + order.quantity + ' item</td>' +
+                '<td><a href="/orderdetails?id=' + order.id + '" class="btn-small d-block">View</a> <button onclick="cancelOrder(' + order.id + ')" class="btn-small d-block" style="color: red;"><i class="fas fa-times"></i>cancel</button></td>' +
+                '</tr>';
+
+            tableBody.append(row);
+        });
+    }
+
+</script>
+//cancel order
+<script>
+    function cancelOrder(orderId) {
+        $.ajax({
+            url: '/order',
+            type: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: orderId}),
+            success: function (response) {
+                console.log('Success:', response);
+
+                // Show success toast
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Status Updated!',
+                    text: 'The status has been updated successfully.',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+
+                // Optionally, you can redirect the user or update the UI
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            },
+            error: function (error) {
+                console.error('Error:', error);
+
+                // Show error toast
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error.responseJSON ? error.responseJSON.error : 'An error occurred while updating the status.',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+            }
+        });
+    }
+</script>
+
+</script>
 <script>
     $(document).ready(function () {
         $('#account-detail-tab').click(function (e) {
@@ -465,7 +534,7 @@
                 error: function (error) {
                     console.error('Error:', error);
                     showToast('Failed to update userdetails', 'error');
-                    
+
 
                 }
 
@@ -476,7 +545,7 @@
 
         $('form[name="userInfoForm2"]').submit(function (e) {
             e.preventDefault();
-            var formData = $(this).serializeArray();  
+            var formData = $(this).serializeArray();
             console.log("FormData:", formData);
             $.ajax({
                 url: '/userprofile',
@@ -491,7 +560,7 @@
                 error: function (error) {
                     console.error('Error:', error);
                     showToast('Failed to update password', 'error');
-                    
+
 
                 }
 
@@ -550,9 +619,6 @@
                 backgroundColor: type === 'success' ? '#2ecc71' : '#e74c3c',
             }).showToast();
         }
-
-
-
         $('#new-address-tab').click(function () {
             $('#newAddressModal').modal('show');
         });

@@ -14,8 +14,7 @@ func main() {
 
 	db.InitDB()
 
-	// router.LoadHTMLGlob("templates/*.html")
-	// router.LoadHTMLGlob("templates/*")
+	//
 	router.LoadHTMLGlob("templates/**/*.html")
 	router.Static("/static", "./static")
 
@@ -33,20 +32,28 @@ func main() {
 	router.GET("/cart", middleware.LoginAuth(), handlers.GetCarthandler)
 	router.POST("/cart", middleware.LoginAuth(), handlers.AddToCarthandler)
 	router.DELETE("/cart", middleware.LoginAuth(), handlers.DeleteCartHandler)
+	router.GET("/checkout", middleware.LoginAuth(), handlers.CheckOuthandler)
+
+	//order
+
+	router.POST("/order", middleware.LoginAuth(), handlers.OrderPlacehandler)
+	router.GET("/order", middleware.LoginAuth(), handlers.GetOrdershandler)
+	router.GET("/orderdetails", middleware.LoginAuth(), handlers.GetOrderDetailshandler)
+	router.PATCH("/order", middleware.LoginAuth(), handlers.CancelOrderHandler)
 
 	//admin
-	router.GET("/admin/login", middleware.IsLogin(), handlers.AdminLogin)
+	router.GET("/admin/login", handlers.AdminLogin)
 	router.POST("/admin/login", handlers.AdminLoginPost)
 	router.GET("/admin/home", middleware.AdminAuth(), handlers.AdminHome)
 
 	//customers
 	router.GET("/admin/customers", middleware.AdminAuth(), handlers.CustomerHandler)
 	router.DELETE("/admin/customers", middleware.AdminAuth(), handlers.DeleteCustomerHandler)
-	router.GET("/admin/update-status", middleware.AdminAuth(), handlers.UpdateStatusHandler)
+	router.GET("/admin/customer/update-status", middleware.AdminAuth(), handlers.UpdateStatusHandler)
 
 	//category
 	router.GET("/admin/categories", middleware.AdminAuth(), handlers.Categoryhandler)
-	router.PATCH("/admin/categories/update-status", middleware.AdminAuth(), handlers.UpdateCategoryStatus)
+	router.PATCH("/admin/categories", middleware.AdminAuth(), handlers.UpdateCategoryStatus)
 	router.POST("/admin/categories", middleware.AdminAuth(), handlers.CategoryPost)
 	router.DELETE("/admin/categories", middleware.AdminAuth(), handlers.DeleteCategoryHandler)
 
@@ -56,12 +63,17 @@ func main() {
 	//Products
 	router.GET("/admin/products", middleware.AdminAuth(), handlers.ProductsHandler)
 	router.POST("/admin/product", middleware.AdminAuth(), handlers.AddProduct)
-	router.GET("/admin/Products/update-status", middleware.AdminAuth(), handlers.UpdateProductStatus)
+	router.PATCH("/admin/products", middleware.AdminAuth(), handlers.UpdateProductStatus)
 	router.DELETE("/admin/products", middleware.AdminAuth(), handlers.DeleteProductHandler)
 
 	//product edit
 	router.GET("/admin/product", middleware.AdminAuth(), handlers.ProductDetailsHandler)
 	router.PUT("/admin/product", middleware.AdminAuth(), handlers.ProductUpdateHandler)
+
+	//orders
+
+	router.GET("/admin/orders", middleware.AdminAuth(), handlers.UserOrdersHandler)
+	router.PATCH("/admin/orders", middleware.AdminAuth(), handlers.UpdateOrderStatusHandler)
 
 	//user dashboard
 	router.GET("/userdashboard", middleware.LoginAuth(), handlers.UserDashboardHandler)

@@ -7,13 +7,13 @@ import (
 type Cart struct {
 	gorm.Model
 	ID        uint            `json:"id" gorm:"unique;not null"`
-	ProductID uint            `json:"productID" gorm:"index;foreignKey:ProductID"`
-	VariantID uint            `json:"variantID" gorm:"index;foreignKey:VariantID"`
-	UserID    uint            `json:"userID" gorm:"index;foreignKey:userID"`
+	ProductID uint            `json:"productID" gorm:"index;foreignKey:ProductID;constraint:OnDelete:CASCADE"`
+	VariantID uint            `json:"variantID" gorm:"index;foreignKey:VariantID;constraint:OnDelete:CASCADE"`
+	UserID    uint            `json:"userID" gorm:"index;foreignKey:userID;constraint:OnDelete:CASCADE"`
 	Quantity  uint            `json:"quantity" gorm:"not null"`
 	Price     float64         `json:"price" gorm:"not null"`
 	Total     float64         `json:"Total" gorm:"not null"`
-	Product   Products        `gorm:"foreignKey:ProductID"`
+	Product   Products        `gorm:"foreignKey:ProductID;"`
 	Variant   ProductVariants `gorm:"foreignKey:VariantID"`
 	// Image     []Image `gorm:"foreignKey:ProductID"`
 }

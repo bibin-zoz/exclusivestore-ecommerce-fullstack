@@ -35,6 +35,12 @@ func AdminHome(c *gin.Context) {
 func AdminLogin(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
+	_, err := c.Cookie("adminAuth")
+	if err == nil {
+		c.Redirect(http.StatusSeeOther, "/admin/home")
+		c.AbortWithStatus(http.StatusSeeOther)
+		return
+	}
 
 	c.HTML(http.StatusOK, "adminlogin.html", nil)
 
@@ -98,14 +104,14 @@ func AdminLoginPost(c *gin.Context) {
 	accessToken, err := helpers.GenerateAccessToken(claims)
 	if err != nil {
 		fmt.Println("Error generating access token:", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 	}
 
 	refreshToken, err := helpers.GenerateRefreshToken(claims)
 	if err != nil {
 		fmt.Println("Error generating refresh token:", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 	}
 
@@ -335,7 +341,13 @@ func ProductsHandler(c *gin.Context) {
 	if count%2 != 0 {
 		count = count + 1
 	}
+	fmt.Println("count", count)
+	fmt.Println("lim", limit)
 	num := int(count) / (limit)
+	if int(count)%limit != 0 {
+		num = num + 1
+	}
+	fmt.Println("num", num)
 	pagenumber := make([]int, 0)
 
 	for i := 1; i <= num; i++ {
@@ -344,7 +356,7 @@ func ProductsHandler(c *gin.Context) {
 	if len(pagenumber) == 0 {
 		pagenumber = append(pagenumber, 1)
 	}
-	fmt.Println("pagenumber", pagenumber)
+	fmt.Println("pagenumber", len(pagenumber))
 
 	// c.JSON(http.StatusOK, products)
 	fmt.Println("pgno", pgno)
@@ -374,7 +386,6 @@ func AddProduct(c *gin.Context) {
 	categoryID, _ := strconv.Atoi(c.PostForm("categoryID"))
 	brandID, _ := strconv.Atoi(c.PostForm("brandID"))
 
-	// validation
 	if productName == "" || productDetails == "" || stock <= 0 || price <= 100 {
 		if productName == "" {
 			Producterror.ProductNameError = "invalid productname"
@@ -397,7 +408,7 @@ func AddProduct(c *gin.Context) {
 		return
 
 	}
-	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB limit
+	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -422,23 +433,21 @@ func AddProduct(c *gin.Context) {
 	}
 	newProductVariant := models.ProductVariants{
 		ProductID: newProduct.ID,
-		Processor: c.PostForm("processor"), // Assuming you get the processor value from the form
+		Processor: c.PostForm("processor"),
 		Storage:   storage,
 		Ram:       ram,
 		Status:    "listed",
-		Stock:     stock, // You can set the default value here or get it from the form
-		MaxPrice:  price, // Assuming max price is the same as the regular price for now
+		Stock:     stock,
+		MaxPrice:  price,
 	}
 	newProductVariant.CreateSlug(productName)
 
-	// Insert the new ProductVariant into the database
 	resultVariant := db.DB.Create(&newProductVariant)
 	if resultVariant.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": resultVariant.Error.Error()})
 		return
 	}
 
-	// Process each file
 	for _, file := range files {
 		isValid, detectedType := helpers.IsImageFile(file)
 		if !isValid {
@@ -449,7 +458,6 @@ func AddProduct(c *gin.Context) {
 
 		fmt.Println("Valid format:", detectedType)
 
-		// Continue processing the file since it's a valid image
 		src, err := file.Open()
 		if err != nil {
 			fmt.Println("Error opening file:", err)
@@ -480,7 +488,6 @@ func AddProduct(c *gin.Context) {
 		}
 		defer dst.Close()
 
-		// Resize the image
 		img, _, err := image.Decode(src)
 		if err != nil {
 			fmt.Println("Error decoding image:", err)
@@ -488,10 +495,8 @@ func AddProduct(c *gin.Context) {
 			return
 		}
 
-		// Resize to your desired width and height
 		resizedImg := resize.Resize(465, 576, img, resize.Lanczos3)
 
-		// Save the resized image
 		if err := jpeg.Encode(dst, resizedImg, nil); err != nil {
 			fmt.Println("Error encoding image:", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -512,7 +517,13 @@ func AddProduct(c *gin.Context) {
 
 func UpdateProductStatus(c *gin.Context) {
 
-	ID := c.Query("id")
+	var req DeleteRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ID := req.ID
 
 	var product models.Products
 	if err := db.DB.Where("id = ?", ID).First(&product).Error; err != nil {
@@ -533,7 +544,10 @@ func UpdateProductStatus(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/admin/products")
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Product Status Updated Successfully",
+		"redirect": "/admin/categories",
+	})
 }
 
 func DeleteProductHandler(c *gin.Context) {
@@ -566,7 +580,7 @@ func ProductDetailsHandler(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Query("id"))
 	var Product models.Products
 	var category []models.Categories
-	if err := db.DB.Preload("Brand").Preload("ProductVariants").Preload("Images").Find(&Product, ID).Error; err != nil {
+	if err := db.DB.Preload("Brand").Preload("Variants").Preload("Images").Find(&Product, ID).Error; err != nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
 		return
 	}
@@ -600,20 +614,64 @@ func ProductDetailsHandler(c *gin.Context) {
 func ProductUpdateHandler(c *gin.Context) {
 	// Get product ID from the form data
 	idStr := c.PostForm("id")
-	id, _ := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		return
+	}
 
 	// Parse other form data
-	variantID, _ := strconv.Atoi(c.PostForm("variantID"))
+	variantID, err := strconv.Atoi(c.PostForm("variantID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid variant ID"})
+		return
+	}
+
 	productName := c.PostForm("productName")
+	if productName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Product name cannot be empty"})
+		return
+	}
+
 	productDetails := c.PostForm("productDetails")
+	if productDetails == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Product details cannot be empty"})
+		return
+	}
+
+	categoryID, err := strconv.ParseUint(c.PostForm("categoryID"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+		return
+	}
 	storage := c.PostForm("storage")
-	ram := c.PostForm("ram")
 	stock, _ := strconv.Atoi(c.PostForm("stock"))
-	price, _ := strconv.ParseFloat(c.PostForm("price"), 64)
-	categoryID, _ := strconv.ParseUint(c.PostForm("categoryID"), 10, 64)
+	price, err := strconv.ParseFloat(c.PostForm("price"), 64)
+	addProduct := c.PostForm("addProduct")
+	ram := c.PostForm("ram")
 	fmt.Println("variant", variantID)
 
-	if variantID == 0 {
+	if variantID == 0 && addProduct == "true" {
+		if ram == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ram  cannot be empty"})
+			return
+		}
+
+		if storage == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "storage  cannot be empty"})
+			return
+		}
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid stock value"})
+			return
+		}
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price value"})
+			return
+		}
+
 		fmt.Println("variant zero entered")
 		// VariantID is 0, create a new ProductVariants record
 		newProductVariant := models.ProductVariants{
@@ -630,7 +688,8 @@ func ProductUpdateHandler(c *gin.Context) {
 		// Insert the new ProductVariant into the database
 		result := db.DB.Create(&newProductVariant)
 		if result.Error != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+			fmt.Println("result.Error.Error()")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Variant already Exist"})
 			return
 		}
 		if result.Error != nil {
@@ -696,7 +755,7 @@ func ProductUpdateHandler(c *gin.Context) {
 
 	}
 
-	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB limit
+	err = c.Request.ParseMultipartForm(10 << 20) // 10 MB limit
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -754,4 +813,74 @@ func ProductUpdateHandler(c *gin.Context) {
 		"message":  "Product updated successfully",
 		"redirect": "/admin/product?id=" + idStr,
 	})
+}
+
+func UserOrdersHandler(c *gin.Context) {
+	var orders []models.Orders
+	pgno, err := strconv.Atoi(c.Query("offset"))
+	if err != nil {
+		pgno = 1
+	}
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		limit = 10
+	}
+	offset := (pgno - 1) * limit
+
+	var count int64
+	db.DB.Model(models.Orders{}).Count(&count)
+	fmt.Println("count", count)
+
+	// Fetch all orders from the database
+	if err := db.DB.Preload("User").Preload("Address").Preload("Variant").Preload("Product").Offset(offset).Limit(limit).Find(&orders).Error; err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "Failed to fetch orders"})
+		return
+	}
+	num := int(count) / (limit)
+	if int(count)%limit != 0 {
+		num = num + 1
+	}
+	fmt.Println("num", num)
+	pagenumber := make([]int, 0)
+
+	for i := 1; i <= num; i++ {
+		pagenumber = append(pagenumber, i)
+	}
+	if len(pagenumber) == 0 {
+		pagenumber = append(pagenumber, 1)
+	}
+
+	// Render the userorders.html template with the orders data
+	c.HTML(http.StatusOK, "orders.html", gin.H{
+		"Orders":      orders,
+		"Pagenumber":  pagenumber,
+		"Entries":     limit,
+		"Currentpage": pgno,
+	})
+}
+
+func UpdateOrderStatusHandler(c *gin.Context) {
+	var updateStatusRequest struct {
+		ID     uint   `json:"id"`
+		Status string `json:"status"`
+	}
+
+	if err := c.ShouldBindJSON(&updateStatusRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var order models.Orders
+	if err := db.DB.First(&order, updateStatusRequest.ID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+		return
+	}
+
+	order.Status = updateStatusRequest.Status
+	if err := db.DB.Save(&order).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update status"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Status updated successfully"})
 }

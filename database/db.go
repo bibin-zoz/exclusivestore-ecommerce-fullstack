@@ -59,5 +59,9 @@ func InitDB() {
 
 		panic(err)
 	}
+	if err := DB.AutoMigrate(&models.Orders{}); err != nil {
+
+		panic(err)
+	}
 
 }

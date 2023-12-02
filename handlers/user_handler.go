@@ -90,14 +90,14 @@ func LoginPost(c *gin.Context) {
 	accessToken, err := helpers.GenerateAccessToken(claims)
 	if err != nil {
 		fmt.Println("Error generating access token:", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 	}
 
 	refreshToken, err := helpers.GenerateRefreshToken(claims)
 	if err != nil {
 		fmt.Println("Error generating refresh token:", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 	}
 
@@ -119,11 +119,8 @@ func LoginPost(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
 
-	// Redirect to home only after successful token generation
 	c.Redirect(http.StatusFound, "/home")
 }
-
-// ... (your other functions)
 
 func SignupHandler(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -231,7 +228,7 @@ func SignupPost(c *gin.Context) {
 var lastOTPSendTime time.Time
 
 func VerifyHandler(c *gin.Context) {
-	// Check if it has been at least 60 seconds since the last OTP was sent
+	//for avoiding req in 60secondss
 	if time.Since(lastOTPSendTime) < 60*time.Second {
 		c.HTML(http.StatusOK, "verify.html", gin.H{"Message": "Please wait before requesting a new OTP"})
 		return
@@ -303,7 +300,7 @@ func VerifyPost(c *gin.Context) {
 func HomeHandler(c *gin.Context) {
 	var products []models.ProductVariants
 
-	if err := db.DB.Preload("Product").Preload("Product.Images").Find(&products).Error; err != nil {
+	if err := db.DB.Preload("Product").Preload("Product.Images").Where("status='listed'").Find(&products).Error; err != nil {
 		fmt.Println("Error fetching product variant with product and images:", err)
 		return
 	}
@@ -334,8 +331,6 @@ func ProductViewhandler(c *gin.Context) {
 	for i := 1; i <= product.Stock && i <= 5; i++ {
 		result = append(result, i)
 	}
-
-	// Iterate through product variants to find unique Ram values
 
 	c.HTML(http.StatusOK, "productdetail.html", gin.H{
 		// "Productvariants": ProductVariants,
@@ -368,13 +363,13 @@ func UserAddressHandler(c *gin.Context) {
 	err := json.NewDecoder(strings.NewReader(usercookie)).Decode(&token)
 	if err != nil {
 		fmt.Println("Error fetching  UserDetails :", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 	}
 	Claims, err := helpers.ParseToken(token.AccessToken)
 	if err != nil {
 		fmt.Println("Error fetching  UserDetails :", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 
 	}
@@ -412,13 +407,12 @@ func NewAddressHandler(c *gin.Context) {
 	err := json.NewDecoder(strings.NewReader(usercookie)).Decode(&token)
 	if err != nil {
 		fmt.Println("Error fetching  UserDetails :", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 	}
 	Claims, err := helpers.ParseToken(token.AccessToken)
 	if err != nil {
 		fmt.Println("Error fetching  UserDetails :", err)
-		// Handle the error (e.g., return an error response)
 		return
 
 	}
@@ -448,13 +442,13 @@ func GetUserProfileHandler(c *gin.Context) {
 	err := json.NewDecoder(strings.NewReader(usercookie)).Decode(&token)
 	if err != nil {
 		fmt.Println("Error fetching  UserDetails :", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 	}
 	Claims, err := helpers.ParseToken(token.AccessToken)
 	if err != nil {
 		fmt.Println("Error fetching  UserDetails :", err)
-		// Handle the error (e.g., return an error response)
+
 		return
 
 	}

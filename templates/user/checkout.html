@@ -1,0 +1,553 @@
+{{template "userheader.html"}}
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Checkout
+            </div>
+        </div>
+    </div>
+    <section class="mt-50 mb-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-sm-15">
+                    <div class="toggle_info">
+                        <span><i class="fi-rs-user mr-10"></i><span class="text-muted">Already have an account?</span>
+                            <a href="#loginform" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click
+                                here to login</a></span>
+                    </div>
+                    <div class="panel-collapse collapse login_form" id="loginform">
+                        <div class="panel-body">
+                            <p class="mb-30 font-sm">If you have shopped with us before, please enter your details
+                                below. If you are a new customer, please proceed to the Billing &amp; Shipping section.
+                            </p>
+                            <form method="post">
+                                <div class="form-group">
+                                    <input type="text" name="email" placeholder="Username Or Email">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" name="password" placeholder="Password">
+                                </div>
+                                <div class="login_footer form-group">
+                                    <div class="chek-form">
+                                        <div class="custome-checkbox">
+                                            <input class="form-check-input" type="checkbox" name="checkbox"
+                                                id="remember" value="">
+                                            <label class="form-check-label" for="remember"><span>Remember
+                                                    me</span></label>
+                                        </div>
+                                    </div>
+                                    <a href="#">Forgot password?</a>
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-md" name="login">Log in</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="toggle_info">
+                        <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a
+                                href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click
+                                here to enter your code</a></span>
+                    </div>
+                    <div class="panel-collapse collapse coupon_form " id="coupon">
+                        <div class="panel-body">
+                            <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
+                            <form method="post">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Enter Coupon Code...">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn  btn-md" name="login">Apply Coupon</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="divider mt-50 mb-50"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="tab-pane " id="address" role="tabpanel">
+                        <H2>Saved Address</H2>
+                        <div class="card-header">
+                            <h5 class="mb-0">Billing Address</h5>
+                        </div>
+                        <div class="row1" id="addressBlocks">
+                            <form>
+                                <input class="form-check-input " type="hidden" name="cartid" id="cartid"
+                                    value="{{.CartID}}">
+                                <div class="row1 container fluid card-header mt-2">
+
+
+
+
+
+                                </div>
+                            </form>
+
+                        </div>
+
+
+
+                        <a class="nav-link" id="new-address-tab" data-bs-toggle="tab" href="#newAddressModal" role="tab"
+                            aria-controls="newAddressModal" aria-selected="false">
+                            <i class="fi-rs-marker mr-10"></i>Add New Address
+                        </a>
+
+                    </div>
+                    <div class="modal fade" id="newAddressModal" tabindex="-1" role="dialog"
+                        aria-labelledby="newAddressModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="newAddressModalLabel">Add New Address</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- address form -->
+                                    <form name="enq" id="addressForm">
+                                        <div class="row">
+                                            <div class="form-group col-md-12">
+                                                <label>Street <span class="required">*</span></label>
+                                                <input required="" class="form-control square" name="street"
+                                                    type="text">
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label>City <span class="required">*</span></label>
+                                                <input required="" class="form-control square" name="city" type="text">
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label>State <span class="required">*</span></label>
+                                                <input required="" class="form-control square" name="state" type="text">
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label>Postal Code <span class="required">*</span></label>
+                                                <input required="" class="form-control square" name="postalcode"
+                                                    type="text">
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label>Country <span class="required">*</span></label>
+                                                <input required="" class="form-control square" name="country"
+                                                    type="text">
+                                            </div>
+
+                                            <div class="form-group col-md-12">
+                                                <label>Mobile Number <span class="required">*</span></label>
+                                                <input required="" class="form-control square" name="phonenumber"
+                                                    type="tel">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-fill-out"
+                                                id="adsubmitBtn">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="order_review">
+                        <div class="mb-20">
+                            <h4>Your Orders</h4>
+                        </div>
+                        <div class="table-responsive order_table text-center">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">Product</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{range .Cart}}
+                                    {{ $cartid := .ID }}
+                                    <tr>
+
+                                        <td class="image product-thumbnail"> {{ with index .Product.Images 0}}
+                                            <img src="{{ .FilePath }}" alt="IMG">
+                                            {{ end }}
+                                        </td>
+                                        <td>
+                                            <h5><a href="shop-product-full.html">{{.Product.ProductName}} <br>
+                                                    {{.Variant.Slug}}</a></h5> <span class="product-qty">x
+                                                {{.Quantity}}</span>
+                                        </td>
+                                        <td>${{.Variant.Price}}</td>
+                                    </tr>
+                                    {{end}}
+
+                                    <tr>
+                                        <th>SubTotal</th>
+                                        <td class="product-subtotal" colspan="2">${{.CartTotal}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Shipping</th>
+                                        <td colspan="2"><em>Free Shipping</em></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total</th>
+                                        <td colspan="2" class="product-subtotal"><span
+                                                class="font-xl text-brand fw-900">${{.CartTotal}}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                        <div class="payment_method">
+                            <div class="mb-25">
+                                <h5>Payment</h5>
+                            </div>
+                            <div class="payment_option">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="exampleRadios"
+                                        id="exampleRadios2" value="option2">
+                                    <label class="form-check-label" for="exampleRadios2">
+                                        Cash on delivery
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="exampleRadios"
+                                        id="exampleRadios3" value="option3" disabled>
+                                    <label class="form-check-label" for="exampleRadios3">
+                                        Disabled radio
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <button class="btn btn-fill-out btn-block mt-30" id="placeOrderBtn">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer class="main">
+
+    <section class="section-padding footer-mid">
+        <div class="container pt-15 pb-20">
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="widget-about font-md mb-md-5 mb-lg-0">
+                        <div class="logo logo-width-1 wow fadeIn animated">
+                            <a href="index.html"><img src="static/evara/assets/imgs/theme/logo.svg" alt="logo"></a>
+                        </div>
+                        <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
+                        <p class="wow fadeIn animated">
+                            <strong>Address: </strong>562 Wellington Road, Street 32, San Francisco
+                        </p>
+                        <p class="wow fadeIn animated">
+                            <strong>Phone: </strong>+01 2222 365 /(+91) 01 2345 6789
+                        </p>
+                        <p class="wow fadeIn animated">
+                            <strong>Hours: </strong>10:00 - 18:00, Mon - Sat
+                        </p>
+                        <h5 class="mb-10 mt-30 fw-600 text-grey-4 wow fadeIn animated">Follow Us</h5>
+                        <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0">
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <h5 class="widget-title wow fadeIn animated">About</h5>
+                    <ul class="footer-list wow fadeIn animated mb-sm-5 mb-md-0">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Delivery Information</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms &amp; Conditions</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Support Center</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2  col-md-3">
+                    <h5 class="widget-title wow fadeIn animated">My Account</h5>
+                    <ul class="footer-list wow fadeIn animated">
+                        <li><a href="#">Sign In</a></li>
+                        <li><a href="#">View Cart</a></li>
+                        <li><a href="#">My Wishlist</a></li>
+                        <li><a href="#">Track My Order</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Order</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="widget-title wow fadeIn animated">Install App</h5>
+                    <div class="row">
+                        <div class="col-md-8 col-lg-12">
+                            <p class="wow fadeIn animated">From App Store or Google Play</p>
+                            <div class="download-app wow fadeIn animated">
+                                <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active"
+                                        src="static/evara/assets/imgs/theme/app-store.jpg" alt=""></a>
+                                <a href="#" class="hover-up"><img src="static/evara/assets/imgs/theme/google-play.jpg"
+                                        alt=""></a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
+                            <p class="mb-20 wow fadeIn animated">Secured Payment Gateways</p>
+                            <img class="wow fadeIn animated" src="static/evara/assets/imgs/theme/payment-method.png"
+                                alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="container pb-20 wow fadeIn animated">
+        <div class="row">
+            <div class="col-12 mb-20">
+                <div class="footer-bottom"></div>
+            </div>
+            <div class="col-lg-6">
+                <p class="float-md-left font-sm text-muted mb-0">&copy; 2021, <strong class="text-brand">Evara</strong>
+                    - HTML Ecommerce Template </p>
+            </div>
+            <div class="col-lg-6">
+                <p class="text-lg-end text-start font-sm text-muted mb-0">
+                    Designed by <a href="http://alithemes.com/" target="_blank">Alithemes.com</a>. All rights reserved
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- Preloader Start -->
+<div id="preloader-active">
+    <div class="preloader d-flex align-items-center justify-content-center">
+        <div class="preloader-inner position-relative">
+            <div class="text-center">
+                <h5 class="mb-5">Now Loading</h5>
+
+                <div class="loader">
+                    <div class="bar bar1"></div>
+                    <div class="bar bar2"></div>
+                    <div class="bar bar3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Vendor JS-->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@2"></script>
+
+<!-- Place order checkout JS-->
+<script>
+    $(document).ready(function () {
+
+        // Assuming there is a button or trigger for processing the order
+        $('#placeOrderBtn').on('click', function () {
+
+            // Get the selected address ID
+            var addressID = $('input[name="flexRadioDefault"]:checked').val();
+            var cartID = '{{.CartID}}';
+            var requestData = {
+                cartID: cartID,
+                AddressID: addressID,
+            };
+            $.ajax({
+                url: '/order',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(requestData),
+                success: function (response) {
+                   
+                    console.log('Success:', response);
+                   
+                    Swal.fire({
+            icon: 'success',
+            title: 'Order Placed Successfully',
+            text: 'Your order has been placed successfully!',
+        }).then((result) => {
+          
+            if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                location.reload();
+            }
+        });
+    },
+                error: function (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+            icon: 'error',
+            title: 'Error Placing Order',
+            text: error.responseJSON.error || 'There was an error placing your order. Please try again.',
+        });
+                }
+            });
+
+        });
+    });
+
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/useraddress',
+            type: 'GET',
+            dataType: 'json',
+            success: function (userAddresses) {
+                // Handle the response and update the HTML
+                displayAddresses(userAddresses);
+            },
+            error: function (error) {
+                console.error('Error fetching store addresses:', error);
+            }
+        });
+
+
+        $('#adsubmitBtn').click(function () {
+
+            var formData = $('#addressForm').serializeArray();
+            $.ajax({
+                url: '/useraddress',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    console.log('Success:', response);
+                    showToast('Address saved successfully', 'success');
+                    $('#newAddressModal').modal('hide');
+                    $('#address-tab').click();
+
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                    showToast('Failed to save address', 'error');
+                    $('#newAddressModal').modal('hide');
+
+                }
+
+
+            });
+
+        });
+
+        function showToast(message, type) {
+            Toastify({
+                text: message,
+                duration: 3000, // 3 seconds
+                close: true,
+                gravity: 'top', // 'top' or 'bottom'
+                position: 'center', // 'left', 'center', or 'right'
+                backgroundColor: type === 'success' ? '#2ecc71' : '#e74c3c',
+            }).showToast();
+        }
+
+
+
+        $('#new-address-tab').click(function () {
+            $('#newAddressModal').modal('show');
+        });
+        $('#newAddressModal button[data-dismiss="modal"]').click(function () {
+            $('#newAddressModal').modal('hide');
+        });
+
+        // Attach a click event listener to the "My Address" link
+
+
+        // Function to display store addresses inside #addressBlocks div
+        function displayAddresses(userAddresses) {
+            var addressBlocks = $('#addressBlocks');
+
+            // Clear previous content
+            addressBlocks.empty();
+
+            // Loop through each address and create a new block
+            userAddresses.forEach(function (userAddress) {
+                var addressBlock = `
+                    <input class="form-check-input " type="radio" name="flexRadioDefault" id="selectedaddress" value="${userAddress.ID}">Select
+                    
+                    
+                    <div class="row1 container fluid card-header mt-2" >      
+                                    <div class="card-body">
+                                        <address>
+                                            ${userAddress.street}, ${userAddress.city}, ${userAddress.state} <br>
+                                            ${userAddress.postalcode} <br>
+                                            ${userAddress.country} <br>
+                                            ${userAddress.phone_number} <br>
+                                            <button type="button"
+                                            data-id="${userAddress.ID}" class="text-muted ad-delete-btn"><i class="fi-rs-trash"></i></button>
+                                        </address>
+                                        <a href="#" class="btn-small">Edit</a>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        </div>`;
+                addressBlocks.append(addressBlock);
+            });
+        }
+        $('#addressBlocks').on('click', '.ad-delete-btn', function () {
+            var addressID = $(this).data('id');
+
+            console.log('Sending AJAX request with ID:', addressID);
+
+            $.ajax({
+                url: '/useraddress',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: addressID }),
+                success: function (response) {
+                    console.log('Success:', response);
+                    $('#address-tab').click();
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+
+    });
+</script>
+<script src="static/evara/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+<script src="static/evara/assets/js/vendor/jquery-3.6.0.min.js"></script>
+<script src="static/evara/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+<script src="static/evara/assets/js/vendor/bootstrap.bundle.min.js"></script>
+<script src="static/evara/assets/js/plugins/slick.js"></script>
+<script src="static/evara/assets/js/plugins/jquery.syotimer.min.js"></script>
+<script src="static/evara/assets/js/plugins/wow.js"></script>
+<script src="static/evara/assets/js/plugins/jquery-ui.js"></script>
+<script src="static/evara/assets/js/plugins/perfect-scrollbar.js"></script>
+<script src="static/evara/assets/js/plugins/magnific-popup.js"></script>
+<script src="static/evara/assets/js/plugins/select2.min.js"></script>
+<script src="static/evara/assets/js/plugins/waypoints.js"></script>
+<script src="static/evara/assets/js/plugins/counterup.js"></script>
+<script src="static/evara/assets/js/plugins/jquery.countdown.min.js"></script>
+<script src="static/evara/assets/js/plugins/images-loaded.js"></script>
+<script src="static/evara/assets/js/plugins/isotope.js"></script>
+<script src="static/evara/assets/js/plugins/scrollup.js"></script>
+<script src="static/evara/assets/js/plugins/jquery.vticker-min.js"></script>
+<!-- Template  JS -->
+<script src="static/evara/assets/js/main.js"></script>
+<script src="static/evara/assets/js/shop.js"></script>
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/shop-checkout.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:26:06 GMT -->
+
+</html>

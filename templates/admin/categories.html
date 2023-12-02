@@ -240,7 +240,7 @@
                 console.log('Sending AJAX request with ID:', customerId);
 
                 $.ajax({
-                    url: '/admin/categories/update-status',
+                    url: '/admin/categories',
                     type: 'PATCH',
                     contentType: 'application/json',
                     data: JSON.stringify({ id: customerId }),

@@ -166,13 +166,21 @@
                                                 placeholder="{{.Product.Status}}" value="{{.Product.Status}}"> -->
                                         </div>
                                     </div>
+                                    <div class="form-group row">
+                                        <div class="col-lg-6 offset-lg-4">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="addNewProduct"  onchange="toggleVariantDetails()">
+                                                <label class="form-check-label" for="addNewProduct">Add New Product</label>
+                                            </div>
+                                        </div>
+                                    </div>
                                      <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="Variants">Variants
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
-                                            <select class="variant-dropdown" id="slug" onchange="updateVariantDetails(this)">
+                                            <select class="variant-dropdown" id="slug" onchange="toggleVariantDetails(); updateVariantDetails(this)">
                                                 <option value="0" >Create New Variant</option>
-                                                {{range .Product.ProductVariants}}
+                                                {{range .Product.Variants}}
                                                 
                                                 <option value="{{.ID}}"  data-ram="{{.Ram}}" data-storage="{{.Storage}}" data-stock="{{.Stock}}" data-price="{{.Price}}">
                                                     {{.Slug}}
@@ -182,39 +190,56 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="ram">Ram
-                                            <span class="text-danger">*</span></label>
+                                    <div class="form-group row" style="display: none;" id="ramBlock">
+                                        <label class="col-lg-4 col-form-label" for="ram">Ramss
+                                            <span class="text-danger">*</span>
+                                        </label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="ram" name="ram"
-                                                placeholder="{{.Ram}}" value="{{.Ram}}">
+                                            <select class="form-control" id="ram" name="ram" placeholder="{{.Ram}}">
+                                                <option value="{{.Ram}}"{{if eq .Ram "8GB"}} selected{{end}}>{{.Ram}}</option>
+                                                <option value="8GB"{{if eq .Ram "8GB"}} selected{{end}}>8GB</option>
+                                                <option value="4GB"{{if eq .Ram "4GB"}} selected{{end}}>4GB</option>
+                                                <option value="16GB"{{if eq .Ram "16GB"}} selected{{end}}>16GB</option>
+                                                <option value="32GB"{{if eq .Ram "32GB"}} selected{{end}}>32GB</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="form-group row">
+                                    
+                                    <!-- Add 'style="display: none;"' to hide the blocks by default -->
+                                    <div class="form-group row" style="display: none;" id="storageBlock">
                                         <label class="col-lg-4 col-form-label" for="storage">Storage
-                                            <span class="text-danger">*</span></label>
+                                            <span class="text-danger">*</span>
+                                        </label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="storage" name="storage"
-                                                placeholder="{{.Storage}}" value="{{.Storage}}">
+                                            <select class="form-control" id="storage" name="storage" placeholder="{{.Storage}}">
+                                                <option value="{{.Ram}}" placeholder selected>{{.Ram}}</option>
+                                                <option value="256GB"{{if eq .Storage "256GB"}} selected{{end}}>256GB</option>
+                                                <option value="512GB"{{if eq .Storage "512GB"}} selected{{end}}>512GB</option>
+                                                <option value="1TB"{{if eq .Storage "1TB"}} selected{{end}}>1TB</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="form-group row">
+                                    
+                                    <!-- Add 'style="display: none;"' to hide the blocks by default -->
+                                    <div class="form-group row" style="display: none;" id="stockBlock">
                                         <label class="col-lg-4 col-form-label" for="stock">Stock
-                                            <span class="text-danger">*</span></label>
+                                            <span class="text-danger">*</span>
+                                        </label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="stock" name="stock"
-                                                placeholder="{{.Stock}}" value="{{.Stock}}">
+                                            <input type="text" class="form-control" id="stock" name="stock" placeholder="{{.Stock}}" value="{{.Stock}}">
                                         </div>
                                     </div>
-                                   
-                                    <div class="form-group row">
+                                    
+                                    <!-- Add 'style="display: none;"' to hide the blocks by default -->
+                                    <div class="form-group row" style="display: none;" id="priceBlock">
                                         <label class="col-lg-4 col-form-label" for="price">Price
-                                            <span class="text-danger">*</span></label>
+                                            <span class="text-danger">*</span>
+                                        </label>
                                         <div class="col-lg-6">
-                                            <input type="text" class="form-control" id="price" name="price"
-                                                placeholder="{{.Price}}" value="{{.Price}}">
+                                            <input type="text" class="form-control" id="price" name="price" placeholder="{{.Price}}" value="{{.Price}}">
                                         </div>
                                     </div>
+                                    
                                     <!-- Repeat similar blocks for other fields (ProductDetails, Status, Ram, Storage, Stock, Price, etc.) -->
 
                                     <div class="modal-footer">
@@ -247,8 +272,30 @@
 
 <!-- ... (your existing head section) ... -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
+    function toggleVariantDetails() {
+        var addNewProductCheckbox = document.getElementById('addNewProduct');
+        var ramBlock = document.getElementById('ramBlock');
+        var storageBlock = document.getElementById('storageBlock');
+        var stockBlock = document.getElementById('stockBlock');
+        var priceBlock = document.getElementById('priceBlock');
+
+        if (addNewProductCheckbox.checked) {
+            var addProduct = "true";
+            // If the checkbox is checked, hide the variant details blocks
+            ramBlock.style.display = 'flex';
+            storageBlock.style.display = 'flex';
+            stockBlock.style.display = 'flex';
+            priceBlock.style.display = 'flex';
+        } else {
+            // If the checkbox is unchecked, show the variant details blocks
+            ramBlock.style.display = 'flex';
+            storageBlock.style.display = 'flex';
+            stockBlock.style.display = 'flex';
+            priceBlock.style.display = 'flex';
+        }
+    }
+
     
     function updateVariantDetails(selectedVariant) {
     var selectedOption = selectedVariant.options[selectedVariant.selectedIndex];
@@ -318,6 +365,7 @@
     <script>
 
 async function updateProduct() {
+    var addProduct;
     var deleteImages = document.querySelectorAll('input[name="deleteImages"]:checked');
     console.log("Delete Image IDs:", Array.from(deleteImages).map(checkbox => checkbox.value));
     var id = window.location.href.split('=').pop();
@@ -332,6 +380,7 @@ async function updateProduct() {
     var stock = document.getElementById('stock').value;
     var price = document.getElementById('price').value;
     var images = document.getElementById('images').files;
+    addProduct = document.getElementById('addNewProduct').checked;
 
     var formData = new FormData();
 
@@ -346,6 +395,10 @@ async function updateProduct() {
     formData.append('stock', parseInt(stock));
     formData.append('price', parseFloat(price));
     formData.append('variantID', parseFloat(variantID));
+    formData.append('addProduct', addProduct);
+    
+    
+
 
     deleteImages.forEach(checkbox => {
         formData.append('deleteImages', checkbox.value);
