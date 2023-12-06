@@ -95,22 +95,22 @@ func CreateJson(token *models.TokenUser) (userDetailsJSON []byte) {
 	return userDetailsJSON
 
 }
-func GetID(c *gin.Context) (*uint, error) {
+func GetID(c *gin.Context) (uint, error) {
 	usercookie, _ := c.Cookie("auth")
 	var token models.TokenUser
 	err := json.NewDecoder(strings.NewReader(usercookie)).Decode(&token)
 	if err != nil {
 		fmt.Println("Error fetching UserDetails:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user details"})
-		return nil, err
+		return 0, err
 	}
 
 	Claims, err := ParseToken(token.AccessToken)
 	if err != nil {
 		fmt.Println("Error fetching UserDetails:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse user details from token"})
-		return nil, err
+		return 0, err
 	}
-	return &Claims.ID, nil
+	return Claims.ID, nil
 
 }

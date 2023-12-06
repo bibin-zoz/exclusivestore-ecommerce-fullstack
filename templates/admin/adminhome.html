@@ -104,7 +104,7 @@
                                         </div>
                                     </div>
                                     <div class="chart-wrapper">
-                                        <canvas id="chart_widget_2"></canvas>
+                                        <canvas id="weeklyOrderChart" width="400" height="200"></canvas>
                                     </div>
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between">
@@ -603,6 +603,7 @@
     <!--**********************************
         Scripts
     ***********************************-->
+
     <script src="/static/admin/plugins/common/common.min.js"></script>
     <script src="/static/admin/js/custom.min.js"></script>
     <script src="/static/admin/js/settings.js"></script>
@@ -627,6 +628,45 @@
     <script src="/static/admin/plugins/chartist/js/chartist.min.js"></script>
     <script src="/static/admin/plugins/chartist-plugin-tooltips/js/chartist-plugin-tooltip.min.js"></script>
 
+    <script>
+        // Function to create the weekly orders chart
+        function createWeeklyOrderChart(canvasId, data) {
+            var ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(order => order.product),
+                    datasets: [{
+                        label: 'Weekly Orders',
+                        data: data.map(order => order.quantity),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fetch data from the /order-stats endpoint using AJAX
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/admin/getOrderStats', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                createWeeklyOrderChart('weeklyOrderChart', data.weeklyOrders);
+            } else if (xhr.readyState === 4 && xhr.status !== 200) {
+                console.error('Error fetching data:', xhr.status, xhr.statusText);
+            }
+        };
+        xhr.send();
+    </script>
 
 
     <script src="/static/admin/js/dashboard/dashboard-1.js"></script>

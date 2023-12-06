@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
@@ -883,4 +884,26 @@ func UpdateOrderStatusHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Status updated successfully"})
+}
+func GetOrderStats(c *gin.Context) {
+	// Open a connection to the database
+
+	// Fetch total orders for the last 7 days
+	var weeklyOrders []models.Orders
+	db.DB.Preload("OrderedProducts").Where("created_at > ?", time.Now().AddDate(0, 0, -7)).Find(&weeklyOrders)
+
+	// Prepare data for JSON response
+	var data []map[string]interface{}
+	for _, order := range weeklyOrders {
+		for _, product := range order.OrderedProducts {
+			data = append(data, map[string]interface{}{
+				"product":    product.ProductID,
+				"quantity":   product.Quantity,
+				"created_at": order.CreatedAt.Format("2006-01-02"),
+			})
+		}
+	}
+
+	// Respond with JSON
+	c.JSON(http.StatusOK, gin.H{"weeklyOrders": data})
 }

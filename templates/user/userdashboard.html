@@ -443,7 +443,7 @@
                 '<td>' + formattedDate + '</td>' +
                 '<td>' + order.status + '</td>' +
                 '<td>$' + order.price + ' for ' + order.quantity + ' item</td>' +
-                '<td><a href="/orderdetails?id=' + order.id + '" class="btn-small d-block">View</a> <button onclick="cancelOrder(' + order.id + ')" class="btn-small d-block" style="color: red;"><i class="fas fa-times"></i>cancel</button></td>' +
+                '<td><a href="/trackorder?id=' + order.id + '" class="btn-small d-block">View</a> <button onclick="cancelOrder(' + order.id + ')" class="btn-small d-block" style="color: red;"><i class="fas fa-times"></i>cancel</button></td>' +
                 '</tr>';
 
             tableBody.append(row);

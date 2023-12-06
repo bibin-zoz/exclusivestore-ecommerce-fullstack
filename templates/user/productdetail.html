@@ -166,12 +166,16 @@
 									{{ end }}
 								</select>
 						
-
+								{{if eq .Count  0 }}
 								<button
 									class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail"
 									id="AddCart">
-									Add to cart
-								</button>
+									Add to cart </button>
+								
+								{{else}}
+								<a href="/cart" class="flex-c-m stext-101 cl0 size-101 bg2 bor1 hov-btn1 p-lr-15 trans-04 ">Go to cart</a>
+								
+								{{end}}
 							</div>
 						</div>
 					</div>
@@ -956,20 +960,35 @@
 			};
 
 			$.ajax({
-				type: 'POST',
-				url: '/cart', // Update with your server endpoint
-				data: JSON.stringify(postData),
-				contentType: 'application/json',
-				success: function (response) {
-					swal(nameProduct, "is added to cart !", "success");
-					console.log('Success:', response);
-					// You can update the page or perform any other action based on the response
-				},
-				error: function (error) {
-					console.error('Error:', error);
-					// Handle the error, if any
-				}
-			});
+    type: 'POST',
+    url: '/cart', // Update with your server endpoint
+    data: JSON.stringify(postData),
+    contentType: 'application/json',
+    success: function (response) {
+        // Use Toastify for a toast notification with the response
+        Toastify({
+            text: response.message ,
+            duration: 2000, 
+            gravity: "center", 
+            position: "center", 
+            close: true, 
+            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)", // Customize the toast background color
+        }).showToast();
+
+        console.log('Success:', response);
+
+        // Redirect to the /cart route after a delay (e.g., 3000 milliseconds)
+        setTimeout(function () {
+			window.location.reload()
+            
+        }, 1500);
+    },
+    error: function (error) {
+        console.error('Error:', error);
+        // Handle the error, if any
+    }
+});
+
 
 
 		});

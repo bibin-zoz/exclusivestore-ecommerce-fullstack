@@ -32,14 +32,18 @@ func main() {
 	router.GET("/cart", middleware.LoginAuth(), handlers.GetCarthandler)
 	router.POST("/cart", middleware.LoginAuth(), handlers.AddToCarthandler)
 	router.DELETE("/cart", middleware.LoginAuth(), handlers.DeleteCartHandler)
-	router.GET("/checkout", middleware.LoginAuth(), handlers.CheckOuthandler)
 
 	//order
 
 	router.POST("/order", middleware.LoginAuth(), handlers.OrderPlacehandler)
 	router.GET("/order", middleware.LoginAuth(), handlers.GetOrdershandler)
-	router.GET("/orderdetails", middleware.LoginAuth(), handlers.GetOrderDetailshandler)
+	router.GET("/trackorder", middleware.LoginAuth(), handlers.TrackOrderHandler)
+
 	router.PATCH("/order", middleware.LoginAuth(), handlers.CancelOrderHandler)
+	router.PATCH("/cancelitem", middleware.LoginAuth(), handlers.CancelProductHandler)
+
+	//checkout
+	router.GET("/checkout", middleware.LoginAuth(), handlers.CheckOuthandler)
 
 	//admin
 	router.GET("/admin/login", handlers.AdminLogin)
@@ -74,6 +78,8 @@ func main() {
 
 	router.GET("/admin/orders", middleware.AdminAuth(), handlers.UserOrdersHandler)
 	router.PATCH("/admin/orders", middleware.AdminAuth(), handlers.UpdateOrderStatusHandler)
+
+	router.GET("/admin/getOrderStats", middleware.AdminAuth(), handlers.GetOrderStats)
 
 	//user dashboard
 	router.GET("/userdashboard", middleware.LoginAuth(), handlers.UserDashboardHandler)

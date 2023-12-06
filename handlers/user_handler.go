@@ -319,6 +319,7 @@ func LogoutHandler(c *gin.Context) {
 }
 
 func ProductViewhandler(c *gin.Context) {
+	ID, _ := helpers.GetID(c)
 	slug := c.Query("Variant")
 	var product models.ProductVariants
 
@@ -332,12 +333,24 @@ func ProductViewhandler(c *gin.Context) {
 		result = append(result, i)
 	}
 
+	var count int64
+	var cartcount models.Cart
+	query := db.DB.Where("user_id=? AND variant_id=?", ID, product.ID).Find(&cartcount)
+	fmt.Println("SQL Query:", query.Statement.SQL.String())
+
+	query.Count(&count)
+	fmt.Println("Count:", count)
+
+	if err := query.Error; err != nil {
+		fmt.Println("Error fetching cart count:", err)
+		return
+	}
+
 	c.HTML(http.StatusOK, "productdetail.html", gin.H{
-		// "Productvariants": ProductVariants,
 		"Product":  product,
 		"Quantity": result,
+		"Count":    count,
 	})
-
 }
 
 func UserDashboardHandler(c *gin.Context) {

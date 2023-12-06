@@ -52,18 +52,9 @@ func GetCarthandler(c *gin.Context) {
 
 func AddToCarthandler(c *gin.Context) {
 
-	authCookie, _ := c.Cookie("auth")
-	var token models.TokenUser
-	err := json.NewDecoder(strings.NewReader(authCookie)).Decode(&token)
-	if err != nil {
-		fmt.Println("Error fetching  UserDetails :", err)
-
-		return
-	}
-	Claims, err := helpers.ParseToken(token.AccessToken)
-	if err != nil {
-		fmt.Println("Error fetching  UserDetails :", err)
-
+	ID, err := helpers.GetID(c)
+	if ID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -74,11 +65,23 @@ func AddToCarthandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	var count int64
+	var cartcount models.Cart
+	db.DB.Where("user_id=? AND product_id=?", ID, Cart.ProductID).Find(&cartcount).Count(&count)
+	fmt.Println("count", count)
+	if count != 0 {
+		fmt.Println("product already in cart")
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Product Already in cart....Rediecting"})
+		return
+
+	}
+
 	var variant models.ProductVariants
 	db.DB.First(&variant, Cart.VariantID)
 
 	UpdateCart := &models.Cart{
-		UserID:    Claims.ID,
+		UserID:    ID,
 		VariantID: Cart.VariantID,
 		ProductID: Cart.ProductID,
 		Price:     variant.Price,
@@ -165,8 +168,7 @@ func CheckOuthandler(c *gin.Context) {
 func OrderPlacehandler(c *gin.Context) {
 	var orderReq models.OrderReq
 	var cart []models.Cart
-
-	ID, _ := helpers.GetID(c)
+	userid, _ := helpers.GetID(c)
 
 	if err := c.ShouldBindJSON(&orderReq); err != nil {
 		fmt.Println("bind error order:", err)
@@ -179,7 +181,7 @@ func OrderPlacehandler(c *gin.Context) {
 		return
 	}
 
-	result := db.DB.Where("user_id=?", ID).Find(&cart)
+	result := db.DB.Debug().Where("user_id=?", userid).Find(&cart)
 	if result.Error != nil {
 		fmt.Println("error fetching cart:", result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
@@ -193,24 +195,40 @@ func OrderPlacehandler(c *gin.Context) {
 		return
 	}
 
+	var orderDetail models.Orders
+	orderDetail.AddressID = uint(addressID)
+	orderDetail.UserID = userid
 	for _, cartItem := range cart {
-		var orderDetail models.Orders
-		orderDetail.AddressID = uint(addressID)
-		orderDetail.UserID = cartItem.UserID
-		orderDetail.ProductID = cartItem.ProductID
-		orderDetail.VariantID = cartItem.VariantID
-		orderDetail.Quantity = cartItem.Quantity
-		orderDetail.Price = cartItem.Total
+		orderDetail.Total += cartItem.Total
 
-		result := db.DB.Create(&orderDetail)
+	}
+
+	result = db.DB.Debug().Create(&orderDetail)
+	if result.Error != nil {
+		fmt.Println("error creating order detail:", result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+	fmt.Println("orderDetailid", orderDetail)
+
+	for i, cartItem := range cart {
+		fmt.Println("count", i)
+		var orderProduct models.OrderProducts
+		orderProduct.OrderID = orderDetail.ID
+		orderProduct.ProductID = cartItem.ProductID
+		orderProduct.VariantID = cartItem.VariantID
+		orderProduct.Quantity = cartItem.Quantity
+		orderProduct.Price = cartItem.Price
+		orderProduct.Total = cartItem.Total
+
+		result = db.DB.Debug().Create(&orderProduct)
 		if result.Error != nil {
-			fmt.Println("error creating order detail:", result.Error)
+			fmt.Println("error creating order product entry:", result.Error)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 			return
 		}
 	}
 
-	userid, _ := helpers.GetID(c)
 	result = db.DB.Where("user_id = ?", userid).Delete(&models.Cart{})
 	if result.Error != nil {
 		fmt.Println("error deleting cart item:", result.Error)
@@ -233,9 +251,6 @@ func GetOrdershandler(c *gin.Context) {
 
 }
 
-func GetOrderDetailshandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "orderdetails.html", nil)
-}
 func CancelOrderHandler(c *gin.Context) {
 	var updateStatusRequest struct {
 		ID uint `json:"id"`
@@ -264,4 +279,67 @@ func CancelOrderHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Status updated successfully"})
+}
+
+func CancelProductHandler(c *gin.Context) {
+	var updateStatusRequest struct {
+		OrderID   uint `json:"orderID"`
+		ProductID uint `json:"productID"`
+	}
+
+	if err := c.ShouldBindJSON(&updateStatusRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var order models.OrderProducts
+	if err := db.DB.Where("order_id = ? AND product_id=?", updateStatusRequest.OrderID, updateStatusRequest.ProductID).First(&order).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+		return
+	}
+	if order.Status == "cancelled" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Item already Cancelled "})
+		return
+
+	}
+
+	order.Status = "cancelled"
+	if err := db.DB.Save(&order).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update status"})
+		return
+	}
+	var OrderDetail models.Orders
+	// Fetch an order with preloaded OrderedProducts
+	if err := db.DB.Preload("OrderedProducts").Where("id = ?", updateStatusRequest.OrderID).First(&OrderDetail).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+		return
+	}
+
+	OrderDetail.CalculateTotal()
+
+	// Save to the database
+	db.DB.Save(&OrderDetail)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Status updated successfully"})
+}
+
+func TrackOrderHandler(c *gin.Context) {
+	var orders []models.OrderProducts
+	var OrderDetails models.Orders
+	_, err := helpers.GetID(c)
+	orderid := c.Query("id")
+	if err != nil {
+		fmt.Println("error", err)
+	}
+	fmt.Println("id", orderid)
+	db.DB.Preload("Variant.Product.Images").Preload("Variant.Product").Preload("Variant").Preload("Image").Where("order_id=?", orderid).Find(&orders)
+	db.DB.Preload("Address").Where("id=?", orderid).Find(&OrderDetails)
+	fmt.Println("hiii")
+	// c.JSON(http.StatusOK, orders)
+	c.HTML(http.StatusOK, "orderdetails.html", gin.H{
+		// "Productvariants": ProductVariants,
+		"Order":        orders,
+		"OrderDetails": OrderDetails,
+	})
+
 }
