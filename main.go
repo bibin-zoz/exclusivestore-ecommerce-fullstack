@@ -34,7 +34,7 @@ func main() {
 	router.DELETE("/cart", middleware.LoginAuth(), handlers.DeleteCartHandler)
 
 	//order
-
+	router.POST("/razorpay/order", handlers.CreateRazorpayOrder)
 	router.POST("/order", middleware.LoginAuth(), handlers.OrderPlacehandler)
 	router.GET("/order", middleware.LoginAuth(), handlers.GetOrdershandler)
 	router.GET("/trackorder", middleware.LoginAuth(), handlers.TrackOrderHandler)
@@ -77,6 +77,7 @@ func main() {
 	//orders
 
 	router.GET("/admin/orders", middleware.AdminAuth(), handlers.UserOrdersHandler)
+	router.GET("/admin/manageorder", middleware.AdminAuth(), handlers.ManageOrderHandler)
 	router.PATCH("/admin/orders", middleware.AdminAuth(), handlers.UpdateOrderStatusHandler)
 
 	router.GET("/admin/getOrderStats", middleware.AdminAuth(), handlers.GetOrderStats)

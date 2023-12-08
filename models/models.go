@@ -67,6 +67,7 @@ type Compare struct {
 //	}
 
 type OrderReq struct {
-	CartID    string `json:"cartID"`
-	AddressID string `json:"addressID"`
+	CartID        string `json:"cartID"`
+	AddressID     string `json:"addressID"`
+	PaymentMethod string `json:"paymentMethod"`
 }

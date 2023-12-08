@@ -119,11 +119,11 @@
                                         </td>
                                         <td><div class="right info"><h5> {{.Variant.Product.ProductName}}</h5>
                                             <p class="font-xs">{{.Variant.Slug}}<br> {{.Variant.Product.ProductDetails}}</div></td>
-                                        <td class="price" data-title="Price"><span>$ {{.Price}} </span></td>
+                                        <td class="price" data-title="Price"><span>₹ {{.Price}} </span></td>
                                         <td>X {{.Quantity}}</td>
                                         
                                         <td class="text-center" data-title="Cart">
-                                            <span>${{.Total}} </span>
+                                            <span>₹{{.Total}} </span>
                                         </td>
                                         <td>
                                             {{if eq .Status "pending"}}
@@ -139,8 +139,13 @@
                                             {{end}}
                                         </td>
                                         <td class="text-center" data-title="Cancel Order">
-                                            <button class="btn btn-danger cancel-order-btn btn-sm" data-order-id="{{.OrderID}}" data-product-id="{{.ProductID}}">Cancel</button>
+                                            {{if eq .Status "pending"}}
+                                            <button class="btn btn-danger cancel-order-btn btn-sm" data-order-id="{{.OrderID}}" data-product-id="{{.ProductID}}" >Cancel</button>
 
+                                            
+                                            {{else}}
+                                            <button class="btn btn-dark cancel-order-btn btn-sm" data-order-id="{{.OrderID}}" data-product-id="{{.ProductID}}" disabled>Cancel</button>
+                                            {{end}}
                                         </td>
                                      
                                     </tr>
@@ -153,7 +158,7 @@
                                             <article class="float-end">
                                                 <dl class="dlist">
                                                     <dt>Subtotal:</dt>
-                                                    <dd>${{.OrderDetails.Total}}</dd>
+                                                    <dd>₹{{.OrderDetails.Total}}</dd>
                                                 </dl>
                                                 <dl class="dlist">
                                                     <dt>Shipping cost:</dt>
@@ -161,7 +166,7 @@
                                                 </dl>
                                                 <dl class="dlist">
                                                     <dt>Grand total:</dt>
-                                                    <dd> <b class="h5">${{.OrderDetails.Total}}</b> </dd>
+                                                    <dd> <b class="h5">₹{{.OrderDetails.Total}}</b> </dd>
                                                 </dl>
                                                 <dl class="dlist">
                                                     <dt class="text-muted">Status:</dt>
@@ -192,7 +197,7 @@
                             <h4 class="font-size-20 mb-0 ml-3">Sign up to Newsletter</h4>
                         </div>
                         <div class="col my-4 my-md-0 des">
-                            <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>$25 coupon for first shopping.</strong></h5>
+                            <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>₹25 coupon for first shopping.</strong></h5>
                         </div>
                     </div>
                 </div>

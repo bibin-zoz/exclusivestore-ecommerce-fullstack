@@ -7,10 +7,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/razorpay/razorpay-go"
 )
 
 func GetCarthandler(c *gin.Context) {
@@ -180,13 +182,23 @@ func OrderPlacehandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Select an address or add a new address"})
 		return
 	}
+	if orderReq.PaymentMethod == "" || orderReq.CartID == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error to fetch payment method"})
+		return
+	}
 
-	result := db.DB.Debug().Where("user_id=?", userid).Find(&cart)
+	result := db.DB.Where("user_id=?", userid).Find(&cart)
 	if result.Error != nil {
 		fmt.Println("error fetching cart:", result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
+	// result = db.DB.Where("id=?", cart.product_id).Find(&cart)
+	// if result.Error != nil {
+	// 	fmt.Println("error fetching cart:", result.Error)
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+	// 	return
+	// }
 
 	addressID, err := strconv.ParseUint(orderReq.AddressID, 10, 64)
 	if err != nil {
@@ -198,6 +210,7 @@ func OrderPlacehandler(c *gin.Context) {
 	var orderDetail models.Orders
 	orderDetail.AddressID = uint(addressID)
 	orderDetail.UserID = userid
+	orderDetail.Payment = orderReq.PaymentMethod
 	for _, cartItem := range cart {
 		orderDetail.Total += cartItem.Total
 
@@ -236,7 +249,10 @@ func OrderPlacehandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Order placed successfully"})
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Order placed successfully",
+		"orderID": orderDetail.ID,
+	})
 }
 
 func GetOrdershandler(c *gin.Context) {
@@ -342,4 +358,64 @@ func TrackOrderHandler(c *gin.Context) {
 		"OrderDetails": OrderDetails,
 	})
 
+}
+func CreateRazorpayOrder(c *gin.Context) {
+	var requestData models.OrderReq
+	if err := c.ShouldBindJSON(&requestData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if requestData.AddressID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "select Delivery address"})
+		return
+
+	}
+	if requestData.CartID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cart Details not found"})
+		return
+
+	}
+	fmt.Println("reqdata", requestData)
+	var cart models.Cart
+
+	result := db.DB.Where("ID=?", requestData.CartID).Find(&cart)
+	if result.Error != nil {
+		fmt.Println("Error fetching cart details:", result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart details"})
+	}
+
+	// You may need to calculate the order amount based on the items in the cart or other factors.
+	// For simplicity, I'm assuming a fixed amount of 1000 here.
+	orderAmount := cart.Total
+
+	params := map[string]interface{}{
+		"amount":          orderAmount * 100,
+		"currency":        "INR",
+		"payment_capture": 1,
+	}
+	razorpayKey := os.Getenv("RAZORPAY_KEY_ID")
+	razorpaySecret := os.Getenv("RAZORPAY_KEY_SECRET")
+
+	client := razorpay.NewClient(razorpayKey, razorpaySecret)
+
+	order, err := client.Order.Create(params, nil)
+	if err != nil {
+		fmt.Println("Error creating Razorpay order:", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create Razorpay order"})
+		return
+	}
+
+	// Type assert the 'id' field from the map
+	orderID, ok := order["id"].(string)
+	if !ok {
+		fmt.Println("Invalid order ID format:", order)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid order ID format"})
+		return
+	}
+	fmt.Println("aaaaaaa")
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":     orderID,
+		"amount": strconv.Itoa(int(orderAmount)),
+	})
 }

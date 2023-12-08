@@ -13,7 +13,7 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!-- Custom Stylesheet -->
 
-
+       
         <link href="/static/admin/css/style.css" rel="stylesheet">
         <style>
             .modal-dialog {
@@ -78,7 +78,7 @@
                                                 <th>Order ID</th>
                                                 <th>Username</th>
                                                 <th>Address</th>
-                                                <th>Quantity</th>
+                                                <th>payment method</th>
                                                 <th>Total Price</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
@@ -91,8 +91,8 @@
                                                 <td>{{.User.Username}}</td>
                                                 <td>{{.Address.Street}},{{.Address.City}},{{.Address.PostalCode}},{{.Address.State}}<br>{{.Address.Country}}
                                                 </td>
-                                                <td>{{.Quantity}}</td>
-                                                <td>${{.Price}}</td>
+                                                <td>{{.Payment}}</td>
+                                                <td>${{.Total}}</td>
                                                 <td>
                                                     {{if eq .Status "pending"}}
                                                     <span class="label label-warning">{{.Status}}</span>
@@ -108,20 +108,16 @@
                                                 </td>
 
                                                 <td>
-                                                    <a href="/order/details/{{.ID}}"
+                                                    <a href="/admin/manageorder?id={{.ID}}"
                                                         class="btn btn-info btn-xs">Details</a>
-                                                        {{if eq .Status "pending"}}
+                                                        <!-- {{if eq .Status "pending"}}
                                                         <button type="button" class="btn btn-warning btn-xs cancel-btn"
                                                         data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
                                                         title="Cancel">
                                                         <span class="btn-icon"><i class="fa fa-times"></i></span>
                                                     </button>
 
-                                                    <button type="button" class="btn btn-success btn-xs delivered-btn"
-                                                        data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
-                                                        title="Delivered">
-                                                        <span class="btn-icon"><i class="fa fa-check-circle"></i></span>
-                                                    </button>
+                                                    
                                                         {{else if eq .Status "shipped"}}
                                                         <button type="button" class="btn btn-warning btn-xs cancel-btn"
                                                         data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
@@ -156,7 +152,7 @@
                                                         title="Delivered">
                                                         <span class="btn-icon"><i class="fa fa-check-circle"></i></span>
                                                     </button>
-                                                        {{end}}
+                                                        {{end}} -->
 
                                                    
 

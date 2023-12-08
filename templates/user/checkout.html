@@ -188,13 +188,13 @@
                                                     {{.Variant.Slug}}</a></h5> <span class="product-qty">x
                                                 {{.Quantity}}</span>
                                         </td>
-                                        <td>${{.Variant.Price}}</td>
+                                        <td>₹{{.Variant.Price}}</td>
                                     </tr>
                                     {{end}}
 
                                     <tr>
                                         <th>SubTotal</th>
-                                        <td class="product-subtotal" colspan="2">${{.CartTotal}}</td>
+                                        <td class="product-subtotal" colspan="2">₹{{.CartTotal}}</td>
                                     </tr>
                                     <tr>
                                         <th>Shipping</th>
@@ -203,7 +203,7 @@
                                     <tr>
                                         <th>Total</th>
                                         <td colspan="2" class="product-subtotal"><span
-                                                class="font-xl text-brand fw-900">${{.CartTotal}}</span></td>
+                                                class="font-xl text-brand fw-900">₹{{.CartTotal}}</span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -215,17 +215,17 @@
                             </div>
                             <div class="payment_option">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="exampleRadios"
-                                        id="exampleRadios2" value="option2">
+                                    <input class="form-check-input" type="radio" name="paymentmethod"
+                                        id="exampleRadios2" value="cod">
                                     <label class="form-check-label" for="exampleRadios2">
                                         Cash on delivery
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="exampleRadios"
-                                        id="exampleRadios3" value="option3" disabled>
+                                    <input class="form-check-input" type="radio" name="paymentmethod"
+                                        id="exampleRadios3" value="prepaid">
                                     <label class="form-check-label" for="exampleRadios3">
-                                        Disabled radio
+                                        Prepaid
                                     </label>
                                 </div>
 
@@ -354,7 +354,158 @@
 <script src="https://cdn.jsdelivr.net/npm/toastr@2"></script>
 
 <!-- Place order checkout JS-->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+    $(document).ready(function () {
+
+        // Assuming there is a button or trigger for processing the order
+        $('#placeOrderBtn').on('click', function () {
+            // Get the selected address ID
+            var paymentmethod = document.querySelector('input[name="paymentmethod"]:checked').value
+            var addressID = $('input[name="flexRadioDefault"]:checked').val();
+            var cartID = '{{.CartID}}';
+            var requestData = {
+                cartID: cartID,
+                AddressID: addressID,
+                paymentMethod: paymentmethod,
+            };
+
+            if (paymentmethod == "cod") {
+                $.ajax({
+                    url: '/order',
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        var orderID=response.orderID
+
+                        console.log('Success:', response);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Order Placed Successfully',
+                            text: 'Your order has been placed successfully!',
+                        }).then((result) => {
+
+                            if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                                window.location.href = "/trackorder?id=" + orderID;
+                            }
+                        });
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error Placing Order',
+                            text: error.responseJSON.error || 'There was an error placing your order. Please try again.',
+                        });
+                    }
+                });
+
+            }
+            else {
+                $.ajax({
+                    url: '/razorpay/order', // Replace with your server-side endpoint for creating Razorpay order
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        // Once you get the Razorpay Order ID, initiate the Razorpay payment
+                        var options = {
+                            key: 'rzp_test_lubBWkd9tngCdR', // Replace with your actual Razorpay Key ID
+                            amount: response.amount,
+                            currency: 'INR',
+                            order_id: response.id,
+                            name: 'Your Company Name',
+                            description: 'Order Payment',
+                            handler: function (response) {
+                                // Handle the success callback after payment
+                                console.log('Payment Success:', response);
+                                var paymentmethod = document.querySelector('input[name="paymentmethod"]:checked').value
+                                var requestData = {
+                                    cartID: cartID,
+                                    AddressID: addressID,
+                                    paymentMethod: paymentmethod,
+                                };
+
+                                $.ajax({
+                                    url: '/order',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(requestData),
+                                    success: function (response) {
+
+                                        console.log('Success:', response);
+                                        var orderID=response.orderID
+
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Order Placed Successfully',
+                                            text: 'Your order has been placed successfully!',
+                                        }).then((result) => {
+
+                                            if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                                                window.location.href = "/trackorder?id=" + orderID;
+                                            }
+                                        });
+                                    },
+                                    error: function (error) {
+                                        console.error('Error:', error);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error Placing Order',
+                                            text: error.responseJSON.error || 'There was an error placing your order. Please try again.',
+                                        });
+                                    }
+                                });
+                            },
+                            cancel: function (response) {
+                                // Handle the cancellation callback
+                                console.log('Payment Cancelled:', response);
+
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Payment Cancelled',
+                                    text: 'Your payment was cancelled. Please try again.',
+                                });
+                            },
+                            prefill: {
+                                name: 'User Name',
+                                email: 'user@example.com',
+                                contact: '1234567890',
+                            },
+                            notes: {
+                                address: 'Shipping Address',
+                            },
+                            theme: {
+                                color: '#F37254',
+                            },
+                        };
+
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+                    },
+                    error: function (error) {
+                        console.error('Error creating Razorpay order:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error Creating Order',
+                            text: error.responseJSON.error || 'There was an error creating your order. Please try again.',
+                        });
+                    }
+                });
+
+            }
+
+        });
+    });
+</script>
+
+
+<!-- <script>
     $(document).ready(function () {
 
         // Assuming there is a button or trigger for processing the order
@@ -374,27 +525,27 @@
                 contentType: 'application/json',
                 data: JSON.stringify(requestData),
                 success: function (response) {
-                   
+
                     console.log('Success:', response);
-                   
+
                     Swal.fire({
-            icon: 'success',
-            title: 'Order Placed Successfully',
-            text: 'Your order has been placed successfully!',
-        }).then((result) => {
-          
-            if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
-                location.reload();
-            }
-        });
-    },
+                        icon: 'success',
+                        title: 'Order Placed Successfully',
+                        text: 'Your order has been placed successfully!',
+                    }).then((result) => {
+
+                        if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                            location.reload();
+                        }
+                    });
+                },
                 error: function (error) {
                     console.error('Error:', error);
                     Swal.fire({
-            icon: 'error',
-            title: 'Error Placing Order',
-            text: error.responseJSON.error || 'There was an error placing your order. Please try again.',
-        });
+                        icon: 'error',
+                        title: 'Error Placing Order',
+                        text: error.responseJSON.error || 'There was an error placing your order. Please try again.',
+                    });
                 }
             });
 
@@ -402,7 +553,7 @@
     });
 
 
-</script>
+</script> -->
 
 <script>
     $(document).ready(function () {

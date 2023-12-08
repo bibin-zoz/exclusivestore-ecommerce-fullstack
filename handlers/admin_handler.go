@@ -833,7 +833,7 @@ func UserOrdersHandler(c *gin.Context) {
 	fmt.Println("count", count)
 
 	// Fetch all orders from the database
-	if err := db.DB.Preload("User").Preload("Address").Preload("Variant").Preload("Product").Offset(offset).Limit(limit).Find(&orders).Error; err != nil {
+	if err := db.DB.Preload("User").Preload("Address").Offset(offset).Limit(limit).Find(&orders).Error; err != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "Failed to fetch orders"})
 		return
 	}
@@ -871,14 +871,14 @@ func UpdateOrderStatusHandler(c *gin.Context) {
 		return
 	}
 
-	var order models.Orders
+	var order models.OrderProducts
 	if err := db.DB.First(&order, updateStatusRequest.ID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
-
+	fmt.Println("upda", updateStatusRequest.Status, updateStatusRequest.ID)
 	order.Status = updateStatusRequest.Status
-	if err := db.DB.Save(&order).Error; err != nil {
+	if err := db.DB.Debug().Save(&order).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update status"})
 		return
 	}
@@ -906,4 +906,23 @@ func GetOrderStats(c *gin.Context) {
 
 	// Respond with JSON
 	c.JSON(http.StatusOK, gin.H{"weeklyOrders": data})
+}
+func ManageOrderHandler(c *gin.Context) {
+	var orders []models.OrderProducts
+	var OrderDetails models.Orders
+	_, err := helpers.GetID(c)
+	orderid := c.Query("id")
+	if err != nil {
+		fmt.Println("error", err)
+	}
+	fmt.Println("id", orderid)
+	db.DB.Preload("Variant.Product.Images").Preload("Variant.Product").Preload("Variant").Preload("Image").Where("order_id=?", orderid).Find(&orders)
+	db.DB.Preload("User").Preload("Address").Where("id=?", orderid).Find(&OrderDetails)
+	fmt.Println("hiii")
+	// c.JSON(http.StatusOK, orders)
+	c.HTML(http.StatusOK, "manageorder.html", gin.H{
+		// "Productvariants": ProductVariants,
+		"Order":        orders,
+		"OrderDetails": OrderDetails,
+	})
 }
