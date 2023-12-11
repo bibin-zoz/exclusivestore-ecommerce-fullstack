@@ -71,3 +71,7 @@ type OrderReq struct {
 	AddressID     string `json:"addressID"`
 	PaymentMethod string `json:"paymentMethod"`
 }
+type Updatecart struct {
+	ID       string `json:"id"`
+	Quantity string `json:"quantity"`
+}

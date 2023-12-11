@@ -4,6 +4,7 @@ import (
 	"ecommercestore/helpers"
 	"ecommercestore/models"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -15,9 +16,10 @@ import (
 func LoginAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve the auth cookie
+
 		authCookie, err := c.Cookie("auth")
 		if err != nil {
-			// Redirect to login if the auth cookie is not present
+			fmt.Println("err not present", err)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
@@ -76,8 +78,6 @@ func LoginAuth() gin.HandlerFunc {
 			}
 
 		}
-		// fmt.Println("user", claims)
-
 		if err != nil {
 			log.Println("Token not present in cookie:", err)
 			c.Redirect(http.StatusSeeOther, "/login")
@@ -96,6 +96,7 @@ func LoginAuth() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusSeeOther)
 			return
 		}
+
 		c.Next()
 	}
 }

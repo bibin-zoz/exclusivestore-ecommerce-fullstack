@@ -78,9 +78,10 @@
                                                 <th>Order ID</th>
                                                 <th>Username</th>
                                                 <th>Address</th>
+                                                <th>Order Date</th>
                                                 <th>payment method</th>
                                                 <th>Total Price</th>
-                                                <th>Status</th>
+                                                <!-- <th>Status</th> -->
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -91,9 +92,12 @@
                                                 <td>{{.User.Username}}</td>
                                                 <td>{{.Address.Street}},{{.Address.City}},{{.Address.PostalCode}},{{.Address.State}}<br>{{.Address.Country}}
                                                 </td>
+                                                <td>{{.CreatedAt.Format "Monday,January 2006"}}</td>
+
+
                                                 <td>{{.Payment}}</td>
                                                 <td>${{.Total}}</td>
-                                                <td>
+                                                <!-- <td>
                                                     {{if eq .Status "pending"}}
                                                     <span class="label label-warning">{{.Status}}</span>
                                                     {{else if eq .Status "shipped"}}
@@ -105,7 +109,7 @@
                                                     {{else}}
                                                     <span class="label label-default">{{.Status}}</span>
                                                     {{end}}
-                                                </td>
+                                                </td> -->
 
                                                 <td>
                                                     <a href="/admin/manageorder?id={{.ID}}"

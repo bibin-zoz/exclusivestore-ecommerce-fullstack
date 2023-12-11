@@ -33,6 +33,14 @@ func AdminHome(c *gin.Context) {
 	c.HTML(http.StatusOK, "adminhome.html", nil)
 
 }
+
+func SalesReporthandler(c *gin.Context) {
+	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+	c.Header("Expires", "0")
+
+	c.HTML(http.StatusOK, "salesreport.html", nil)
+
+}
 func AdminLogin(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
@@ -79,7 +87,8 @@ func AdminLoginPost(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "adminlogin.html", data)
 		return
 	}
-	if compare.Password != Newpassword {
+	err := helpers.VerifyPassword(Newpassword, compare.Password)
+	if err != nil {
 		data.PasswordError = "check password again"
 		c.HTML(http.StatusBadRequest, "adminlogin.html", data)
 		return
@@ -123,13 +132,23 @@ func AdminLoginPost(c *gin.Context) {
 	}
 	userDetailsJSON := helpers.CreateJson(UserLoginDetails)
 
-	c.SetCookie("adminAuth", string(userDetailsJSON), 0, "/", "localhost", true, true)
+	c.SetCookie("adminAuth", string(userDetailsJSON), 0, "/admin", "localhost", true, true)
 
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
 
 	// Redirect to home only after successful token generation
 	c.Redirect(http.StatusFound, "/admin/home")
+}
+func AdminLogoutHandler(c *gin.Context) {
+	fmt.Println("admin logout")
+
+	// Clear the adminAuth cookie
+
+	c.SetCookie("adminAuth", "", -1, "/admin", "localhost", false, true)
+
+	// Redirect to the login page
+	c.Redirect(http.StatusSeeOther, "/admin/login")
 }
 
 // customer
@@ -653,6 +672,7 @@ func ProductUpdateHandler(c *gin.Context) {
 	fmt.Println("variant", variantID)
 
 	if variantID == 0 && addProduct == "true" {
+		fmt.Println("hii")
 		if ram == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "ram  cannot be empty"})
 			return
@@ -746,7 +766,6 @@ func ProductUpdateHandler(c *gin.Context) {
 			return
 		}
 
-		// Delete the image record from the database
 		deleteResult := db.DB.Delete(&models.Image{}, deleteImageID)
 		if deleteResult.Error != nil {
 			fmt.Println("Error deleting image:", deleteResult.Error.Error())
@@ -756,7 +775,7 @@ func ProductUpdateHandler(c *gin.Context) {
 
 	}
 
-	err = c.Request.ParseMultipartForm(10 << 20) // 10 MB limit
+	err = c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -784,7 +803,7 @@ func ProductUpdateHandler(c *gin.Context) {
 		}
 
 		// Resize the image
-		resizedImage, err := helpers.ResizeImage(src, 500, 500) // Adjust the dimensions as needed
+		resizedImage, err := helpers.ResizeImage(src, 500, 500)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error resizing image: " + err.Error()})
 			return
@@ -800,7 +819,6 @@ func ProductUpdateHandler(c *gin.Context) {
 		}
 		defer dst.Close()
 
-		// Save the resized image to the destination file
 		if err := helpers.SaveResizedImage(dst, resizedImage, "jpeg"); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -832,7 +850,6 @@ func UserOrdersHandler(c *gin.Context) {
 	db.DB.Model(models.Orders{}).Count(&count)
 	fmt.Println("count", count)
 
-	// Fetch all orders from the database
 	if err := db.DB.Preload("User").Preload("Address").Offset(offset).Limit(limit).Find(&orders).Error; err != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "Failed to fetch orders"})
 		return
@@ -878,7 +895,7 @@ func UpdateOrderStatusHandler(c *gin.Context) {
 	}
 	fmt.Println("upda", updateStatusRequest.Status, updateStatusRequest.ID)
 	order.Status = updateStatusRequest.Status
-	if err := db.DB.Debug().Save(&order).Error; err != nil {
+	if err := db.DB.Save(&order).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update status"})
 		return
 	}
@@ -886,35 +903,72 @@ func UpdateOrderStatusHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Status updated successfully"})
 }
 func GetOrderStats(c *gin.Context) {
-	// Open a connection to the database
+	report := c.Query("report")
+	fmt.Println("report", report)
 
-	// Fetch total orders for the last 7 days
-	var weeklyOrders []models.Orders
-	db.DB.Preload("OrderedProducts").Where("created_at > ?", time.Now().AddDate(0, 0, -7)).Find(&weeklyOrders)
+	var (
+		orders         []models.OrderProducts
+		count          int64
+		totalAmount    float64
+		totalDelivered int64
+	)
 
-	// Prepare data for JSON response
-	var data []map[string]interface{}
-	for _, order := range weeklyOrders {
-		for _, product := range order.OrderedProducts {
-			data = append(data, map[string]interface{}{
-				"product":    product.ProductID,
-				"quantity":   product.Quantity,
-				"created_at": order.CreatedAt.Format("2006-01-02"),
-			})
-		}
+	// Set the time range based on the report type
+	var timeRange time.Time
+	switch report {
+	case "daily":
+		timeRange = time.Now().AddDate(0, 0, -1)
+	case "weekly":
+		timeRange = time.Now().AddDate(0, 0, -7)
+	case "monthly":
+		timeRange = time.Now().AddDate(0, -1, 0)
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "badrequest"})
+		return
 	}
 
-	// Respond with JSON
-	c.JSON(http.StatusOK, gin.H{"weeklyOrders": data})
+	err := db.DB.Preload("Variant").Preload("Variant.Product").Preload("OrderDetails").
+		Preload("OrderDetails.User").Where("status <> 'cancelled' AND created_at > ?", timeRange).Find(&orders).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching orders"})
+		return
+	}
+
+	if err := db.DB.Debug().Table("orders").Where("status <> 'cancelled' AND created_at > ?", timeRange).Count(&count).Error; err != nil {
+		fmt.Println("Error checking table count:", err)
+		return
+	}
+
+	if err := db.DB.Debug().Table("order_products").Where("status = 'delivered' AND created_at > ?", timeRange).Count(&totalDelivered).Error; err != nil {
+		fmt.Println("Error checking table count:", err)
+		return
+	}
+
+	if count > 0 {
+		if result := db.DB.Table("orders").Where("status <> 'cancelled' AND created_at > ?", timeRange).
+			Select("SUM(Total) as total_amount").Scan(&totalAmount); result.Error != nil {
+			fmt.Println("Error calculating sum:", result.Error)
+			return
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"OrdersReport":   orders,
+		"TotalAmount":    totalAmount,
+		"TotalOrders":    count,
+		"TotalDelivered": totalDelivered,
+	})
 }
+
 func ManageOrderHandler(c *gin.Context) {
 	var orders []models.OrderProducts
 	var OrderDetails models.Orders
-	_, err := helpers.GetID(c)
 	orderid := c.Query("id")
-	if err != nil {
-		fmt.Println("error", err)
-	}
+	// if err != nil {
+	// 	fmt.Println("error", err)
+	// 	// Handle the error appropriately, possibly return an error response.
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+	// 	return
+	// }
 	fmt.Println("id", orderid)
 	db.DB.Preload("Variant.Product.Images").Preload("Variant.Product").Preload("Variant").Preload("Image").Where("order_id=?", orderid).Find(&orders)
 	db.DB.Preload("User").Preload("Address").Where("id=?", orderid).Find(&OrderDetails)

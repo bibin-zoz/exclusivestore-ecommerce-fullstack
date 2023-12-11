@@ -58,13 +58,8 @@ func LoginPost(c *gin.Context) {
 		return
 	}
 
-	// var count int64
-	// if result := db.DB.Model(&models.User{}).Where("email = ?", Newmail).Count(&count); result.Error != nil || count == 0 {
-	// 	data.EmailError = "User not found! Re-check the Mailid"
-	// 	c.HTML(http.StatusBadRequest, "login.html", data)
-	// 	return
-	// }
-	if compare.Password != Newpassword {
+	err := helpers.VerifyPassword(Newpassword, compare.Password)
+	if err != nil {
 		data.PasswordError = "Check password again"
 		c.HTML(http.StatusBadRequest, "login.html", data)
 		return
@@ -75,6 +70,7 @@ func LoginPost(c *gin.Context) {
 		return
 	}
 	if compare.Status != "active" {
+		fmt.Println("user blocked")
 		data.StatusError = "User is blocked"
 		c.HTML(http.StatusBadRequest, "login.html", data)
 		return
@@ -108,13 +104,7 @@ func LoginPost(c *gin.Context) {
 	}
 	userDetailsJSON := helpers.CreateJson(UserLoginDetails)
 
-	if claims.Role == "admin" {
-		c.SetCookie("adminAuth", string(userDetailsJSON), 0, "/", "localhost", true, true)
-
-	} else {
-		c.SetCookie("auth", string(userDetailsJSON), 0, "/", "localhost", true, true)
-
-	}
+	c.SetCookie("auth", string(userDetailsJSON), 0, "/", "localhost", true, true)
 
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
@@ -261,12 +251,12 @@ func VerifyPost(c *gin.Context) {
 		return
 	}
 
-	// Attempt to create a new user
+	hasedPassword, _ := helpers.HashPassword(user.Password)
 	newUser := models.User{
 		Username: user.Username,
 		Email:    user.Email,
 		Number:   user.Number,
-		Password: user.Password,
+		Password: hasedPassword,
 	}
 
 	err := db.DB.Create(&newUser).Error
@@ -312,6 +302,7 @@ func HomeHandler(c *gin.Context) {
 }
 
 func LogoutHandler(c *gin.Context) {
+	fmt.Println("user logut")
 
 	c.SetCookie("auth", "", -1, "/", "localhost", false, true)
 

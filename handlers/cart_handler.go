@@ -69,7 +69,7 @@ func AddToCarthandler(c *gin.Context) {
 	}
 	var count int64
 	var cartcount models.Cart
-	db.DB.Where("user_id=? AND product_id=?", ID, Cart.ProductID).Find(&cartcount).Count(&count)
+	db.DB.Where("user_id=? AND variant_id=?", ID, Cart.VariantID).Find(&cartcount).Count(&count)
 	fmt.Println("count", count)
 	if count != 0 {
 		fmt.Println("product already in cart")
@@ -101,6 +101,45 @@ func AddToCarthandler(c *gin.Context) {
 		"message": "Cart updated successfully",
 	})
 
+}
+func UpdateQuantityHandler(c *gin.Context) {
+	fmt.Println("hiii")
+	var updateCart models.Updatecart
+	var cart models.Cart
+
+	err := c.ShouldBindJSON(&updateCart)
+	if err != nil {
+		fmt.Println("Error binding JSON:", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+
+	result := db.DB.Preload("Variant").Where("id = ?", updateCart.ID).Find(&cart)
+	if result.Error != nil {
+		fmt.Println("Error fetching cart:", result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart"})
+		return
+	}
+
+	newQuantity, err := strconv.Atoi(updateCart.Quantity)
+	if err != nil {
+		fmt.Println("Error converting quantity to integer:", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid quantity"})
+		return
+	}
+
+	if cart.Variant.Stock+int(cart.Quantity) < newQuantity {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Failed to update quantity"})
+		return
+	}
+
+	cart.Quantity = uint(newQuantity)
+	db.DB.Save(&cart)
+
+	c.JSON(http.StatusOK, gin.H{
+		"Quantity": newQuantity,
+		"Total":    cart.Total,
+	})
 }
 
 func DeleteCartHandler(c *gin.Context) {

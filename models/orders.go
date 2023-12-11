@@ -19,17 +19,18 @@ type Orders struct {
 	Address         UserAddress     `gorm:"foreignKey:AddressID"`
 	OrderedProducts []OrderProducts `json:"Products" gorm:"foreignKey:OrderID"`
 }
-type GetOrders struct {
-	ID              uint            `json:"id" gorm:"unique;not null"`
-	UserID          uint            `json:"UserID" gorm:"index;foreignKey:UserID"`
-	AddressID       uint            `json:"AddressID" gorm:"index;foreignKey:AddressID"`
-	Status          string          `json:"status" gorm:"default:'pending'"`
-	Payment         string          `json:"payment" gorm:"default:'cod'"`
-	Total           float64         `json:"Total" gorm:"not null"`
-	User            User            `gorm:"foreignKey:UserID"`
-	Address         UserAddress     `gorm:"foreignKey:AddressID"`
-	OrderedProducts []OrderProducts `json:"Products" gorm:"foreignKey:OrderID"`
-}
+
+// type GetOrders struct {
+// 	ID              uint            `json:"id" gorm:"unique;not null"`
+// 	UserID          uint            `json:"UserID" gorm:"index;foreignKey:UserID"`
+// 	AddressID       uint            `json:"AddressID" gorm:"index;foreignKey:AddressID"`
+// 	Status          string          `json:"status" gorm:"default:'pending'"`
+// 	Payment         string          `json:"payment" gorm:"default:'cod'"`
+// 	Total           float64         `json:"Total" gorm:"not null"`
+// 	User            User            `gorm:"foreignKey:UserID"`
+// 	Address         UserAddress     `gorm:"foreignKey:AddressID"`
+// 	OrderedProducts []OrderProducts `json:"Products" gorm:"foreignKey:OrderID"`
+// }
 
 type OrderProducts struct {
 	ID           uint            `json:"id" gorm:"unique;not null"`

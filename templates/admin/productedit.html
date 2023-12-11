@@ -170,7 +170,7 @@
                                         <div class="col-lg-6 offset-lg-4">
                                             <div class="form-check">
                                                 <input type="checkbox" class="form-check-input" id="addNewProduct"  onchange="toggleVariantDetails()">
-                                                <label class="form-check-label" for="addNewProduct">Add New Product</label>
+                                                <label class="form-check-label" for="addNewProduct">Add New Variant</label>
                                             </div>
                                         </div>
                                     </div>
@@ -179,7 +179,7 @@
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
                                             <select class="variant-dropdown" id="slug" onchange="toggleVariantDetails(); updateVariantDetails(this)">
-                                                <option value="0" >Create New Variant</option>
+                                                <option value="0" >Variant</option>
                                                 {{range .Product.Variants}}
                                                 
                                                 <option value="{{.ID}}"  data-ram="{{.Ram}}" data-storage="{{.Storage}}" data-stock="{{.Stock}}" data-price="{{.Price}}">

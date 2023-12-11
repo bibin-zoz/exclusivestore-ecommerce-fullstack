@@ -54,7 +54,8 @@ func AdminAuth() gin.HandlerFunc {
 				return
 
 			} else {
-				c.SetCookie("adminAuth", "", -1, "/", "localhost", true, true)
+
+				c.SetCookie("adminAuth", "", -1, "/admin", "localhost", true, true)
 				accessToken, err := helpers.GenerateAccessToken(*claims)
 				if err != nil {
 					log.Println("Error creating access token token:", err)

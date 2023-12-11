@@ -1,4 +1,5 @@
 {{template "userheader.html"}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
 <main class="main">
     <div class="page-header breadcrumb-wrap">
@@ -32,28 +33,38 @@
                                     <td class="image product-thumbnail">
                                         {{ with index .Product.Images 0}}
                                         <img src="{{ .FilePath }}" alt="IMG">
-                                      {{ end }}</td>
+                                        {{ end }}
+                                    </td>
                                     <td class="product-des product-name">
-                                        <h5 class="product-name"><a href="shop-product-right.html">{{.Product.ProductName}}</a></h5>
+                                        <h5 class="product-name"><a
+                                                href="shop-product-right.html">{{.Product.ProductName}}</a></h5>
                                         <p class="font-xs">{{.Variant.Slug}}<br> {{.Product.ProductDetails}}
                                         </p>
                                     </td>
                                     <td class="price" data-title="Price"><span>₹ {{.Variant.Price}} </span></td>
                                     <td class="text-center" data-title="Stock">
-                                        <div class="detail-qty border radius  m-auto">
-                                            <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
-                                            <span class="qty-val">{{.Quantity}}</span>
-                                            <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                                        <!-- <div class="detail-qty border radius m-auto">
+                                            <button href="#"  data-action="decrement" data-slug="{{.Variant.Slug}}" onclick="updateQuantity(this)"><i class="fi-rs-angle-small-down"></i></button>
+                                            <span class="qty-val" id="NewQuantity">{{.Quantity}}</span>
+                                            <button href="#"  data-action="increment" data-slug="{{.Variant.Slug}}" onclick="updateQuantity(this)"><i class="fi-rs-angle-small-up"></i></button>
+                                        </div> -->
+                                        <div class="cart-product-quantity small">
+                                            <input type="number" class="form-control qty-val form-control-sm" name="qty"
+                                                value="{{.Quantity}}" min="1" max="10" step="1" data-decimals="0"
+                                                data-id="{{.ID}}" onchange="updateQuantity(this)">
                                         </div>
+
+
+
                                     </td>
                                     <td class="text-right" data-title="Cart">
-                                        <span>₹{{.Total}} </span>
+                                        <span class="total-val">₹{{.Total}} </span>
                                     </td>
-                                    <td class="action" data-title="Remove"><button type="button"
-                                        data-id="{{.ID}}" class="text-muted delete-btn"><i class="fi-rs-trash"></i></button></td>
+                                    <td class="action" data-title="Remove"><button type="button" data-id="{{.ID}}"
+                                            class="text-muted delete-btn"><i class="fi-rs-trash"></i></button></td>
                                 </tr>
-                                
-                               
+
+
                                 {{end}}
                                 <tr>
                                     <td colspan="6" class="text-end">
@@ -119,10 +130,12 @@
                                             <form action="#" target="_blank">
                                                 <div class="form-row row justify-content-center">
                                                     <div class="form-group col-lg-6">
-                                                        <input class="font-medium" name="Coupon" placeholder="Enter Your Coupon">
+                                                        <input class="font-medium" name="Coupon"
+                                                            placeholder="Enter Your Coupon">
                                                     </div>
                                                     <div class="form-group col-lg-6">
-                                                        <button class="btn  btn-sm"><i class="fi-rs-label mr-10"></i>Apply</button>
+                                                        <button class="btn  btn-sm"><i
+                                                                class="fi-rs-label mr-10"></i>Apply</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -141,20 +154,25 @@
                                         <tbody>
                                             <tr>
                                                 <td class="cart_total_label">Cart Subtotal</td>
-                                                <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">₹{{.CartTotal}}</span></td>
+                                                <td class="cart_total_amount"><span
+                                                        class="font-lg fw-900 text-brand">₹{{.CartTotal}}</span></td>
                                             </tr>
                                             <tr>
                                                 <td class="cart_total_label">Shipping</td>
-                                                <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                                <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free
+                                                    Shipping</td>
                                             </tr>
                                             <tr>
                                                 <td class="cart_total_label">Total</td>
-                                                <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">₹{{.CartTotal}}</span></strong></td>
+                                                <td class="cart_total_amount"><strong><span
+                                                            class="font-xl fw-900 text-brand">₹{{.CartTotal}}</span></strong>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
+                                    CheckOut</a>
                             </div>
                         </div>
                     </div>
@@ -174,7 +192,8 @@
                             <h4 class="font-size-20 mb-0 ml-3">Sign up to Newsletter</h4>
                         </div>
                         <div class="col my-4 my-md-0 des">
-                            <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>₹25 coupon for first shopping.</strong></h5>
+                            <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>₹25 coupon for first
+                                    shopping.</strong></h5>
                         </div>
                     </div>
                 </div>
@@ -245,13 +264,16 @@
                         <div class="col-md-8 col-lg-12">
                             <p class="wow fadeIn animated">From App Store or Google Play</p>
                             <div class="download-app wow fadeIn animated">
-                                <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active" src="static/evara/assets/imgs/theme/app-store.jpg" alt=""></a>
-                                <a href="#" class="hover-up"><img src="static/evara/assets/imgs/theme/google-play.jpg" alt=""></a>
+                                <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active"
+                                        src="static/evara/assets/imgs/theme/app-store.jpg" alt=""></a>
+                                <a href="#" class="hover-up"><img src="static/evara/assets/imgs/theme/google-play.jpg"
+                                        alt=""></a>
                             </div>
                         </div>
                         <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
                             <p class="mb-20 wow fadeIn animated">Secured Payment Gateways</p>
-                            <img class="wow fadeIn animated" src="static/evara/assets/imgs/theme/payment-method.png" alt="">
+                            <img class="wow fadeIn animated" src="static/evara/assets/imgs/theme/payment-method.png"
+                                alt="">
                         </div>
                     </div>
                 </div>
@@ -264,7 +286,8 @@
                 <div class="footer-bottom"></div>
             </div>
             <div class="col-lg-6">
-                <p class="float-md-left font-sm text-muted mb-0">&copy; 2021, <strong class="text-brand">Evara</strong> - HTML Ecommerce Template </p>
+                <p class="float-md-left font-sm text-muted mb-0">&copy; 2021, <strong class="text-brand">Evara</strong>
+                    - HTML Ecommerce Template </p>
             </div>
             <div class="col-lg-6">
                 <p class="text-lg-end text-start font-sm text-muted mb-0">
@@ -290,32 +313,78 @@
     </div>
 </div>
 <!-- Vendor JS-->
+
+
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function updateQuantity(element) {
+        var newQuantity = element.value;
+        var id = element.dataset.id;
+
+        // Use jQuery Ajax for simplicity
+        $.ajax({
+            type: 'PATCH', // or 'PUT' depending on your API design
+            url: `/cart`,
+            contentType: 'application/json',
+            data: JSON.stringify({ id: id, quantity: newQuantity }),
+            success: function (data) {
+                const updatedTotal = data.Total
+                const updatedQuantity = data.Quantity;
+
+                $(element).closest('tr').find('.qty-val').text(updatedQuantity);
+                $(element).closest('tr').find('.total-val').text(`₹${updatedTotal}`);
+                Toastify({
+                    text: 'Quantity Updated',
+                    duration: 2000,
+                    gravity: 'bottom', // Change as needed
+                    position: 'right', // Change as needed
+                    backgroundColor: 'green', // Change as needed
+                }).showToast();
+
+            },
+            error: function (error) {
+                console.error('Error updating quantity:', error);
+                Toastify({
+                    text: 'Out of stock',
+                    duration: 2000,
+                    gravity: 'bottom', // Change as needed
+                    position: 'right', // Change as needed
+                    backgroundColor: 'red', // Change as needed
+                }).showToast();
+            }
+        });
+    }
+</script>
+
 <script>
 
-$(document).ready(function () {
-    
-$('.delete-btn').on('click', function () {
-                var productID = $(this).data('id');
+    $(document).ready(function () {
 
-                console.log('Sending AJAX request with ID:', productID);
+        $('.delete-btn').on('click', function () {
+            var productID = $(this).data('id');
 
-                $.ajax({
-                            url: '/cart',
-                            type: 'DELETE',
-                            contentType: 'application/json',
-                            data: JSON.stringify({ id: productID }),
-                            success: function (response) {
-                                console.log('Success:', response);
-                                window.location.reload();
-                            },
-                            error: function (error) {
-                                console.error('Error:', error);
-                            }
-                        });
-});});
+            console.log('Sending AJAX request with ID:', productID);
 
-    </script>
+            $.ajax({
+                url: '/cart',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: productID }),
+                success: function (response) {
+                    console.log('Success:', response);
+                    window.location.reload();
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+
+</script>
 <script src="static/evara/assets/js/vendor/modernizr-3.6.0.min.js"></script>
 <script src="static/evara/assets/js/vendor/jquery-3.6.0.min.js"></script>
 <script src="static/evara/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
@@ -341,4 +410,5 @@ $('.delete-btn').on('click', function () {
 
 
 <!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/shop-cart.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:26:06 GMT -->
+
 </html>
