@@ -40,6 +40,7 @@ func main() {
 	router.POST("/order", middleware.LoginAuth(), handlers.OrderPlacehandler)
 	router.GET("/order", middleware.LoginAuth(), handlers.GetOrdershandler)
 	router.GET("/trackorder", middleware.LoginAuth(), handlers.TrackOrderHandler)
+	router.PUT("/order", middleware.LoginAuth(), handlers.ReturnOrderHandler)
 
 	router.PATCH("/order", middleware.LoginAuth(), handlers.CancelOrderHandler)
 	router.PATCH("/cancelitem", middleware.LoginAuth(), handlers.CancelProductHandler)

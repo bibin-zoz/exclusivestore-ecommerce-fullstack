@@ -52,7 +52,7 @@
                             <h3 class="card-title text-white">Total Orders</h3>
                             <div class="d-inline-block">
                                 <h2 class="text-white" id="totalOrders"></h2>
-                                <p class="text-white mb-0">Jan - March 2019</p>
+                                
                             </div>
                             <span class="float-right display-5 opacity-5"><i class="fa fa-shopping-cart"></i></span>
                         </div>
@@ -65,7 +65,7 @@
                             <div class="d-inline-block">
                                 <h2 id="totalAmount" class="text-white">0.00</h2>
 
-                                <p class="text-white mb-0">Jan - March 2019</p>
+                                
                             </div>
                             <span class="float-right display-5 opacity-5"><i class="fa fa-money"></i></span>
                         </div>
@@ -311,38 +311,36 @@
         row.append('<td>' + order.status + '</td>');
         row.append('<td>' + order.Products.payment + '</td>');
         row.append('<td>' + order.Total + '</td>');
-        // Append the row to the tbody
+       
         tbody.append(row);
     });
 }
 function displayChart(response) {
     const orders = response.OrdersReport;
 
-    // Check if orders is an array and not empty
+    
     if (!Array.isArray(orders) || orders.length === 0) {
         console.error('Invalid or empty orders data:', orders);
         return;
     }
 
-    // Create a Set to store unique dates
+ 
     const uniqueDates = new Set();
 
-    // Aggregate quantities for each date
+
     orders.forEach(order => {
         const date = new Date(order.CreatedAt);
         const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 
-        // Add the formatted date to the Set
+      
         uniqueDates.add(formattedDate);
     });
 
-    // Convert the Set to an array
     const labels = Array.from(uniqueDates);
 
-    // Create an object to store the aggregated quantities for each date
+ 
     const aggregatedData = {};
 
-    // Aggregate quantities for each date
     orders.forEach(order => {
         const date = new Date(order.CreatedAt);
         const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
@@ -354,25 +352,25 @@ function displayChart(response) {
         }
     });
 
-    // Extract data from the aggregatedData object
+  
     const data = labels.map(date => aggregatedData[date] || 0);
 
-    // Log labels and data to check if they are valid
+
     console.log('Labels:', labels);
     console.log('Data:', data);
 
-    // Get the canvas element
+
     const canvas = document.getElementById('weeklyReportChart');
 
-    // Check if there's an existing chart and destroy it
+
     if (canvas.chart) {
         canvas.chart.destroy();
     }
 
-    // Create a Chart.js chart
+
     const ctx = canvas.getContext('2d');
     const myChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
             labels: labels,
             datasets: [{
@@ -393,7 +391,7 @@ function displayChart(response) {
         }
     });
 
-    // Store the chart reference on the canvas
+ 
     canvas.chart = myChart;
 }
 

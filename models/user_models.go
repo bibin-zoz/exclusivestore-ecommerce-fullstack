@@ -34,6 +34,7 @@ type UserAddress struct {
 	State       string `gorm:"not null" json:"state" form:"state" binding:"required"`
 	PostalCode  string `gorm:"not null" json:"postalcode" form:"postalcode" binding:"required"`
 	Country     string `gorm:"not null" json:"country" form:"country" binding:"required"`
+	IsPrimary   string `gorm:"default:'false'"`
 	PhoneNumber string `json:"phone_number" gorm:"not null" form:"phonenumber" binding:"required"`
 }
 

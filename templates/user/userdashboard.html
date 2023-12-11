@@ -458,7 +458,7 @@
             url: '/order',
             type: 'PATCH',
             contentType: 'application/json',
-            data: JSON.stringify({ id: orderId}),
+            data: JSON.stringify({ id: orderId }),
             success: function (response) {
                 console.log('Success:', response);
 
@@ -678,19 +678,50 @@
         $('#addressBlocks').on('click', '.ad-delete-btn', function () {
             var addressID = $(this).data('id');
 
-            console.log('Sending AJAX request with ID:', addressID);
+            // Use SweetAlert to confirm the deletion
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('Sending AJAX request with ID:', addressID);
 
-            $.ajax({
-                url: '/useraddress',
-                type: 'DELETE',
-                contentType: 'application/json',
-                data: JSON.stringify({ id: addressID }),
-                success: function (response) {
-                    console.log('Success:', response);
-                    $('#address-tab').click();
-                },
-                error: function (error) {
-                    console.error('Error:', error);
+                    // Send the AJAX request to delete the address
+                    $.ajax({
+                        url: '/useraddress',
+                        type: 'DELETE',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: addressID }),
+                        success: function (response) {
+                            console.log('Success:', response);
+
+                            // Show success message
+                            Swal.fire(
+                                'Deleted!',
+                                'Your address has been deleted.',
+                                'success'
+                            );
+
+                            // Reload the address tab
+                            $('#address-tab').click();
+                        },
+                        error: function (error) {
+                            console.error('Error:', error);
+
+                            // Show error message
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Cannot delete primary Address',
+                               
+                            });
+                        }
+                    });
                 }
             });
         });

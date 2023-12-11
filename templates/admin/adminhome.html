@@ -39,8 +39,8 @@
                             <div class="card-body">
                                 <h3 class="card-title text-white">Products Sold</h3>
                                 <div class="d-inline-block">
-                                    <h2 class="text-white">4565</h2>
-                                    <p class="text-white mb-0">Jan - March 2019</p>
+                                    <h2 class="text-white">{{.ProductsSold}}</h2>
+                                    <p class="text-white mb-0"></p>
                                 </div>
                                 <span class="float-right display-5 opacity-5"><i class="fa fa-shopping-cart"></i></span>
                             </div>
@@ -51,8 +51,8 @@
                             <div class="card-body">
                                 <h3 class="card-title text-white">Net Profit</h3>
                                 <div class="d-inline-block">
-                                    <h2 class="text-white">$ 8541</h2>
-                                    <p class="text-white mb-0">Jan - March 2019</p>
+                                    <h2 class="text-white">₹ {{.NetProfit}}</h2>
+                                   
                                 </div>
                                 <span class="float-right display-5 opacity-5"><i class="fa fa-money"></i></span>
                             </div>
@@ -63,8 +63,8 @@
                             <div class="card-body">
                                 <h3 class="card-title text-white">New Customers</h3>
                                 <div class="d-inline-block">
-                                    <h2 class="text-white">4565</h2>
-                                    <p class="text-white mb-0">Jan - March 2019</p>
+                                    <h2 class="text-white">{{.NewCustomers}}</h2>
+                                    <p class="text-white mb-0">In this month</p>
                                 </div>
                                 <span class="float-right display-5 opacity-5"><i class="fa fa-users"></i></span>
                             </div>
@@ -76,7 +76,7 @@
                                 <h3 class="card-title text-white">Customer Satisfaction</h3>
                                 <div class="d-inline-block">
                                     <h2 class="text-white">99%</h2>
-                                    <p class="text-white mb-0">Jan - March 2019</p>
+                                   
                                 </div>
                                 <span class="float-right display-5 opacity-5"><i class="fa fa-heart"></i></span>
                             </div>
@@ -91,9 +91,8 @@
                                 <div class="card">
                                     <div class="card-body pb-0 d-flex justify-content-between">
                                         <div>
-                                            <h4 class="mb-1">Product Sales</h4>
-                                            <p>Total Earnings of the Month</p>
-                                            <h3 class="m-0">$ 12,555</h3>
+                                            <h4 class="mb-1">Top Product Sales</h4>
+                                           
                                         </div>
                                         <div>
                                             <ul>
@@ -106,7 +105,7 @@
                                     <div class="chart-wrapper">
                                         <canvas id="weeklyOrderChart" width="400" height="200"></canvas>
                                     </div>
-                                    <div class="card-body">
+                                    <!-- <div class="card-body">
                                         <div class="d-flex justify-content-between">
                                             <div class="w-100 mr-2">
                                                 <h6>Pixel 2</h6>
@@ -121,7 +120,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -635,32 +634,33 @@
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data.map(order => order.product),
+                    labels: data.map(order => order.Variant.slug),
                     datasets: [{
                         label: 'Weekly Orders',
                         data: data.map(order => order.quantity),
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            precision: 0
                         }
                     }
                 }
             });
         }
 
-        // Fetch data from the /order-stats endpoint using AJAX
+       
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/admin/getOrderStats', true);
+        xhr.open('GET', '/admin/getOrderStats?report=weekly', true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var data = JSON.parse(xhr.responseText);
-                createWeeklyOrderChart('weeklyOrderChart', data.weeklyOrders);
+                createWeeklyOrderChart('weeklyOrderChart', data.OrdersReport);
             } else if (xhr.readyState === 4 && xhr.status !== 200) {
                 console.error('Error fetching data:', xhr.status, xhr.statusText);
             }

@@ -390,16 +390,27 @@ func DeleteAddressHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	cartID := req.ID
+	ID := req.ID
 
 	var address models.UserAddress
-	result := db.DB.Where("id = ?", cartID).Delete(&address)
+	result := db.DB.Where("id = ?", ID).First(&address)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove address"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch address"})
 		return
 	}
 
+	if address.IsPrimary == "true" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot remove primary address"})
+		return
+	}
+
+	result = db.DB.Delete(&address)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove"})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"message": "address removed successfully"})
 }
 

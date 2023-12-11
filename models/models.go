@@ -75,3 +75,8 @@ type Updatecart struct {
 	ID       string `json:"id"`
 	Quantity string `json:"quantity"`
 }
+
+type UserRequest struct {
+	ID      int    `json:"id"`
+	Request string `json:"request"`
+}

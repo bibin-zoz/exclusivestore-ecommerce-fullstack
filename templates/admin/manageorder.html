@@ -97,13 +97,15 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th width="10%">Product</th>
-                                            <th width="20%">Product Details</th>
-                                            <th width="20%">Unit Price</th>
+                                            <th>Product</th>
+                                            <th >Product Details</th>
+                                            <th >Unit Price</th>
                                             <th width="20%">Quantity</th>
-                                            <th width="10%">Total</th>
+                                            <th>Total</th>
                                             <th>Status</th>
-                                            <th width="10%">sdsd</th>
+                                            <th width="15%">Notes:</th>
+                                            <th >Actions</th>
+                                          
 
                                         </tr>
                                     </thead>
@@ -144,22 +146,36 @@
                                 <span class="badge badge-info">{{.Status}}</span>
                                 {{else if eq .Status "cancelled"}}
                                 <span class="badge badge-danger">{{.Status}}</span>
-                                {{else if eq .Status "Delivered"}}
+                                {{else if eq .Status "delivered"}}
                                 <span class="badge badge-success">{{.Status}}</span>
-                                {{else if eq .Status "Refunded"}}
+                                {{else if eq .Status "refunded"}}
                                 <span class="badge badge-success">{{.Status}}</span>
                                 {{else}}
                                 <span class="badge badge-dark">{{.Status}}</span>
                                 {{end}}
                             </td>
+                            <td class="text-center" data-title="Cart">
+                                <span>{{.Notes}} </span>
+                            </td>
                             <td class="text-center" data-title="Cancel Order">
+                                <select class="form-control status-select" data-order-id="{{.OrderID}}" data-product-id="{{.ProductID}}">
+                                {{if eq .Status "delivered"}}
+                                
+                                    <option value="Refunded">Refunded</option>
+                                    <option value="Returning">Refunded</option>
 
-                                <select class="form-control status-select" data-order-id="{{.OrderID}}"
-                                    data-product-id="{{.ProductID}}">
-                                    <option value="approved">Approved</option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="Delivered">Delivered</option>
-                                        <option value="Refunded">Refunded</option>
+                                {{else}}
+                                <option value="approved">Approved</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="refunded">Refunded</option>
+
+
+                                {{end}}
+
+                               
+                                    
+                                   
                                 </select>
                                 <button class="btn btn-primary update-status-btn btn-sm" data-order-id="{{.ID}}"
                                     data-product-id="{{.ProductID}}">Update Status</button>
@@ -175,7 +191,7 @@
                             {{end}}
 
                             <tr>
-                                <td colspan="7">
+                                <td colspan="8">
                                     <article class="float-end">
                                         <dl class="dlist">
                                             <dt>Subtotal:</dt>

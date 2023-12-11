@@ -22,12 +22,13 @@
                 <div class="row align-items-center">
                     <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
                         <span>
-                            <i class="material-icons md-calendar_today"></i> <b>{{ .OrderDetails.CreatedAt.Format "Monday, January 2, 2006" }}</b>
+                            <i class="material-icons md-calendar_today"></i> <b>{{ .OrderDetails.CreatedAt.Format
+                                "Monday, January 2, 2006" }}</b>
                         </span> <br>
                         <small class="text-muted">Order ID: {{.OrderDetails.ID}}</small>
                     </div>
-                <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                          <!--   <Di class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                        <!--   <Di class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
                             <option>Change status</option>
                             <option>Awaiting payment</option>
                             <option>Confirmed</option>
@@ -35,10 +36,11 @@
                             <option>Delivered</option>
                         </Di>
                         <a class="btn btn-primary" href="#">Save</a>-->
-                         <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
-                        
-                    </div> 
-                   
+                        <a class="btn btn-secondary print ms-2" href="#"><i
+                                class="icon material-icons md-print"></i></a>
+
+                    </div>
+
                 </div>
             </header> <!-- card-header end// -->
             <div class="card-body">
@@ -51,7 +53,9 @@
                             <div class="text">
                                 <h6 class="mb-1">Customer</h6>
                                 <p class="mb-1">
-                                    John Alexander <br> <template class="__cf_email__" data-cfemail="e2838e879aa2879a838f928e87cc818d8f">[email&#160;protected]</template> <br> +998 99 22123456
+                                    John Alexander <br> <template class="__cf_email__"
+                                        data-cfemail="e2838e879aa2879a838f928e87cc818d8f">[email&#160;protected]</template>
+                                    <br> +998 99 22123456
                                 </p>
                                 <a href="#">View profile</a>
                             </div>
@@ -79,7 +83,9 @@
                             <div class="text">
                                 <h6 class="mb-1">Deliver to</h6>
                                 <p class="mb-1">
-                                    City: {{.OrderDetails.Address.Street}}, {{.OrderDetails.Address.City}} <br>{{.OrderDetails.Address.State}}-{{.OrderDetails.Address.Country}}<br> Po Box {{.OrderDetails.Address.PostalCode}}
+                                    City: {{.OrderDetails.Address.Street}}, {{.OrderDetails.Address.City}}
+                                    <br>{{.OrderDetails.Address.State}}-{{.OrderDetails.Address.Country}}<br> Po Box
+                                    {{.OrderDetails.Address.PostalCode}}
                                 </p>
                                 <a href="#">View profile</a>
                             </div>
@@ -97,92 +103,133 @@
                                         <th width="20%">Unit Price</th>
                                         <th width="20%">Quantity</th>
                                         <th width="10%">Total</th>
-                                        <th >Status</th>
+                                        <th>Status</th>
                                         <th width="10%">sdsd</th>
-                                        
+
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{range .Order}}
+                                    {{range .Order}}<!-- Modal for Return Details -->
+                                    <div class="modal fade" id="returnModal" tabindex="-1" role="dialog"
+                                        aria-labelledby="returnModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="returnModalLabel">Return Details</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Input fields for return details -->
+                                                    <label for="returnReason">Return Reason:</label>
+                                                    <input type="text" class="form-control" id="returnReason"
+                                                        placeholder="Enter return reason" required>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Close</button>
+                                                        <button class="btn btn-primary" id="submitReturn" data-id="{{.ID}}">Submit Return</button>
+            
+                                                        Return</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <tr>
                                         <td>
                                             <a class="itemside" href="#">
                                                 <div class="left">
                                                     {{ with index .Variant.Product.Images 0}}
-                                                    <img src="{{ .FilePath }}" width="40" height="40" class="img-xs rounded-circle" alt="Item">
-                                                    {{ end }}</td>
-                                                   
-                                                </div>
-                                                
-                                             
-                                            </a>
+                                                    <img src="{{ .FilePath }}" width="40" height="40"
+                                                        class="img-xs rounded-circle" alt="Item">
+                                                    {{ end }}
                                         </td>
-                                        <td><div class="right info"><h5> {{.Variant.Product.ProductName}}</h5>
-                                            <p class="font-xs">{{.Variant.Slug}}<br> {{.Variant.Product.ProductDetails}}</div></td>
-                                        <td class="price" data-title="Price"><span>₹ {{.Price}} </span></td>
-                                        <td>X {{.Quantity}}</td>
-                                        
-                                        <td class="text-center" data-title="Cart">
-                                            <span>₹{{.Total}} </span>
-                                        </td>
-                                        <td>
-                                            {{if eq .Status "pending"}}
-                                            <span class="badge badge-warning">{{.Status}}</span>
-                                            {{else if eq .Status "shipped"}}
-                                            <span class="badge badge-info">{{.Status}}</span>
-                                            {{else if eq .Status "delivered"}}
-                                            <span class="badge badge-success">{{.Status}}</span>
-                                            {{else if eq .Status "cancelled"}}
-                                            <span class="badge badge-danger">{{.Status}}</span>
-                                            {{else}}
-                                            <span class="badge badge-default">{{.Status}}</span>
-                                            {{end}}
-                                        </td>
-                                        <td class="text-center" data-title="Cancel Order">
-                                            {{if eq .Status "pending"}}
-                                            <button class="btn btn-danger cancel-order-btn btn-sm" data-order-id="{{.OrderID}}" data-product-id="{{.ProductID}}" >Cancel</button>
 
-                                            
-                                            {{else}}
-                                            <button class="btn btn-dark cancel-order-btn btn-sm" data-order-id="{{.OrderID}}" data-product-id="{{.ProductID}}" disabled>Cancel</button>
-                                            {{end}}
-                                        </td>
-                                     
-                                    </tr>
+                        </div>
 
-                                   
-                                    {{end}}
-                                  
-                                    <tr>
-                                        <td colspan="7">
-                                            <article class="float-end">
-                                                <dl class="dlist">
-                                                    <dt>Subtotal:</dt>
-                                                    <dd>₹{{.OrderDetails.Total}}</dd>
-                                                </dl>
-                                                <dl class="dlist">
-                                                    <dt>Shipping cost:</dt>
-                                                    <dd>Free Shipping</dd>
-                                                </dl>
-                                                <dl class="dlist">
-                                                    <dt>Grand total:</dt>
-                                                    <dd> <b class="h5">₹{{.OrderDetails.Total}}</b> </dd>
-                                                </dl>
-                                                <dl class="dlist">
-                                                    <dt class="text-muted">Status:</dt>
-                                                    <dd>
-                                                        <span class="badge rounded-pill alert-success text-success">{{.OrderDetails.Status}}</span>
-                                                    </dd>
-                                                </dl>
-                                            </article>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> <!-- table-responsive// -->
-                    </div> <!-- col// -->
-                </div>
-            </div> <!-- card-body end// -->
+
+                        </a>
+                        </td>
+                        <td>
+                            <div class="right info">
+                                <h5> {{.Variant.Product.ProductName}}</h5>
+                                <p class="font-xs">{{.Variant.Slug}}<br> {{.Variant.Product.ProductDetails}}
+                            </div>
+                        </td>
+                        <td class="price" data-title="Price"><span>₹ {{.Price}} </span></td>
+                        <td>X {{.Quantity}}</td>
+
+                        <td class="text-center" data-title="Cart">
+                            <span>₹{{.Total}} </span>
+                        </td>
+                        <td>
+                            {{if eq .Status "pending"}}
+                            <span class="badge badge-warning">{{.Status}}</span>
+                            {{else if eq .Status "shipped"}}
+                            <span class="badge badge-info">{{.Status}}</span>
+                            {{else if eq .Status "delivered"}}
+                            <span class="badge badge-success">{{.Status}}</span>
+                            {{else if eq .Status "cancelled"}}
+                            <span class="badge badge-danger">{{.Status}}</span>
+                            {{else}}
+                            <span class="badge badge-dark">{{.Status}}</span>
+                            {{end}}
+                        </td>
+                        <td class="text-center" data-title="Cancel Order">
+
+                            {{if eq .Status "delivered"}}
+                            <button class="btn btn-danger return-order-btn btn-sm" data-order-id="{{.OrderID}}"
+                                data-product-id="{{.ProductID}}"> Return</button>
+                            {{else if eq .Status "pending"}}
+                            <button class="btn-danger cancel-order-btn btn-sm" data-order-id="{{.OrderID}}"
+                                data-product-id="{{.ProductID}}">Cancel</button>
+
+
+                            {{else}}
+                            <button class="btn btn-dark cancel-order-btn btn-sm" data-order-id="{{.OrderID}}"
+                                data-product-id="{{.ProductID}}" disabled>Cancel</button>
+                            {{end}}
+                        </td>
+
+                        </tr>
+
+
+                        {{end}}
+
+                        <tr>
+                            <td colspan="7">
+                                <article class="float-end">
+                                    <dl class="dlist">
+                                        <dt>Subtotal:</dt>
+                                        <dd>₹{{.OrderDetails.Total}}</dd>
+                                    </dl>
+                                    <dl class="dlist">
+                                        <dt>Shipping cost:</dt>
+                                        <dd>Free Shipping</dd>
+                                    </dl>
+                                    <dl class="dlist">
+                                        <dt>Grand total:</dt>
+                                        <dd> <b class="h5">₹{{.OrderDetails.Total}}</b> </dd>
+                                    </dl>
+                                    <dl class="dlist">
+                                        <dt class="text-muted">Status:</dt>
+                                        <dd>
+                                            <span
+                                                class="badge rounded-pill alert-success text-success">{{.OrderDetails.Status}}</span>
+                                        </dd>
+                                    </dl>
+                                </article>
+                            </td>
+                        </tr>
+                        </tbody>
+                        </table>
+                        
+
+                    </div> <!-- table-responsive// -->
+                </div> <!-- col// -->
+            </div>
+        </div> <!-- card-body end// -->
         </div> <!-- card end// -->
     </section>
 </main>
@@ -197,7 +244,8 @@
                             <h4 class="font-size-20 mb-0 ml-3">Sign up to Newsletter</h4>
                         </div>
                         <div class="col my-4 my-md-0 des">
-                            <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>₹25 coupon for first shopping.</strong></h5>
+                            <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>₹25 coupon for first
+                                    shopping.</strong></h5>
                         </div>
                     </div>
                 </div>
@@ -268,13 +316,16 @@
                         <div class="col-md-8 col-lg-12">
                             <p class="wow fadeIn animated">From App Store or Google Play</p>
                             <div class="download-app wow fadeIn animated">
-                                <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active" src="static/evara/assets/imgs/theme/app-store.jpg" alt=""></a>
-                                <a href="#" class="hover-up"><img src="static/evara/assets/imgs/theme/google-play.jpg" alt=""></a>
+                                <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active"
+                                        src="static/evara/assets/imgs/theme/app-store.jpg" alt=""></a>
+                                <a href="#" class="hover-up"><img src="static/evara/assets/imgs/theme/google-play.jpg"
+                                        alt=""></a>
                             </div>
                         </div>
                         <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
                             <p class="mb-20 wow fadeIn animated">Secured Payment Gateways</p>
-                            <img class="wow fadeIn animated" src="static/evara/assets/imgs/theme/payment-method.png" alt="">
+                            <img class="wow fadeIn animated" src="static/evara/assets/imgs/theme/payment-method.png"
+                                alt="">
                         </div>
                     </div>
                 </div>
@@ -287,7 +338,8 @@
                 <div class="footer-bottom"></div>
             </div>
             <div class="col-lg-6">
-                <p class="float-md-left font-sm text-muted mb-0">&copy; 2021, <strong class="text-brand">Evara</strong> - HTML Ecommerce Template </p>
+                <p class="float-md-left font-sm text-muted mb-0">&copy; 2021, <strong class="text-brand">Evara</strong>
+                    - HTML Ecommerce Template </p>
             </div>
             <div class="col-lg-6">
                 <p class="text-lg-end text-start font-sm text-muted mb-0">
@@ -315,7 +367,59 @@
 <!-- Vendor JS-->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    $(document).ready(function () {
+        // Click event for the "Return" button
+        $('.return-order-btn').click(function () {
+            // Show the return modal
+            $('#returnModal').modal('show');
+        });
 
+        $('#returnModal button[data-dismiss="modal"]').click(function () {
+            $('#returnModal').modal('hide');
+        });
+
+        // Click event for the "Submit Return" button in the modal
+        $('#submitReturn').click(function () {
+            // Get return details from the input field
+            const returnReason = $('#returnReason').val();
+            const orderId = $('#submitReturn').data('id');
+            console.log(orderId);
+
+            $.ajax({
+    url: '/order',
+    type: 'PUT',
+    dataType: 'json',
+    data: JSON.stringify({ id: orderId, request: returnReason }),
+    contentType: 'application/json',
+    success: function (response) {
+        console.log('Success:', response);
+        // Display success message with SweetAlert
+        Swal.fire({
+            icon: 'success',
+            title: 'Return Request Successful',
+            text: 'Your return request has been processed successfully.',
+        });
+    },
+    error: function (error) {
+        console.error('Error:', error);
+        // Display error message with SweetAlert
+        Swal.fire({
+            icon: 'error',
+            title: 'Return Request Error',
+            text: error.responseJSON ? error.responseJSON.error : 'An error occurred while processing your return request. Please try again.',
+        });
+    }
+});
+
+
+
+
+            console.log(returnReason)
+            $('#returnModal').modal('hide');
+        });
+    });
+</script>
 <script>
     $(document).ready(function () {
         $('.cancel-order-btn').on('click', function () {
@@ -338,8 +442,10 @@
                         url: '/cancelitem',
                         type: 'PATCH',
                         contentType: 'application/json',
-                        data: JSON.stringify({ orderId: orderID,
-                                                productId:productID }),
+                        data: JSON.stringify({
+                            orderId: orderID,
+                            productId: productID
+                        }),
                         success: function (response) {
                             console.log('Order canceled successfully:', response);
 
@@ -370,31 +476,31 @@
     });
 </script>
 <script>
-   
-            $.ajax({
-                url: '/useraddress',
-                type: 'GET',
-                dataType: 'json',
-                success: function (userAddresses) {
-                    // Handle the response and update the HTML
-                    displayAddresses(userAddresses);
-                },
-                error: function (error) {
-                    console.error('Error fetching store addresses:', error);
-                }
-            });
-    
 
-        // Function to display store addresses inside #addressBlocks div
-        function displayAddresses(userAddresses) {
-            var addressBlocks = $('#addressBlocks');
+    $.ajax({
+        url: '/useraddress',
+        type: 'GET',
+        dataType: 'json',
+        success: function (userAddresses) {
+            // Handle the response and update the HTML
+            displayAddresses(userAddresses);
+        },
+        error: function (error) {
+            console.error('Error fetching store addresses:', error);
+        }
+    });
 
-            // Clear previous content
-            addressBlocks.empty();
 
-            // Loop through each address and create a new block
-            userAddresses.forEach(function (userAddress) {
-                var addressBlock = `
+    // Function to display store addresses inside #addressBlocks div
+    function displayAddresses(userAddresses) {
+        var addressBlocks = $('#addressBlocks');
+
+        // Clear previous content
+        addressBlocks.empty();
+
+        // Loop through each address and create a new block
+        userAddresses.forEach(function (userAddress) {
+            var addressBlock = `
                         <div class="col-lg-6">
                             <div class="card mb-3 mb-lg-0">
                                 <div class="card-header">
@@ -414,35 +520,36 @@
                             </div>
                         </div>
                     `;
-                addressBlocks.append(addressBlock);
-            });
-        }
-    </script>
+            addressBlocks.append(addressBlock);
+        });
+    }
+</script>
 <script>
 
-$(document).ready(function () {
-    
-$('.delete-btn').on('click', function () {
-                var productID = $(this).data('id');
+    $(document).ready(function () {
 
-                console.log('Sending AJAX request with ID:', productID);
+        $('.delete-btn').on('click', function () {
+            var productID = $(this).data('id');
 
-                $.ajax({
-                            url: '/cart',
-                            type: 'DELETE',
-                            contentType: 'application/json',
-                            data: JSON.stringify({ id: productID }),
-                            success: function (response) {
-                                console.log('Success:', response);
-                                window.location.reload();
-                            },
-                            error: function (error) {
-                                console.error('Error:', error);
-                            }
-                        });
-});});
+            console.log('Sending AJAX request with ID:', productID);
 
-    </script>
+            $.ajax({
+                url: '/cart',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: productID }),
+                success: function (response) {
+                    console.log('Success:', response);
+                    window.location.reload();
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+
+</script>
 <script src="static/evara/assets/js/vendor/modernizr-3.6.0.min.js"></script>
 <script src="static/evara/assets/js/vendor/jquery-3.6.0.min.js"></script>
 <script src="static/evara/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
@@ -468,4 +575,5 @@ $('.delete-btn').on('click', function () {
 
 
 <!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/shop-cart.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:26:06 GMT -->
+
 </html>

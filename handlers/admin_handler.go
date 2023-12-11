@@ -30,7 +30,29 @@ func AdminHome(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
 
-	c.HTML(http.StatusOK, "adminhome.html", nil)
+	// var orders models.OrderProducts
+	var productssold int64
+	result := db.DB.Table("order_products").Where("status='delivered'").Count(&productssold)
+	if result.Error != nil {
+		fmt.Println("error")
+	}
+	var netProfit int64
+	result = db.DB.Table("order_products").Where("status='delivered'").Select("SUM(total)").Scan(&netProfit)
+	if result.Error != nil {
+		fmt.Println("error")
+	}
+	var newCustomers int64
+	timeRange := time.Now().AddDate(0, -1, 0)
+	result = db.DB.Table("users").Where("created_at>?", timeRange).Count(&newCustomers)
+	if result.Error != nil {
+		fmt.Println("error")
+	}
+
+	c.HTML(http.StatusOK, "adminhome.html", gin.H{
+		"ProductsSold": productssold,
+		"NewCustomers": newCustomers,
+		"NetProfit":    netProfit,
+	})
 
 }
 
@@ -850,10 +872,11 @@ func UserOrdersHandler(c *gin.Context) {
 	db.DB.Model(models.Orders{}).Count(&count)
 	fmt.Println("count", count)
 
-	if err := db.DB.Preload("User").Preload("Address").Offset(offset).Limit(limit).Find(&orders).Error; err != nil {
+	if err := db.DB.Preload("User").Preload("Address").Offset(offset).Limit(limit).Order("created_at DESC").Find(&orders).Error; err != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "Failed to fetch orders"})
 		return
 	}
+
 	num := int(count) / (limit)
 	if int(count)%limit != 0 {
 		num = num + 1
@@ -928,7 +951,7 @@ func GetOrderStats(c *gin.Context) {
 	}
 
 	err := db.DB.Preload("Variant").Preload("Variant.Product").Preload("OrderDetails").
-		Preload("OrderDetails.User").Where("status <> 'cancelled' AND created_at > ?", timeRange).Find(&orders).Error
+		Preload("OrderDetails.User").Where("status <> 'cancelled' AND created_at > ?", timeRange).Order("created_at DESC").Find(&orders).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching orders"})
 		return

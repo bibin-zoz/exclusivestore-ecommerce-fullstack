@@ -42,6 +42,7 @@ type OrderProducts struct {
 	Price        float64         `json:"price" gorm:"not null"`
 	Total        float64         `json:"Total" gorm:"not null"`
 	Variant      ProductVariants `gorm:"foreignKey:VariantID"`
+	Notes        string          `json:"Notes" `
 	Image        []Image         `gorm:"foreignKey:ProductID"`
 	OrderDetails Orders          `json:"Products" gorm:"foreignKey:OrderID"`
 	CreatedAt    time.Time

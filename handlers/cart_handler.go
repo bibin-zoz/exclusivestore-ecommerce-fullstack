@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/razorpay/razorpay-go"
@@ -398,6 +399,37 @@ func TrackOrderHandler(c *gin.Context) {
 	})
 
 }
+
+func ReturnOrderHandler(c *gin.Context) {
+	// Parse JSON request body into an OrderProduct struct
+	var returnRequest models.UserRequest
+	var orderdetails models.OrderProducts
+	if err := c.ShouldBindJSON(&returnRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := db.DB.Where("id=?", returnRequest.ID).First(&orderdetails).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Order not found"})
+		return
+	}
+
+	// Check if the return period has expired
+	sevenDaysAgo := time.Now().AddDate(0, 0, -7)
+	if orderdetails.CreatedAt.Before(sevenDaysAgo) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Return period expired"})
+		return
+	}
+	result := db.DB.Debug().Table("order_products").Where("id=?", returnRequest.ID).Update("notes", "Return Request:"+returnRequest.Request).Update("status", "pending")
+	if result.Error != nil {
+		fmt.Println("error", result.Error)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to request return"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Return request processed successfully"})
+}
+
 func CreateRazorpayOrder(c *gin.Context) {
 	var requestData models.OrderReq
 	if err := c.ShouldBindJSON(&requestData); err != nil {
