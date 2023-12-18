@@ -32,7 +32,7 @@ func InitDB() {
 	if err != nil {
 		log.Fatal("Failed to connect to the database")
 	}
-	if err := DB.AutoMigrate(&models.User{}); err != nil {
+	if err := DB.AutoMigrate(&models.User{}, models.ReferalDetails{}); err != nil {
 
 		panic(err)
 	}
@@ -51,7 +51,7 @@ func InitDB() {
 	// 	panic(err)
 	// }
 
-	if err := DB.AutoMigrate(&models.Cart{}); err != nil {
+	if err := DB.AutoMigrate(&models.Cart{}, &models.CartProducts{}); err != nil {
 
 		panic(err)
 	}
@@ -63,5 +63,12 @@ func InitDB() {
 
 		panic(err)
 	}
+
+	if err := DB.AutoMigrate(&models.Coupons{}); err != nil {
+
+		panic(err)
+	}
+	DB.AutoMigrate(&models.Wallet{}, &models.Transaction{})
+	DB.AutoMigrate(&models.CategoryOffer{})
 
 }

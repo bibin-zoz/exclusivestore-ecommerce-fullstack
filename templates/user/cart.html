@@ -28,7 +28,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{range .Cart}}
+                                {{range .CartProducts}}
                                 <tr>
                                     <td class="image product-thumbnail">
                                         {{ with index .Product.Images 0}}
@@ -127,18 +127,26 @@
                                 <div class="total-amount">
                                     <div class="left">
                                         <div class="coupon">
-                                            <form action="#" target="_blank">
-                                                <div class="form-row row justify-content-center">
-                                                    <div class="form-group col-lg-6">
-                                                        <input class="font-medium" name="Coupon"
-                                                            placeholder="Enter Your Coupon">
-                                                    </div>
-                                                    <div class="form-group col-lg-6">
-                                                        <button class="btn  btn-sm"><i
-                                                                class="fi-rs-label mr-10"></i>Apply</button>
-                                                    </div>
+                                          
+                                            <p class="coupon-status text-success" ></p>
+                                            <div class="form-row row justify-content-center">
+                                                <div class="form-group col-lg-6">
+                                                    <input class="font-medium CouponCode"  name="CouponCode"
+                                                        placeholder="Enter Your Coupon" onchange="validateCoupon()">
                                                 </div>
-                                            </form>
+                                                <div class="form-group col-lg-6">
+                                                    <button class="btn  btn-sm" onclick="validateCoupon()"><i
+                                                            class="fi-rs-label mr-10"></i>Apply</button>
+                                                </div>
+                                                <p class="error text-danger" id="couponError"></p>
+                                            </div>
+                                           
+                                    
+                                        
+                                        
+                                           
+                                                
+                                          
                                         </div>
                                     </div>
                                 </div>
@@ -182,32 +190,7 @@
     </section>
 </main>
 <footer class="main">
-    <section class="newsletter p-30 text-white wow fadeIn animated">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-7 mb-md-3 mb-lg-0">
-                    <div class="row align-items-center">
-                        <div class="col flex-horizontal-center">
-                            <img class="icon-email" src="static/evara/assets/imgs/theme/icons/icon-email.svg" alt="">
-                            <h4 class="font-size-20 mb-0 ml-3">Sign up to Newsletter</h4>
-                        </div>
-                        <div class="col my-4 my-md-0 des">
-                            <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>₹25 coupon for first
-                                    shopping.</strong></h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <!-- Subscribe Form -->
-                    <form class="form-subcriber d-flex wow fadeIn animated">
-                        <input type="email" class="form-control bg-white font-small" placeholder="Enter your email">
-                        <button class="btn bg-dark text-white" type="submit">Subscribe</button>
-                    </form>
-                    <!-- End Subscribe Form -->
-                </div>
-            </div>
-        </div>
-    </section>
+    
     <section class="section-padding footer-mid">
         <div class="container pt-15 pb-20">
             <div class="row">
@@ -318,6 +301,55 @@
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function RemoveCoupon(){
+        $.ajax({
+                type: 'PATCH',
+                url: '/coupon',
+                dataType: 'json',
+                success: function(response) {
+                   window.location.reload();
+                },
+                error: function(response) {
+                   
+                    console.error('Error in AJAX request');
+                }
+            });
+
+    }
+    function validateCoupon() {
+        var CouponCode = document.querySelector('[name="CouponCode"]');
+        
+        if (CouponCode) {
+            var CouponCode = CouponCode.value;
+            console.log(CouponCode);
+
+            // Make an AJAX GET request with JSON
+            $.ajax({
+                type: 'GET',
+                url: '/couponvalidate',
+                data: { CouponCode: CouponCode },
+                dataType: 'json',
+                success: function(response) {
+                   console.log(response.Message)
+                    $('.coupon-status').text(response.Message);
+                    $('.coupon-status').removeClass('text-danger').addClass('text-success');
+                    $('.CouponCode').attr('disabled', true);
+                    $('#couponError').empty();
+                },
+                error: function(response) {
+                    console.log(response.responseJSON.Message)
+                    $('.coupon-status').text(response.responseJSON.Message);
+                    $('.coupon-status').removeClass('text-success').addClass('text-danger');
+                    console.error('Error in AJAX request');
+                }
+            });
+        } else {
+            console.error('coupon input not found');
+        }
+    }
+    </script>
 
 <script>
     function updateQuantity(element) {

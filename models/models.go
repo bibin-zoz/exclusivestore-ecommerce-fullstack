@@ -28,6 +28,7 @@ type VerifyData struct {
 }
 
 type Invalid struct {
+	IDError       string
 	NameError     string
 	EmailError    string
 	NumberError   string
@@ -35,6 +36,8 @@ type Invalid struct {
 	RoleError     string
 	CommonError   string
 	LoginStatus   bool
+	AmountError   string
+	DateError     string
 	StatusError   string
 }
 
@@ -70,6 +73,7 @@ type OrderReq struct {
 	CartID        string `json:"cartID"`
 	AddressID     string `json:"addressID"`
 	PaymentMethod string `json:"paymentMethod"`
+	CouponCode    string `json:"couponcode"`
 }
 type Updatecart struct {
 	ID       string `json:"id"`

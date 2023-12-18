@@ -20,6 +20,16 @@ type User struct {
 	Status    string `gorm:"default:'active'"`
 	CreatedAt time.Time
 }
+
+type ReferalDetails struct {
+	gorm.Model
+	UserID      uint   `json:"userID" gorm:"index;foreignKey:UserID"`
+	Count       uint   `json:"count"`
+	ReferalCode string `json:"referalCode" gorm:"unique_index"`
+}
+
+
+
 type TokenUser struct {
 	Users        Claims
 	AccessToken  string

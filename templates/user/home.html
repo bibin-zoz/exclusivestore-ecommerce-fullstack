@@ -459,9 +459,30 @@
 								<li>
 									Processor: {{ .Processor }}, Storage: {{ .Storage }}, RAM: {{ .Ram }}, Stock: {{ .Stock }},
 									<br>
+									{{if eq .DiscountPrice 0 }}
 									<div style="background-color: #f0f0f0; padding: 5px; display: inline-block; border-radius: 5px;">
-										<span style="color: #3498db; font-weight: bold;">Price: {{ .Price }}</span>
+										
+										<span style="color: #3498db; font-weight: bold;"> Price: {{ .Price }}</span>
 									</div>
+
+									{{else}}
+									<div style="background-color: #f0f0f0; padding: 5px; display: inline-block; border-radius: 5px;">
+										
+										<span style="color: #3498db; font-weight: bold;">Discount Price: {{ .DiscountPrice }}</span>
+									</div>
+									
+									<span style="color: #e74c3c; text-decoration: line-through;">Original Price: {{ .Price }}</span>
+									
+									<br>
+									{{if ne .Product.Category.CategoryOffer.Discount 0 }}
+									<span style="color: #1961d6; ">Category Discount Price: ₹{{ .Product.Category.CategoryOffer.Discount }}</span>
+									{{end}}
+									{{if ne .Product.Discount 0 }}
+									<br>
+									<span style="color: #1961d6; ">Product Extra {{ .Product.Discount }} Off</span>
+									{{end}}
+									{{end}}
+									
 								</li>
 								
 								<h6><b>Variant:</b></h6>

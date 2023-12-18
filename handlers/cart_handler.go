@@ -32,14 +32,20 @@ func GetCarthandler(c *gin.Context) {
 	}
 	fmt.Println("claimscart", Claims)
 
-	var Cart []models.Cart
-	if err := db.DB.Preload("Product").Preload("Variant").Preload("Product.Images").Where("user_id=?", Claims.ID).Find(&Cart).Error; err != nil {
+	var Cart models.Cart
+	if err := db.DB.Where("user_id=?", Claims.ID).Find(&Cart).Error; err != nil {
+		fmt.Println("Error fetching carts:", err)
+		return
+	}
+
+	var CartProducts []models.CartProducts
+	if err := db.DB.Preload("Product").Preload("Variant").Preload("Product.Images").Where("cart_id=?", Cart.ID).Find(&CartProducts).Error; err != nil {
 		fmt.Println("Error fetching carts:", err)
 		return
 	}
 	var totalSum float64
 
-	for _, cartItem := range Cart {
+	for _, cartItem := range CartProducts {
 		totalSum += cartItem.Total
 	}
 
@@ -47,66 +53,102 @@ func GetCarthandler(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "cart.html", gin.H{
 		// "Productvariants": ProductVariants,
-		"Cart":      Cart,
-		"CartTotal": totalSum,
+		"Cart":         Cart,
+		"CartProducts": CartProducts,
+		"CartTotal":    totalSum,
 	})
+	// c.JSON(http.StatusOK, gin.H{
+	// 	// "Productvariants": ProductVariants,
+	// 	"Cart":         Cart,
+	// 	"CartProducts": CartProducts,
+	// 	"CartTotal":    totalSum,
+	// })
 
 }
 
 func AddToCarthandler(c *gin.Context) {
-
-	ID, err := helpers.GetID(c)
-	if ID == 0 {
+	// Retrieve user ID
+	userID, err := helpers.GetID(c)
+	if userID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var Cart models.GetCart
-
-	if err := c.ShouldBindJSON(&Cart); err != nil {
-		// fmt.Println("sas")
+	// Bind JSON data to AddCart model
+	var AddCart models.GetCart
+	if err := c.ShouldBindJSON(&AddCart); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Check if the product is already in the cart
 	var count int64
-	var cartcount models.Cart
-	db.DB.Where("user_id=? AND variant_id=?", ID, Cart.VariantID).Find(&cartcount).Count(&count)
-	fmt.Println("count", count)
-	if count != 0 {
-		fmt.Println("product already in cart")
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Product Already in cart....Rediecting"})
-		return
+	var cartCount models.CartProducts
+	var cartDetails models.Cart
 
-	}
-
-	var variant models.ProductVariants
-	db.DB.First(&variant, Cart.VariantID)
-
-	UpdateCart := &models.Cart{
-		UserID:    ID,
-		VariantID: Cart.VariantID,
-		ProductID: Cart.ProductID,
-		Price:     variant.Price,
-		Quantity:  Cart.Quantity,
-	}
-
-	result := db.DB.Create(UpdateCart)
+	result := db.DB.Where("user_id=?", userID).Attrs(models.Cart{UserID: userID}).FirstOrCreate(&cartDetails)
 
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+	db.DB.Where("cart_id=? AND variant_id=?", cartDetails.ID, AddCart.VariantID).Find(&cartCount).Count(&count)
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Cart updated successfully",
-	})
+	if count != 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "Product Already in cart. Redirecting..."})
+		return
+	}
 
+	// Retrieve product variant details
+	var variant models.ProductVariants
+	db.DB.First(&variant, AddCart.VariantID)
+
+	// Find or create a cart for the user
+
+	// Create a new CartProducts entry
+	var cartID uint
+	db.DB.Table("carts").Where("user_id=?", userID).Select("id").Scan(&cartID)
+	fmt.Println("cartid", cartDetails.ID)
+
+	cartProduct := &models.CartProducts{
+		CartID:    cartDetails.ID,
+		VariantID: AddCart.VariantID,
+		ProductID: AddCart.ProductID,
+		Price:     variant.Price,
+		Quantity:  AddCart.Quantity,
+		Total:     variant.Price * float64(AddCart.Quantity),
+	}
+
+	// Create the cart product entry
+	result = db.DB.Create(cartProduct)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+	var CartTotal models.Cart
+	// Fetch an order with preloaded OrderedProducts
+	if err := db.DB.Preload("CartProducts").Where("id = ?", cartDetails.ID).First(&CartTotal).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+		return
+	}
+
+	CartTotal.CalculateTotal()
+
+	// Save to the database
+	db.DB.Save(&CartTotal)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Product added to cart successfully"})
 }
+
 func UpdateQuantityHandler(c *gin.Context) {
 	fmt.Println("hiii")
 	var updateCart models.Updatecart
-	var cart models.Cart
+	var cart models.CartProducts
 
 	err := c.ShouldBindJSON(&updateCart)
 	if err != nil {
@@ -152,7 +194,7 @@ func DeleteCartHandler(c *gin.Context) {
 	}
 	cartID := req.ID
 
-	var cart models.Cart
+	var cart models.CartProducts
 	result := db.DB.Where("id = ?", cartID).Delete(&cart)
 
 	if result.Error != nil {
@@ -180,36 +222,41 @@ func CheckOuthandler(c *gin.Context) {
 	}
 	fmt.Println("claimscart", Claims)
 
-	var Cart []models.Cart
-	if err := db.DB.Preload("Product").Preload("Variant").Preload("Product.Images").Where("user_id=?", Claims.ID).Find(&Cart).Error; err != nil {
+	var Cart models.Cart
+	if err := db.DB.Preload("CartProducts").Preload("CartProducts.Product").Preload("CartProducts.Variant").Preload("CartProducts.Product.Images").Where("user_id=?", Claims.ID).Find(&Cart).Error; err != nil {
 		fmt.Println("Error fetching carts:", err)
 		return
 	}
-	if len(Cart) == 0 {
+	if len(Cart.CartProducts) == 0 {
 
 		c.Redirect(http.StatusTemporaryRedirect, "/home")
 	}
 	var totalSum float64
 	var cartid uint
 
-	for _, cartItem := range Cart {
-		cartid = cartItem.ID
+	for _, cartItem := range Cart.CartProducts {
+		cartid = cartItem.CartID
 		totalSum += cartItem.Total
 	}
 
 	fmt.Println("Total Sum of Cart.TotalPrice:", totalSum)
 
+	couponcode, _ := c.Cookie("couponcode")
+	fmt.Println("couponcode", couponcode)
+
 	c.HTML(http.StatusOK, "checkout.html", gin.H{
 		// "Productvariants": ProductVariants,
-		"Cart":      Cart,
-		"CartID":    cartid,
-		"CartTotal": totalSum,
+		"Cart":       Cart,
+		"CartID":     cartid,
+		"CartTotal":  totalSum,
+		"CouponCode": couponcode,
 	})
 }
 
+// order
 func OrderPlacehandler(c *gin.Context) {
 	var orderReq models.OrderReq
-	var cart []models.Cart
+	var cart models.Cart
 	userid, _ := helpers.GetID(c)
 
 	if err := c.ShouldBindJSON(&orderReq); err != nil {
@@ -227,11 +274,21 @@ func OrderPlacehandler(c *gin.Context) {
 		return
 	}
 
-	result := db.DB.Where("user_id=?", userid).Find(&cart)
+	result := db.DB.Preload("CartProducts").Where("user_id=?", userid).Find(&cart)
 	if result.Error != nil {
 		fmt.Println("error fetching cart:", result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
+	}
+	var couponDetails models.Coupons
+	CouponCode, _ := c.Cookie("couponcode")
+	var coupon bool
+	result = db.DB.Where("coupon_code=?", CouponCode).Find(&couponDetails)
+	if result.Error != nil {
+		fmt.Println("error fetching coupon details:", result.Error)
+		coupon = false
+	} else {
+		coupon = true
 	}
 	// result = db.DB.Where("id=?", cart.product_id).Find(&cart)
 	// if result.Error != nil {
@@ -248,11 +305,15 @@ func OrderPlacehandler(c *gin.Context) {
 	}
 
 	var orderDetail models.Orders
+
 	orderDetail.AddressID = uint(addressID)
 	orderDetail.UserID = userid
 	orderDetail.Payment = orderReq.PaymentMethod
-	for _, cartItem := range cart {
-		orderDetail.Total += cartItem.Total
+	orderDetail.Total = cart.Total
+	if coupon {
+		fmt.Println("dsdsd")
+		orderDetail.Discount = helpers.DiscountPrice(couponDetails, c)
+		orderDetail.Total = orderDetail.Total - float64(orderDetail.Discount)
 
 	}
 
@@ -264,7 +325,7 @@ func OrderPlacehandler(c *gin.Context) {
 	}
 	fmt.Println("orderDetailid", orderDetail)
 
-	for i, cartItem := range cart {
+	for i, cartItem := range cart.CartProducts {
 		fmt.Println("count", i)
 		var orderProduct models.OrderProducts
 		orderProduct.OrderID = orderDetail.ID
@@ -282,7 +343,7 @@ func OrderPlacehandler(c *gin.Context) {
 		}
 	}
 
-	result = db.DB.Where("user_id = ?", userid).Delete(&models.Cart{})
+	result = db.DB.Where("cart_id = ?", cart.ID).Delete(&models.CartProducts{})
 	if result.Error != nil {
 		fmt.Println("error deleting cart item:", result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
@@ -301,7 +362,8 @@ func GetOrdershandler(c *gin.Context) {
 	if err != nil {
 		fmt.Println("error", err)
 	}
-	db.DB.Where("user_id=?", ID).Find(&orders)
+	// db.DB.Where("user_id=?", ID).Find(&orders)
+	db.DB.Where("user_id = ?", ID).Order("created_at DESC").Find(&orders)
 	// fmt.Println("useradd", userAddress)
 	c.JSON(http.StatusOK, orders)
 
@@ -337,7 +399,9 @@ func CancelOrderHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Status updated successfully"})
 }
 
+// cancel
 func CancelProductHandler(c *gin.Context) {
+	ID, _ := helpers.GetID(c)
 	var updateStatusRequest struct {
 		OrderID   uint `json:"orderID"`
 		ProductID uint `json:"productID"`
@@ -349,33 +413,59 @@ func CancelProductHandler(c *gin.Context) {
 	}
 
 	var order models.OrderProducts
-	if err := db.DB.Where("order_id = ? AND product_id=?", updateStatusRequest.OrderID, updateStatusRequest.ProductID).First(&order).Error; err != nil {
+	if err := db.DB.Preload("OrderDetails").Where("order_id = ? AND product_id=?", updateStatusRequest.OrderID, updateStatusRequest.ProductID).First(&order).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
 	if order.Status == "cancelled" {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Item already Cancelled "})
 		return
+	}
+
+	// Calculate refund amount and product discount
+	refundAmount, productDiscount := helpers.GetRefundAmount(&order)
+	if order.OrderDetails.Payment != "cod" {
+		var wallet models.Wallet
+		db.DB.Preload("Transactions").Where("user_id=?", ID).Find(&wallet)
+		var Transaction models.Transaction
+		Transaction.WalletID = wallet.ID
+		Transaction.Amount = int(refundAmount)
+		Transaction.Type = "credit"
+		Transaction.Description = fmt.Sprintf("refund for order %d", order.ID)
+
+		db.DB.Create(&Transaction)
+		wallet.Balance += float64(refundAmount)
+		db.DB.Save(&wallet)
 
 	}
 
-	order.Status = "cancelled"
-	if err := db.DB.Save(&order).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update status"})
-		return
-	}
+	fmt.Print("refund details", refundAmount, productDiscount)
+
+	// Update order's total and discount
 	var OrderDetail models.Orders
-	// Fetch an order with preloaded OrderedProducts
 	if err := db.DB.Preload("OrderedProducts").Where("id = ?", updateStatusRequest.OrderID).First(&OrderDetail).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
 
-	OrderDetail.CalculateTotal()
+	// Update discount and total
+	OrderDetail.Discount -= uint(productDiscount)
+	OrderDetail.Total -= float64(refundAmount)
 
 	// Save to the database
-	db.DB.Save(&OrderDetail)
+	if err := db.DB.Save(&OrderDetail).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update order details"})
+		return
+	}
 
+	// Update order status
+	order.Status = "cancelled"
+	if err := db.DB.Save(&order).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update status"})
+		return
+	}
+
+	// Respond with success message
 	c.JSON(http.StatusOK, gin.H{"message": "Status updated successfully"})
 }
 
@@ -401,7 +491,7 @@ func TrackOrderHandler(c *gin.Context) {
 }
 
 func ReturnOrderHandler(c *gin.Context) {
-	// Parse JSON request body into an OrderProduct struct
+
 	var returnRequest models.UserRequest
 	var orderdetails models.OrderProducts
 	if err := c.ShouldBindJSON(&returnRequest); err != nil {
@@ -446,18 +536,33 @@ func CreateRazorpayOrder(c *gin.Context) {
 		return
 
 	}
+	if requestData.CartID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cart Details not found"})
+		return
+
+	}
 	fmt.Println("reqdata", requestData)
 	var cart models.Cart
 
-	result := db.DB.Where("ID=?", requestData.CartID).Find(&cart)
+	result := db.DB.Debug().Where("ID=?", requestData.CartID).Find(&cart)
 	if result.Error != nil {
 		fmt.Println("Error fetching cart details:", result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart details"})
 	}
+	fmt.Println("cart", cart)
+	coupon, err := c.Cookie("couponcode")
+	var orderAmount float64
+	orderAmount = cart.Total
+	if err == nil {
 
-	// You may need to calculate the order amount based on the items in the cart or other factors.
-	// For simplicity, I'm assuming a fixed amount of 1000 here.
-	orderAmount := cart.Total
+		var couponDetails models.Coupons
+		db.DB.Where("coupon_code=?", coupon).Find(&couponDetails)
+		fmt.Println("couponDetails")
+		discount := float64(helpers.DiscountPrice(couponDetails, c))
+		fmt.Println("not", orderAmount)
+		orderAmount = orderAmount - discount
+
+	}
 
 	params := map[string]interface{}{
 		"amount":          orderAmount * 100,

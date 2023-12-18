@@ -9,66 +9,9 @@
             </div>
         </div>
     </div>
-    <section class="mt-50 mb-50">
+    <section class="mt-0 mb-50">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-6 mb-sm-15">
-                    <div class="toggle_info">
-                        <span><i class="fi-rs-user mr-10"></i><span class="text-muted">Already have an account?</span>
-                            <a href="#loginform" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click
-                                here to login</a></span>
-                    </div>
-                    <div class="panel-collapse collapse login_form" id="loginform">
-                        <div class="panel-body">
-                            <p class="mb-30 font-sm">If you have shopped with us before, please enter your details
-                                below. If you are a new customer, please proceed to the Billing &amp; Shipping section.
-                            </p>
-                            <form method="post">
-                                <div class="form-group">
-                                    <input type="text" name="email" placeholder="Username Or Email">
-                                </div>
-                                <div class="form-group">
-                                    <input type="password" name="password" placeholder="Password">
-                                </div>
-                                <div class="login_footer form-group">
-                                    <div class="chek-form">
-                                        <div class="custome-checkbox">
-                                            <input class="form-check-input" type="checkbox" name="checkbox"
-                                                id="remember" value="">
-                                            <label class="form-check-label" for="remember"><span>Remember
-                                                    me</span></label>
-                                        </div>
-                                    </div>
-                                    <a href="#">Forgot password?</a>
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn btn-md" name="login">Log in</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="toggle_info">
-                        <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a
-                                href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click
-                                here to enter your code</a></span>
-                    </div>
-                    <div class="panel-collapse collapse coupon_form " id="coupon">
-                        <div class="panel-body">
-                            <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                            <form method="post">
-                                <div class="form-group">
-                                    <input type="text" placeholder="Enter Coupon Code...">
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn  btn-md" name="login">Apply Coupon</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
             <div class="row">
                 <div class="col-12">
                     <div class="divider mt-50 mb-50"></div>
@@ -159,6 +102,50 @@
                             </div>
                         </div>
                     </div>
+
+                    {{if .CouponCode}}
+
+                    <div class="coupon">
+                        <p class="coupon-status text-success"></p>
+                        <div class="form-row row justify-content-center">
+                            <p class="coupon-status text-succes">Coupon Applied</p>
+                            <div class="form-group col-lg-6">
+                                <input class="font-medium CouponCode" name="CouponCode" placeholder="OFFER10" disabled>
+                            </div>
+                            <div class="form-group col-lg-6">
+                                <button class="btn btn-sm" onclick="RemoveCoupon()">
+                                    <i class="fi-rs-label mr-10"></i>Remove
+                                </button>
+                            </div>
+                            <p class="error text-danger" id="couponError"></p>
+                        </div>
+                    </div>
+
+
+
+                    {{else}}
+                    <div class="col-lg-6">
+
+
+                        <div class="coupon">
+
+                            <p class="coupon-status text-succes"></p>
+                            <div class="form-row row justify-content-center">
+                                <div class="form-group col-lg-6">
+                                    <input class="font-medium CouponCode" name="CouponCode"
+                                        placeholder="Enter Your Coupon" onchange="validateCoupon()">
+                                </div>
+                                <div class="form-group col-lg-6">
+                                    <button class="btn  btn-sm" onclick="validateCoupon()"><i
+                                            class="fi-rs-label mr-10"></i>Apply</button>
+                                </div>
+                                <p class="error text-danger" id="couponError"></p>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    {{end}}
                 </div>
 
                 <div class="col-md-6">
@@ -175,7 +162,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{range .Cart}}
+                                    {{range .Cart.CartProducts}}
                                     {{ $cartid := .ID }}
                                     <tr>
 
@@ -203,12 +190,23 @@
                                     <tr>
                                         <th>Total</th>
                                         <td colspan="2" class="product-subtotal"><span
-                                                class="font-xl text-brand fw-900">₹{{.CartTotal}}</span></td>
+                                                class="font-l text-brand fw-900">₹{{.CartTotal}}</span></td>
+                                    </tr>
+                                    <tr class='discount-row' hidden>
+                                        <th>Discount:</th>
+                                        <td colspan="2" class=""><span
+                                                class="font-md text-brand fw-900 cart-discount"></span></td>
+                                    </tr class='row-hidden'>
+                                    <tr class='final-price' hidden>
+                                        <th>AFTER DISCOUNT:</th>
+                                        <td colspan="3" class=""><span
+                                                class="font-xl text-brand fw-900 cart-finalprice"></span></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+
                         <div class="payment_method">
                             <div class="mb-25">
                                 <h5>Payment</h5>
@@ -361,6 +359,8 @@
         // Assuming there is a button or trigger for processing the order
         $('#placeOrderBtn').on('click', function () {
             // Get the selected address ID
+            var couponcode = document.querySelector('[name="CouponCode"]').value;
+            console.log(couponcode);
             var paymentmethod = document.querySelector('input[name="paymentmethod"]:checked').value
             var addressID = $('input[name="flexRadioDefault"]:checked').val();
             var cartID = '{{.CartID}}';
@@ -368,6 +368,7 @@
                 cartID: cartID,
                 AddressID: addressID,
                 paymentMethod: paymentmethod,
+                couponcode: couponcode,
             };
 
             if (paymentmethod == "cod") {
@@ -378,7 +379,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify(requestData),
                     success: function (response) {
-                        var orderID=response.orderID
+                        var orderID = response.orderID
 
                         console.log('Success:', response);
 
@@ -418,7 +419,7 @@
                             amount: response.amount,
                             currency: 'INR',
                             order_id: response.id,
-                            name: 'Your Company Name',
+                            name: 'Laptop Store',
                             description: 'Order Payment',
                             handler: function (response) {
                                 // Handle the success callback after payment
@@ -439,7 +440,7 @@
                                     success: function (response) {
 
                                         console.log('Success:', response);
-                                        var orderID=response.orderID
+                                        var orderID = response.orderID
 
                                         Swal.fire({
                                             icon: 'success',
@@ -473,7 +474,7 @@
                                 });
                             },
                             prefill: {
-                                name: 'User Name',
+                                name: 'User',
                                 email: 'user@example.com',
                                 contact: '1234567890',
                             },
@@ -554,7 +555,59 @@
 
 
 </script> -->
+<script>
+    function RemoveCoupon() {
+        $.ajax({
+            type: 'PATCH',
+            url: '/coupon',
+            dataType: 'json',
+            success: function (response) {
+                window.location.reload();
+            },
+            error: function (response) {
 
+                console.error('Error in AJAX request');
+            }
+        });
+
+    }
+    function validateCoupon() {
+        var CouponCode = document.querySelector('[name="CouponCode"]');
+
+        if (CouponCode) {
+            var CouponCode = CouponCode.value;
+            console.log(CouponCode);
+
+            // Make an AJAX GET request with JSON
+            $.ajax({
+                type: 'GET',
+                url: '/couponvalidate',
+                data: { CouponCode: CouponCode },
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response.Message)
+                    $('.coupon-status').text(response.Message);
+                    $('.coupon-status').removeClass('text-danger').addClass('text-success');
+                    $('.CouponCode').attr('disabled', true);
+                    $('#couponError').empty();
+
+                    $('.cart-discount').text(response.discountprice);
+                    $('.cart-finalprice').text(response.finalPrice);
+                    $('.discount-row').removeAttr('hidden');
+                    $('.final-price').removeAttr('hidden');
+                },
+                error: function (response) {
+                    console.log(response.responseJSON.Message)
+                    $('.coupon-status').text(response.responseJSON.Message);
+                    $('.coupon-status').removeClass('text-success').addClass('text-danger');
+                    console.error('Error in AJAX request');
+                }
+            });
+        } else {
+            console.error('coupon input not found');
+        }
+    }
+</script>
 <script>
     $(document).ready(function () {
         $.ajax({

@@ -9,14 +9,16 @@ import (
 
 type Orders struct {
 	gorm.Model
-	ID              uint            `json:"id" gorm:"unique;not null"`
-	UserID          uint            `json:"UserID" gorm:"index;foreignKey:UserID"`
-	AddressID       uint            `json:"AddressID" gorm:"index;foreignKey:AddressID"`
-	Status          string          `json:"status" gorm:"default:'pending'"`
-	Payment         string          `json:"payment" gorm:"default:'cod'"`
-	Total           float64         `json:"Total" gorm:"not null"`
-	User            User            `gorm:"foreignKey:UserID"`
-	Address         UserAddress     `gorm:"foreignKey:AddressID"`
+	ID        uint        `json:"id" gorm:"unique;not null"`
+	UserID    uint        `json:"UserID" gorm:"index;foreignKey:UserID"`
+	AddressID uint        `json:"AddressID" gorm:"index;foreignKey:AddressID"`
+	Status    string      `json:"status" gorm:"default:'pending'"`
+	Payment   string      `json:"payment" gorm:"default:'cod'"`
+	Discount  uint        `json:"discount"`
+	Total     float64     `json:"Total" gorm:"not null"`
+	User      User        `gorm:"foreignKey:UserID"`
+	Address   UserAddress `gorm:"foreignKey:AddressID"`
+
 	OrderedProducts []OrderProducts `json:"Products" gorm:"foreignKey:OrderID"`
 }
 
@@ -63,5 +65,13 @@ func (o *Orders) CalculateTotal() {
 	}
 
 	fmt.Println("Final Total:", total)
-	o.Total = total
+	if total <= float64(o.Discount) {
+		o.Total = 0
+		o.Status = "cancelled"
+
+	} else {
+		o.Total = total - float64(o.Discount)
+
+	}
+
 }

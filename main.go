@@ -35,6 +35,10 @@ func main() {
 	router.PATCH("/cart", middleware.LoginAuth(), handlers.UpdateQuantityHandler)
 	router.DELETE("/cart", middleware.LoginAuth(), handlers.DeleteCartHandler)
 
+	//coupon cart
+	router.GET("/couponvalidate", handlers.CouponValidatehandler)
+	router.PATCH("/coupon", middleware.LoginAuth(), handlers.RemoveCouponHandler)
+
 	//order
 	router.POST("/razorpay/order", handlers.CreateRazorpayOrder)
 	router.POST("/order", middleware.LoginAuth(), handlers.OrderPlacehandler)
@@ -45,8 +49,15 @@ func main() {
 	router.PATCH("/order", middleware.LoginAuth(), handlers.CancelOrderHandler)
 	router.PATCH("/cancelitem", middleware.LoginAuth(), handlers.CancelProductHandler)
 
+	//wallet
+	router.GET("/wallet", middleware.LoginAuth(), handlers.WalletHandler)
+	router.GET("/test", middleware.LoginAuth(), handlers.TestHandler)
+
 	//checkout
 	router.GET("/checkout", middleware.LoginAuth(), handlers.CheckOuthandler)
+
+	//referall
+	router.GET("/referalvalidate", handlers.ReferalValidatehandler)
 
 	//admin
 	router.GET("/admin/login", handlers.AdminLogin)
@@ -66,6 +77,11 @@ func main() {
 	router.PATCH("/admin/categories", middleware.AdminAuth(), handlers.UpdateCategoryStatus)
 	router.POST("/admin/categories", middleware.AdminAuth(), handlers.CategoryPost)
 	router.DELETE("/admin/categories", middleware.AdminAuth(), handlers.DeleteCategoryHandler)
+
+	//categoryoffers
+	router.GET("/admin/categoryoffers", middleware.AdminAuth(), handlers.CategoryOffershandler)
+	router.POST("/admin/categoryoffers", middleware.AdminAuth(), handlers.AddCategoryOffershandler)
+	router.DELETE("/admin/categoryoffers", middleware.AdminAuth(), handlers.DeleteCategoryOfferHandler)
 
 	//sellers
 	router.GET("/admin/sellers", middleware.AdminAuth(), handlers.SellersHandler)
@@ -100,6 +116,12 @@ func main() {
 	router.GET("/useraddress", middleware.LoginAuth(), handlers.UserAddressHandler)
 	router.POST("/useraddress", middleware.LoginAuth(), handlers.NewAddressHandler)
 	router.DELETE("/useraddress", middleware.LoginAuth(), handlers.DeleteAddressHandler)
+
+	//coupon
+	router.GET("/admin/coupons", middleware.AdminAuth(), handlers.CouponHandler)
+	router.GET("/admin/coupon", middleware.AdminAuth(), handlers.CouponHandler)
+	router.DELETE("/admin/coupons", middleware.AdminAuth(), handlers.DeleteCouponHandler)
+	router.POST("/admin/coupon", middleware.AdminAuth(), handlers.AddCouponHandler)
 
 	router.Run(":8080")
 

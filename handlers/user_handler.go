@@ -22,6 +22,7 @@ type UserDetails struct {
 	Number          string
 	Password        string
 	ConfirmPassword string
+	ReferalCode     string
 }
 
 var user UserDetails
@@ -129,6 +130,7 @@ func SignupPost(c *gin.Context) {
 		Number:          c.Request.FormValue("number"),
 		Password:        c.Request.FormValue("password"),
 		ConfirmPassword: c.Request.FormValue("confirmPassword"),
+		ReferalCode:     c.Request.FormValue("referralCode"),
 	}
 
 	if user.Username == "" {
@@ -148,6 +150,7 @@ func SignupPost(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "signup.html", errors)
 		return
 	}
+
 	if user.Email == "" {
 		errors.EmailError = "Email should not be empty"
 		c.HTML(http.StatusBadRequest, "signup.html", errors)
@@ -176,6 +179,18 @@ func SignupPost(c *gin.Context) {
 
 	if user.Number == "" {
 		errors.NumberError = "Number should not be empty"
+		c.HTML(http.StatusBadRequest, "signup.html", errors)
+		return
+	}
+	var numberCount int64
+	if err := db.DB.Table("users").Where("number = ?", user.Number).Count(&numberCount).Error; err != nil {
+		fmt.Println(err)
+		c.HTML(http.StatusBadRequest, "signup.html", nil)
+		return
+	}
+
+	if numberCount > 0 {
+		errors.NumberError = "Number already exists"
 		c.HTML(http.StatusBadRequest, "signup.html", errors)
 		return
 	}
@@ -267,6 +282,21 @@ func VerifyPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Error creating user"})
 		return
 	}
+	helpers.UpdateReferalCount(user.ReferalCode)
+	referalDetails := models.ReferalDetails{
+		UserID:      1, // Replace with the actual user ID
+		Count:       0,
+		ReferalCode: helpers.GenerateRandomReferalCode(),
+	}
+
+	// Save to the database
+	err = db.DB.Create(&referalDetails).Error
+	if err != nil {
+		// Check for duplicate key violation or other errors
+		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error creating Referal id"})
+		return
+	}
 
 	// Redirect to /login with a success message
 	c.JSON(http.StatusOK, gin.H{"message": "User created successfully. Please log in."})
@@ -289,8 +319,7 @@ func VerifyPost(c *gin.Context) {
 
 func HomeHandler(c *gin.Context) {
 	var products []models.ProductVariants
-
-	if err := db.DB.Preload("Product").Preload("Product.Images").Where("status='listed'").Find(&products).Error; err != nil {
+	if err := db.DB.Preload("Product").Preload("Product.Category").Preload("Product.Category.CategoryOffer").Preload("Product.Images").Where("status='listed'").Find(&products).Error; err != nil {
 		fmt.Println("Error fetching product variant with product and images:", err)
 		return
 	}
@@ -314,7 +343,7 @@ func ProductViewhandler(c *gin.Context) {
 	slug := c.Query("Variant")
 	var product models.ProductVariants
 
-	if err := db.DB.Preload("Product").Preload("Product.Images").Where("Slug=?", slug).Find(&product).Error; err != nil {
+	if err := db.DB.Preload("Product.Category").Preload("Product.Category.CategoryOffer").Preload("Product").Preload("Product.Images").Where("Slug=?", slug).Find(&product).Error; err != nil {
 		fmt.Println("Error fetching product variant with product and images:", err)
 		return
 	}
@@ -324,9 +353,12 @@ func ProductViewhandler(c *gin.Context) {
 		result = append(result, i)
 	}
 
+	var Cartid uint
+	db.DB.Table("carts").Where("user_id=?", ID).Select("id").Scan(&Cartid)
+
 	var count int64
-	var cartcount models.Cart
-	query := db.DB.Where("user_id=? AND variant_id=?", ID, product.ID).Find(&cartcount)
+	var cartcount models.CartProducts
+	query := db.DB.Where("cart_id=? AND variant_id=?", Cartid, product.ID).Find(&cartcount)
 	fmt.Println("SQL Query:", query.Statement.SQL.String())
 
 	query.Count(&count)
@@ -417,31 +449,47 @@ func DeleteAddressHandler(c *gin.Context) {
 func NewAddressHandler(c *gin.Context) {
 	var address models.UserAddress
 
-	usercookie, _ := c.Cookie("auth")
-	var token models.TokenUser
-	err := json.NewDecoder(strings.NewReader(usercookie)).Decode(&token)
-	if err != nil {
-		fmt.Println("Error fetching  UserDetails :", err)
-
-		return
-	}
-	Claims, err := helpers.ParseToken(token.AccessToken)
-	if err != nil {
-		fmt.Println("Error fetching  UserDetails :", err)
-		return
-
-	}
+	ID, _ := helpers.GetID(c)
 	if err := c.ShouldBind(&address); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Fill All Fields"})
 		return
 	}
+
+	if address.State == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "State is required"})
+		return
+	}
+
+	// Validate City
+	if address.City == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "City is required"})
+		return
+	}
+	if address.PhoneNumber == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "PhoneNumber is required"})
+		return
+	}
+
+	// Validate City
+	if address.PostalCode == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "PostalCode is required"})
+		return
+	}
+
 	fmt.Println("address", address)
-	address.UserID = Claims.ID
+	address.UserID = ID
+
+	var count int64 = 0
+	db.DB.Where("user_id=? AND is_primary='true'", ID).Count(&count)
+	if count == 0 {
+		address.IsPrimary = "true"
+	}
 
 	result := db.DB.Create(&address)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove address"})
+		fmt.Println("hiii")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save address"})
 		return
 	}
 
