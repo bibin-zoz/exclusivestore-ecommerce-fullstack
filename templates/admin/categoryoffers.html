@@ -69,6 +69,8 @@
                                                                 <option value="{{.ID}}" name="categoryID">{{.CategoryName}}</option>
                                                                 {{end}}
                                                             </select>
+                                                            <p id="NameError"></p>
+                                                            
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="status" class="col-form-label">Offer Discount:</label>
@@ -76,6 +78,7 @@
                                                                 required>
                                                             
                                                             </input>
+                                                            <p style="color: red;" id="AmountError"></p>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="status" class="col-form-label">Offer Expriy date:</label>
@@ -83,6 +86,7 @@
                                                                 required>
                                                             
                                                             </input>
+                                                            <p style="color: red;" id="DateError"></p>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="status" class="col-form-label">Status:</label>
@@ -146,11 +150,11 @@
 
                                                 <a href="/admin/categories/update-status?id={{.ID}}"
                                                     data-toggle="tooltip" data-placement="top" title="Unlist"> -->
-                                                    <button type="button" class="btn mb-1 btn-outline-warning btn-xs block-btn" data-id="{{.CategoryOffer.ID}}" data-toggle="tooltip" data-placement="top"
-                                                    title="Unlist">
+                                                    <!-- <button type="button" class="btn mb-1 btn-outline-warning btn-xs block-btn" data-id="{{.CategoryOffer.ID}}" data-toggle="tooltip" data-placement="top"
+                                                    title="Disable">
                                                         <span><i class="fa fa-close color-muted m-r-5"></i></span>
 
-                                                    </button>
+                                                    </button> -->
                                                 <!-- </a> -->
                                                 <!-- </a> -->
                                                 {{else}}
@@ -341,10 +345,18 @@
                         const NameError = document.getElementById('NameError');
                         NameError.textContent = error.responseJSON.Errors.NameError || '';
                         NameError.style.display = NameError.textContent ? 'block' : 'none';
+                        
+                        const AmountError = document.getElementById('AmountError');
+                        AmountError.textContent = error.responseJSON.Errors.AmountError || '';
+                        AmountError.style.display = AmountError.textContent ? 'block' : 'none';
+
+                        const DateError = document.getElementById('DateError');
+                        DateError.textContent = error.responseJSON.Errors.DateError || '';
+                        DateError.style.display = DateError.textContent ? 'block' : 'none'
 
                         // Show error message as a toast with a close button and fading bar
                         toastr.error(
-                            error.responseJSON.Errors.NameError || 'An error occurred.',
+                            error.responseJSON.Errors.NameError ||error.responseJSON.Errors.AmountError|| error.responseJSON.Errors.DateError|| 'An error occurred.',
                             'Error', // Title of the toastr notification
                             {
                                 closeButton: true,  // Show a close button

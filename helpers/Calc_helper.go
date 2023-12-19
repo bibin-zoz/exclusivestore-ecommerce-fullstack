@@ -4,6 +4,7 @@ import (
 	db "ecommercestore/database"
 	"ecommercestore/models"
 	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
@@ -82,6 +83,12 @@ func GetProductDiscountPrice(variantID uint) uint {
 		return 0
 	}
 
+	if product.Product.Category.CategoryOffer.ExpiryAt.Before(time.Now()) ||
+		product.Product.Category.CategoryOffer.Status != "active" {
+		discountedPrice := product.Price - float64(product.Product.Discount)
+		return uint(discountedPrice)
+	}
+
 	discountedPrice := product.Price - float64(product.Product.Category.CategoryOffer.Discount) - float64(product.Product.Discount)
 
 	return uint(discountedPrice)
@@ -91,6 +98,7 @@ func UpdateDiscountPrice() {
 	var products []models.ProductVariants
 	db.DB.Preload("Product").Preload("Product.Category").Preload("Product.Category.CategoryOffer").Find(&products)
 	for i := range products {
+
 		products[i].DiscountPrice = GetProductDiscountPrice(products[i].ID)
 		if products[i].DiscountPrice == uint(products[i].Price) {
 			products[i].DiscountPrice = 0

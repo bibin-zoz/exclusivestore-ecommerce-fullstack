@@ -3,7 +3,6 @@ package handlers
 import (
 	db "ecommercestore/database"
 	"ecommercestore/models"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -34,22 +33,8 @@ func ReferalValidatehandler(c *gin.Context) {
 }
 
 func TestHandler(c *gin.Context) {
-	var order models.OrderProducts
-	db.DB.Preload("OrderDetails").Where("id=38").Find(&order)
-	fmt.Println("order", order.ID)
-	fmt.Println("orsssssssder", order.OrderDetails.ID)
-	Discount := order.OrderDetails.Discount
-	TotalOrder := order.OrderDetails.Total + float64(Discount)
-	ProductPrice := order.Total
-	if Discount != 0 {
-		productDiscount := (ProductPrice / TotalOrder) * float64(Discount)
-		refundAmount := uint(ProductPrice) - uint(productDiscount)
-		fmt.Println(refundAmount)
-		return
-
-	}
-
-	refundAmount := uint(ProductPrice)
-	fmt.Println(refundAmount)
+	var Wallet models.Wallet
+	db.DB.Preload("Transactions").Find(&Wallet)
+	db.DB.Save(&Wallet)
 
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CategoryOffershandler(c *gin.Context) {
+func ProductOffersHandler(c *gin.Context) {
 	var Categories []models.Categories
 	db.DB.Preload("CategoryOffer").Find(&Categories)
 
@@ -20,7 +20,7 @@ func CategoryOffershandler(c *gin.Context) {
 	})
 
 }
-func AddCategoryOffershandler(c *gin.Context) {
+func AddProductOfferhandler(c *gin.Context) {
 
 	discount, _ := strconv.Atoi(c.PostForm("discount"))
 	expiryDateStr := c.PostForm("expiryDate")
@@ -42,9 +42,8 @@ func AddCategoryOffershandler(c *gin.Context) {
 		return
 	}
 	expiryDate, err := time.Parse("2006-01-02", expiryDateStr)
-	if err != nil || expiryDate.Before(time.Now()) {
-
-		NameError.DateError = "Enter a valid expiry date"
+	if err != nil {
+		NameError.DateError = "Enter valid expiry Date "
 		c.JSON(http.StatusBadRequest, gin.H{
 			"Errors": NameError,
 		})
@@ -80,7 +79,7 @@ func AddCategoryOffershandler(c *gin.Context) {
 
 }
 
-func DeleteCategoryOfferHandler(c *gin.Context) {
+func DeleteProductOfferHandler(c *gin.Context) {
 
 	var req DeleteRequest
 

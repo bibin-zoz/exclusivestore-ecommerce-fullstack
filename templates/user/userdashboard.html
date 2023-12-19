@@ -87,6 +87,7 @@
                                                             <th>Order</th>
                                                             <th>Date</th>
                                                             <th>Status</th>
+                                                            <th>payment method</th>
                                                             <th>Total</th>
                                                             <th>Actions</th>
                                                         </tr>
@@ -439,7 +440,7 @@
                     // Update Total Balance
                     const totalBalanceElement = $("#totalBalance");
                     const balance = parseFloat(walletData.WalletDetails.balance);
-                    totalBalanceElement.text(`Total Balance: $${balance.toFixed(2)}`);
+                    totalBalanceElement.text(`Total Balance: ₹${balance.toFixed(2)}`);
 
                     // Update Transaction History Table
                     const transactionTableBody = $("#transactionTableBody");
@@ -501,6 +502,7 @@
                 '<td>#' + order.id + '</td>' +
                 '<td>' + formattedDate + '</td>' +
                 '<td>' + order.status + '</td>' +
+                '<td>' + order.payment + '</td>' +
                 '<td>$' + order.Total + '</td>' +
                 '<td><a href="/trackorder?id=' + order.id + '" class="btn-small d-block">View</a> <button onclick="cancelOrder(' + order.id + ')" class="btn-small d-block" style="color: red;"><i class="fas fa-times"></i>cancel</button></td>' +
                 '</tr>';

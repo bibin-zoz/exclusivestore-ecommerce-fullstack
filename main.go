@@ -40,7 +40,8 @@ func main() {
 	router.PATCH("/coupon", middleware.LoginAuth(), handlers.RemoveCouponHandler)
 
 	//order
-	router.POST("/razorpay/order", handlers.CreateRazorpayOrder)
+	router.POST("/onlinepay", handlers.CreateRazorpayOrder)
+	router.POST("/wallet", handlers.WalletOrderhandler)
 	router.POST("/order", middleware.LoginAuth(), handlers.OrderPlacehandler)
 	router.GET("/order", middleware.LoginAuth(), handlers.GetOrdershandler)
 	router.GET("/trackorder", middleware.LoginAuth(), handlers.TrackOrderHandler)
@@ -56,7 +57,7 @@ func main() {
 	//checkout
 	router.GET("/checkout", middleware.LoginAuth(), handlers.CheckOuthandler)
 
-	//referall
+	//referal
 	router.GET("/referalvalidate", handlers.ReferalValidatehandler)
 
 	//admin
@@ -95,6 +96,9 @@ func main() {
 	//product edit
 	router.GET("/admin/product", middleware.AdminAuth(), handlers.ProductDetailsHandler)
 	router.PUT("/admin/product", middleware.AdminAuth(), handlers.ProductUpdateHandler)
+
+	//product offers
+	router.GET("/admin/productoffers", middleware.AdminAuth(), handlers.ProductOffersHandler)
 
 	//orders
 

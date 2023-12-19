@@ -680,6 +680,11 @@ func ProductUpdateHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Product details cannot be empty"})
 		return
 	}
+	discount, err := strconv.Atoi(c.PostForm("productDiscount"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Discount price"})
+		return
+	}
 
 	categoryID, err := strconv.ParseUint(c.PostForm("categoryID"), 10, 64)
 	if err != nil {
@@ -753,13 +758,16 @@ func ProductUpdateHandler(c *gin.Context) {
 		ProductName:    productName,
 		ProductDetails: productDetails,
 		CategoryID:     uint(categoryID),
+		Discount:       uint(discount),
 	})
+
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		log.Println("prodcut model error")
 
 		return
 	}
+	helpers.UpdateDiscountPrice()
 
 	slugInput := fmt.Sprintf("%s-%s-%s", productName, storage, ram)
 	newSlug := slug.MakeLang(slugInput, "en")

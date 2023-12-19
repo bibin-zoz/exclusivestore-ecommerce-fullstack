@@ -73,6 +73,33 @@
 			</div>
 
 			<div class="col-md-6 col-lg-5 p-b-30">
+				<div style="background-color: #f8f8f8; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+					<div style="margin-bottom: 10px;">
+						{{ if ne .Product.Product.Category.CategoryOffer.Discount 0 }}
+							<span style="color: #1961d6; font-weight: bold;">🎉 Category Discount Price: ₹{{ .Product.Product.Category.CategoryOffer.Discount }}</span>
+						{{ end }}
+					</div>
+				
+					<div>
+						{{ if ne .Product.Product.Discount 0 }}
+							<span style="color: #1961d6; font-weight: bold;">🌟 Product Extra {{ .Product.Product.Discount }} Off</span>
+						{{ end }}
+					</div>
+				</div>
+				
+				<style>
+					/* Additional styling for the offer container */
+					div[style*="background-color: #f8f8f8;"] {
+						border: 1px solid #ddd;
+					}
+				
+					/* Customize the emoji styles */
+					span[style*="color: #1961d6;"]::before {
+						content: '\1F389'; /* Firework emoji for celebration */
+						margin-right: 5px;
+					}
+				</style>
+				
 				<div class="p-r-50 p-t-5 p-lr-0-lg">
 					<h4 class="mtext-105 cl2 js-name-detail p-b-14">
 						{{.Product.Product.ProductName}}
@@ -131,10 +158,13 @@
 								</div>
 							</div>
 						</div>
+						{{if eq .Products.DiscountPrice 0 }}
 						<div class="flex-w flex-r-m p-b-10">
 							<div class="size-203 flex-c-m respon6">
 								Price
 							</div>
+
+							
 						
 							<div class="size-204 respon6-next">
 								<div class="rs1-select2 bor8 bg0">
@@ -142,7 +172,26 @@
 									<div class="dropDownSelect2"></div>
 								</div>
 							</div>
+						
 						</div>
+						{{else}}
+						<div class="flex-w flex-r-m p-b-10">
+							<div class="size-203 flex-c-m respon6">
+								Price
+							</div>
+						
+							<div class="size-204 respon6-next">
+								<div class="rs1-select2 bor8 bg0">
+									<li class="list-group-item">
+										
+										 ₹{{.Product.DiscountPrice}} &nbsp;<del style="color: #e01010;">Regular Price: ₹{{.Product.Price}}</del>
+									</li>
+									<div class="dropDownSelect2"></div>
+								</div>
+							</div>
+						</div>
+						
+						{{end}}
 						
 						<div class="flex-w flex-r-m p-b-10">
 							<div class="size-203 flex-c-m respon6">
@@ -176,9 +225,13 @@
 								<a href="/cart" class="flex-c-m stext-101 cl0 size-101 bg2 bor1 hov-btn1 p-lr-15 trans-04 ">Go to cart</a>
 								
 								{{end}}
+								
+								
 							</div>
+							
 						</div>
 					</div>
+					
 
 					<!--  -->
 					<div class="flex-w flex-m p-l-100 p-t-40 respon7">

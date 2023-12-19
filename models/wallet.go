@@ -23,17 +23,15 @@ type Transaction struct {
 }
 
 func (w *Wallet) BeforeCreate(tx *gorm.DB) (err error) {
-
+	w.Balance = 0
 	for _, val := range w.Transactions {
 		if val.Type == "credit" {
 			w.Balance += float64(val.Amount)
-		} else {
+		} else if val.Type == "debit" {
 			w.Balance -= float64(val.Amount)
 		}
-
 	}
 	return nil
-
 }
 
 func (w *Wallet) BeforeUpdate(tx *gorm.DB) (err error) {

@@ -155,6 +155,15 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="productDiscount">Product Discount
+                                            <span class="text-danger">*</span></label>
+                                        <div class="col-lg-6">
+                                            <input type="text" class="form-control" id="productDiscount"
+                                                name="productDiscount" placeholder="{{.Product.Discount}}"
+                                                value="{{.Product.Discount}}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="status">Status
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
@@ -372,6 +381,7 @@ async function updateProduct() {
     var productName = document.getElementById('productName').value;
     var productDetails = document.getElementById('productDetails').value;
     var status = document.getElementById('status').value;
+    var productDiscount=document.getElementById('productDiscount').value;
 
     var variantID=document.getElementById('slug').value;
     var ram = document.getElementById('ram').value;
@@ -388,6 +398,7 @@ async function updateProduct() {
     formData.append('id', id);
     formData.append('productName', productName);
     formData.append('productDetails', productDetails);
+    formData.append('productDiscount',productDiscount);
     formData.append('status', status);
     formData.append('ram', ram);
     formData.append('storage', storage);

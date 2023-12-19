@@ -226,6 +226,13 @@
                                         Prepaid
                                     </label>
                                 </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentmethod"
+                                        id="exampleRadios3" value="wallet">
+                                    <label class="form-check-label" for="exampleRadios3">
+                                        Wallet
+                                    </label>
+                                </div>
 
                             </div>
                         </div>
@@ -405,9 +412,9 @@
                 });
 
             }
-            else {
+            else if (paymentmethod == "prepaid") {
                 $.ajax({
-                    url: '/razorpay/order', // Replace with your server-side endpoint for creating Razorpay order
+                    url: '/onlinepay', // Replace with your server-side endpoint for creating Razorpay order
                     type: 'POST',
                     dataType: 'json',
                     contentType: 'application/json',
@@ -500,7 +507,65 @@
                 });
 
             }
+            else if (paymentmethod == "wallet"){
+                // Code for Wallet payment
+                $.ajax({
+                    url: '/wallet', // Replace with your server-side endpoint for wallet payment
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        var paymentmethod = document.querySelector('input[name="paymentmethod"]:checked').value
+                                var requestData = {
+                                    cartID: cartID,
+                                    AddressID: addressID,
+                                    paymentMethod: paymentmethod,
+                                };
 
+                                $.ajax({
+                                    url: '/order',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(requestData),
+                                    success: function (response) {
+
+                                        console.log('Success:', response);
+                                        var orderID = response.orderID
+
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Order Placed Successfully',
+                                            text: 'Your order has been placed successfully!',
+                                        }).then((result) => {
+
+                                            if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                                                window.location.href = "/trackorder?id=" + orderID;
+                                            }
+                                        });
+                                    },
+                                    error: function (error) {
+                                        console.error('Error:', error);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error Placing Order',
+                                            text: error.responseJSON.error || 'There was an error placing your order. Please try again.',
+                                        });
+                                    }
+                                });
+
+                    },
+                    error: function (error) {
+                        console.error('Error making wallet payment:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error Making Wallet Payment',
+                            text: error || 'There was an error making the wallet payment. Please try again.',
+                        });
+                    }
+                });
+            }
         });
     });
 </script>

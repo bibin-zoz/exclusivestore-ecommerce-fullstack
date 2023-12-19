@@ -113,12 +113,18 @@ func AddToCarthandler(c *gin.Context) {
 	var cartID uint
 	db.DB.Table("carts").Where("user_id=?", userID).Select("id").Scan(&cartID)
 	fmt.Println("cartid", cartDetails.ID)
+	var Price float64
+	if variant.DiscountPrice > 0 {
+		Price = float64(variant.DiscountPrice)
+	} else {
+		Price = float64(variant.Price)
+	}
 
 	cartProduct := &models.CartProducts{
 		CartID:    cartDetails.ID,
 		VariantID: AddCart.VariantID,
 		ProductID: AddCart.ProductID,
-		Price:     variant.Price,
+		Price:     Price,
 		Quantity:  AddCart.Quantity,
 		Total:     variant.Price * float64(AddCart.Quantity),
 	}
@@ -227,12 +233,43 @@ func CheckOuthandler(c *gin.Context) {
 		fmt.Println("Error fetching carts:", err)
 		return
 	}
+
 	if len(Cart.CartProducts) == 0 {
 
 		c.Redirect(http.StatusTemporaryRedirect, "/home")
 	}
 	var totalSum float64
 	var cartid uint
+	for _, Cart := range Cart.CartProducts {
+		var variant models.ProductVariants
+		db.DB.First(&variant, Cart.VariantID)
+
+		if variant.DiscountPrice > 0 {
+			Cart.Price = float64(variant.DiscountPrice)
+		} else {
+			Cart.Price = float64(variant.Price)
+		}
+		Cart.Total = Cart.Price * float64(Cart.Quantity)
+
+		// Create the cart product entry
+		result := db.DB.Save(&Cart)
+
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+			return
+		}
+
+	}
+	var CartTotal models.Cart
+
+	if err := db.DB.Preload("CartProducts").Where("id = ?", Cart.ID).First(&CartTotal).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+		return
+	}
+
+	CartTotal.CalculateTotal()
+
+	db.DB.Save(&CartTotal)
 
 	for _, cartItem := range Cart.CartProducts {
 		cartid = cartItem.CartID
