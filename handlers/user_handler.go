@@ -515,7 +515,7 @@ func GetUserProfileHandler(c *gin.Context) {
 		return
 
 	}
-	result := db.DB.Where("id=?", Claims.ID).Find(&userdetails)
+	result := db.DB.Preload("ReferalDetails").Where("id=?", Claims.ID).Find(&userdetails)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove address"})
 		return

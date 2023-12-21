@@ -212,6 +212,11 @@
                                         </div>
                                         <!-- HTML Form with Input Fields -->
                                         <div class="card-body">
+                                            <div class="form-group col-md-6">
+                                                <label>Referal code <span class="required">*</span></label>
+                                                <input required="" class="form-control square" name="username"
+                                                    type="text" id="referalcode" value="" disabled>
+                                            </div>
                                             <!-- Form 1: Username, Email, Mobile Number -->
                                             <form method="post" name="userInfoForm1" id="userInfoForm1">
                                                 <div class="row">
@@ -566,8 +571,12 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function (userData) {
+                    console.log(userData)
 
                     $('#usernameInput').attr('value', userData.Username);
+                    $('#referalcode').attr('value', userData.ReferalDetails.referalCode);
+                    $('#referalcode').text(userData.ReferalDetails.referalCode);
+                    console.log(userData.ReferalDetails.referalcode)
                     $('#emailInput').attr('value', userData.Email);
                     $('#mobileInput').attr('value', userData.Number);
                 },

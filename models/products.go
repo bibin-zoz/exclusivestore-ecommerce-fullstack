@@ -26,18 +26,18 @@ type Products struct {
 
 type ProductVariants struct {
 	gorm.Model
-	ID            uint    `json:"id" gorm:"unique;not null"`
-	ProductID     uint    `json:"productID" gorm:"index;foreignKey:ProductID;constraint:OnDelete:CASCADE"`
-	Processor     string  `json:"processor"`
-	Storage       string  `json:"storage"`
-	Ram           string  `json:"ram"`
-	Stock         int     `json:"stock"`
-	Status        string  `json:"status" gorm:"default:'listed'"`
-	Price         float64 `json:"price"`
-	MaxPrice      float64 `json:"maxprice"`
-	Slug          string  `json:"slug" gorm:"uniqueIndex"`
-	DiscountPrice uint    `json:"discountprice" gorm:"not null;default:0"`
-	Product       Products
+	ID            uint     `json:"id" gorm:"unique;not null"`
+	ProductID     uint     `json:"productID" gorm:"index;foreignKey:ProductID;constraint:OnDelete:CASCADE"`
+	Processor     string   `json:"processor"`
+	Storage       string   `json:"storage"`
+	Ram           string   `json:"ram"`
+	Stock         int      `json:"stock"`
+	Status        string   `json:"status" gorm:"default:'listed'"`
+	Price         float64  `json:"price"`
+	MaxPrice      float64  `json:"maxprice"`
+	Slug          string   `json:"slug" gorm:"uniqueIndex"`
+	DiscountPrice uint     `json:"discountprice" gorm:"not null;default:0"`
+	Product       Products `gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
 	// Carts     []CartProducts `gorm:"foreignKey:VariantID"`
 }
 

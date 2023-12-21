@@ -12,13 +12,14 @@ var (
 
 type User struct {
 	gorm.Model
-	Username  string `gorm:"unique;not null"`
-	Email     string `gorm:"unique;not null"`
-	Number    string `gorm:"unique;not null"`
-	Password  string `gorm:"not null"`
-	Role      string `gorm:"default:'user'"`
-	Status    string `gorm:"default:'active'"`
-	CreatedAt time.Time
+	Username       string `gorm:"unique;not null"`
+	Email          string `gorm:"unique;not null"`
+	Number         string `gorm:"unique;not null"`
+	Password       string `gorm:"not null"`
+	Role           string `gorm:"default:'user'"`
+	Status         string `gorm:"default:'active'"`
+	ReferalDetails ReferalDetails
+	CreatedAt      time.Time
 }
 
 type ReferalDetails struct {
@@ -27,8 +28,6 @@ type ReferalDetails struct {
 	Count       uint   `json:"count"`
 	ReferalCode string `json:"referalCode" gorm:"unique_index"`
 }
-
-
 
 type TokenUser struct {
 	Users        Claims

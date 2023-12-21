@@ -441,7 +441,7 @@ func CancelProductHandler(c *gin.Context) {
 	ID, _ := helpers.GetID(c)
 	var updateStatusRequest struct {
 		OrderID   uint `json:"orderID"`
-		ProductID uint `json:"productID"`
+		VariantID uint `json:"variantID"`
 	}
 
 	if err := c.ShouldBindJSON(&updateStatusRequest); err != nil {
@@ -450,7 +450,7 @@ func CancelProductHandler(c *gin.Context) {
 	}
 
 	var order models.OrderProducts
-	if err := db.DB.Preload("OrderDetails").Where("order_id = ? AND product_id=?", updateStatusRequest.OrderID, updateStatusRequest.ProductID).First(&order).Error; err != nil {
+	if err := db.DB.Preload("OrderDetails").Where("order_id = ? AND variant_id=?", updateStatusRequest.OrderID, updateStatusRequest.VariantID).First(&order).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
@@ -516,7 +516,7 @@ func TrackOrderHandler(c *gin.Context) {
 	}
 	fmt.Println("id", orderid)
 	db.DB.Preload("Variant.Product.Images").Preload("Variant.Product").Preload("Variant").Preload("Image").Where("order_id=?", orderid).Find(&orders)
-	db.DB.Preload("Address").Where("id=?", orderid).Find(&OrderDetails)
+	db.DB.Preload("User").Preload("Address").Where("id=?", orderid).Find(&OrderDetails)
 	fmt.Println("hiii")
 	// c.JSON(http.StatusOK, orders)
 	c.HTML(http.StatusOK, "orderdetails.html", gin.H{

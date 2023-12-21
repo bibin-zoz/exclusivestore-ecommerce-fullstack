@@ -35,15 +35,14 @@
                             <option>Shipped</option>
                             <option>Delivered</option>
                         </Di>
-                        <a class="btn btn-primary" href="#">Save</a>-->
-                        <a class="btn btn-secondary print ms-2" href="#"><i
-                                class="icon material-icons md-print"></i></a>
+                        <a class="btn btn-primary" href="#">Save</a> -->
+                        <button  id="pdfButton" class="btn btn-secondary print ms-2" >Print</button>
 
                     </div>
 
                 </div>
             </header> <!-- card-header end// -->
-            <div class="card-body">
+            <div class="card-body" id="card-body">
                 <div class="row mb-50 mt-20 order-info-wrap">
                     <div class="col-md-4">
                         <article class="icontext align-items-start">
@@ -53,9 +52,8 @@
                             <div class="text">
                                 <h6 class="mb-1">Customer</h6>
                                 <p class="mb-1">
-                                    John Alexander <br> <template class="__cf_email__"
-                                        data-cfemail="e2838e879aa2879a838f928e87cc818d8f">[email&#160;protected]</template>
-                                    <br> +998 99 22123456
+                                    {{.OrderDetails.User.Username}} <br> 
+                                    <br> {{.OrderDetails.User.Number}}
                                 </p>
                                 <a href="#">View profile</a>
                             </div>
@@ -180,15 +178,15 @@
 
                             {{if eq .Status "delivered"}}
                             <button class="btn btn-danger return-order-btn btn-sm" data-order-id="{{.OrderID}}"
-                                data-product-id="{{.ProductID}}"> Return</button>
+                                data-variant-id="{{.VariantID}}"> Return</button>
                             {{else if eq .Status "pending"}}
                             <button class="btn-danger cancel-order-btn btn-sm" data-order-id="{{.OrderID}}"
-                                data-product-id="{{.ProductID}}">Cancel</button>
+                                data-variant-id="{{.VariantID}}">Cancel</button>
 
 
                             {{else}}
                             <button class="btn btn-dark cancel-order-btn btn-sm" data-order-id="{{.OrderID}}"
-                                data-product-id="{{.ProductID}}" disabled>Cancel</button>
+                                data-variant-id="{{.VariantID}}" disabled>Cancel</button>
                             {{end}}
                         </td>
 
@@ -342,6 +340,27 @@
 <!-- Vendor JS-->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<!-- print-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script>
+    $(document).ready(function ($) {
+          $(document).on('click', '#pdfButton', function (event) {
+             console.log("jjjjjjjj");
+              var element = document.getElementById('card-body');
+              let randomNumber = Math.floor(Math.random() * (10000000000 - 1)) + 1;
+              var opt = {
+                  margin: 0,
+                  filename: 'invoice' + randomNumber + '.pdf',
+                  html2canvas: { scale: 10 },
+                  jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+              };
+  
+              html2pdf().set(opt).from(element).save();
+      
+          });
+      });
+    </script>
 <script>
     $(document).ready(function () {
       
@@ -398,7 +417,7 @@
     $(document).ready(function () {
         $('.cancel-order-btn').on('click', function () {
             var orderID = $(this).data('order-id');
-            var productID = $(this).data('product-id');
+            var variantID = $(this).data('variant-id');
 
             // Display SweetAlert confirmation dialog
             Swal.fire({
@@ -418,7 +437,7 @@
                         contentType: 'application/json',
                         data: JSON.stringify({
                             orderId: orderID,
-                            productId: productID
+                            variantID: variantID
                         }),
                         success: function (response) {
                             console.log('Order canceled successfully:', response);
@@ -503,7 +522,7 @@
     $(document).ready(function () {
 
         $('.delete-btn').on('click', function () {
-            var productID = $(this).data('id');
+            var variantID = $(this).data('id');
 
             console.log('Sending AJAX request with ID:', productID);
 
@@ -511,7 +530,7 @@
                 url: '/cart',
                 type: 'DELETE',
                 contentType: 'application/json',
-                data: JSON.stringify({ id: productID }),
+                data: JSON.stringify({ id: variantID }),
                 success: function (response) {
                     console.log('Success:', response);
                     window.location.reload();

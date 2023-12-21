@@ -29,6 +29,11 @@ func main() {
 	router.GET("/admin/logout", handlers.AdminLogoutHandler)
 	router.GET("/product", handlers.ProductViewhandler)
 
+	//product
+	router.GET("/shop-products", handlers.GetProductsHandler)
+	router.POST("/shop-products", handlers.FilterProductshandler)
+	// router.GET("/products", handlers.GetProductsHandler)
+
 	//user cart
 	router.GET("/cart", middleware.LoginAuth(), handlers.GetCarthandler)
 	router.POST("/cart", middleware.LoginAuth(), handlers.AddToCarthandler)
@@ -46,6 +51,7 @@ func main() {
 	router.GET("/order", middleware.LoginAuth(), handlers.GetOrdershandler)
 	router.GET("/trackorder", middleware.LoginAuth(), handlers.TrackOrderHandler)
 	router.PUT("/order", middleware.LoginAuth(), handlers.ReturnOrderHandler)
+	router.GET("/download", handlers.InvoiceHandler)
 
 	router.PATCH("/order", middleware.LoginAuth(), handlers.CancelOrderHandler)
 	router.PATCH("/cancelitem", middleware.LoginAuth(), handlers.CancelProductHandler)
