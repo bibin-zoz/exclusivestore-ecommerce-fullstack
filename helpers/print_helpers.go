@@ -2,7 +2,7 @@ package helpers
 
 import "github.com/jung-kurt/gofpdf"
 
-func generateInvoicePDF() error {
+func GenerateInvoicePDF() error {
 
 	// Create a new PDF document
 	pdf := gofpdf.New("P", "mm", "A4", "")

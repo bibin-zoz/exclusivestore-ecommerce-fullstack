@@ -237,17 +237,6 @@ func DeleteCustomerHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Customer deleted successfully"})
 }
 
-//sellers section
-
-func SellersHandler(c *gin.Context) {
-	var sellers []models.User
-	seller := "seller"
-	db.DB.Where("role=?", seller).Find(&sellers)
-
-	c.HTML(http.StatusOK, "sellers.html", gin.H{
-		"Sellers": sellers,
-	})
-}
 
 // category
 func Categoryhandler(c *gin.Context) {

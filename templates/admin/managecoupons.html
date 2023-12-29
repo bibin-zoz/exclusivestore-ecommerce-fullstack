@@ -251,7 +251,7 @@
                     if (result.isConfirmed) {
                         // Perform the AJAX request for deletion
                         $.ajax({
-                            url: '/admin/coupons',
+                            url: '/admin/coupon',
                             type: 'DELETE',
                             contentType: 'application/json',
                             data: JSON.stringify({ id: couponId }),

@@ -51,7 +51,7 @@ func main() {
 	router.GET("/order", middleware.LoginAuth(), handlers.GetOrdershandler)
 	router.GET("/trackorder", middleware.LoginAuth(), handlers.TrackOrderHandler)
 	router.PUT("/order", middleware.LoginAuth(), handlers.ReturnOrderHandler)
-	router.GET("/download", handlers.InvoiceHandler)
+	router.GET("/download", handlers.GeneratePDFHandler)
 
 	router.PATCH("/order", middleware.LoginAuth(), handlers.CancelOrderHandler)
 	router.PATCH("/cancelitem", middleware.LoginAuth(), handlers.CancelProductHandler)
@@ -90,9 +90,6 @@ func main() {
 	router.POST("/admin/categoryoffers", middleware.AdminAuth(), handlers.AddCategoryOffershandler)
 	router.DELETE("/admin/categoryoffers", middleware.AdminAuth(), handlers.DeleteCategoryOfferHandler)
 
-	//sellers
-	router.GET("/admin/sellers", middleware.AdminAuth(), handlers.SellersHandler)
-
 	//Products
 	router.GET("/admin/products", middleware.AdminAuth(), handlers.ProductsHandler)
 	router.POST("/admin/product", middleware.AdminAuth(), handlers.AddProduct)
@@ -128,9 +125,9 @@ func main() {
 	router.DELETE("/useraddress", middleware.LoginAuth(), handlers.DeleteAddressHandler)
 
 	//coupon
-	router.GET("/admin/coupons", middleware.AdminAuth(), handlers.CouponHandler)
+
 	router.GET("/admin/coupon", middleware.AdminAuth(), handlers.CouponHandler)
-	router.DELETE("/admin/coupons", middleware.AdminAuth(), handlers.DeleteCouponHandler)
+	router.DELETE("/admin/coupon", middleware.AdminAuth(), handlers.DeleteCouponHandler)
 	router.POST("/admin/coupon", middleware.AdminAuth(), handlers.AddCouponHandler)
 
 	router.Run(":8080")
