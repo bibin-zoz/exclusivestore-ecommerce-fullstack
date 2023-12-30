@@ -59,36 +59,7 @@
   <script src="/static/user/js/main.js"></script>
 	<section class="ftco-section">
 	
-		<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-	    <div class="container-fluid">
-	    
-	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-	        <span class="fa fa-bars"></span> Menu
-	      </button>
-	      <div class="collapse navbar-collapse" id="ftco-nav">
-	        <ul class="navbar-nav m-auto">
-	        	<li class="nav-item active"><a href="#" class="nav-link">Home</a></li>
-	        	
-	        	<li class="nav-item"><a href="#" class="nav-link">Work</a></li>
-	        	<li class="nav-item"><a href="#" class="nav-link">Blog</a></li>
-	          <li class="nav-item"><a href="#" class="nav-link">Contact</a></li>
-			  {{if .LoginStatus}}
-			  <li class="nav-item"><a href="/logout" class="nav-link">Logout</a></li>
-			 
-			  {{else}}
-			  <li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Get Full Access</a>
-				<div class="dropdown-menu" aria-labelledby="dropdown04">
-					<a class="dropdown-item" href="/signup">SignUp</a>
-				  <a class="dropdown-item" href="/login">Login</a>
-				</div>
-			  </li>
-			  {{end}}
-
-	        </ul>
-	      </div>
-	    </div>
-	  </nav>
+	
     <!-- END nav -->
 
 	
@@ -100,9 +71,8 @@
 
                 <!-- login -->
                 <div class="login">
-                    <span class="fas fa-sign-in-alt"></span>
-                    <strong>Welcome!</strong>
-                    <span>Sign in to your account</span>
+                  
+                    <span>Forgot password</span>
                 
                     <form method="POST" class="login-form">
                         <fieldset>
@@ -114,18 +84,23 @@
                                     <div class="error" style="color: rgb(216, 61, 61);">{{.EmailError}}</div>
                                 </div>
                                 <div class="form-row">
-                                    <span class="fas fa-eye"></span>
-                                    <label class="form-label" for="input">Password</label>
+                                    <span class="fas fa-user"></span>
+                                    <label class="form-label" for="input">New password</label>
                                     <input type="password" class="form-text" name="password" required>
-                                    <p class="error" style="color: rgb(216, 61, 61);">{{.PasswordError}}</p>
-                                </div>
-                                <div class="form-row button-login">
-                                    <button type="submit" class="btn btn-login" style="background-color: red;">Login <span
-                                            class="fas fa-arrow-right"></span></button>
+                                    <div class="error" style="color: rgb(216, 61, 61);">{{.PasswordError}}</div>
                                 </div>
                                 <div class="form-row">
-                                    <a href="/forgotpass" class="forgot">Forgot Password?</a>
+                                    <span class="fas fa-user"></span>
+                                    <label class="form-label" for="input">Confirm password</label>
+                                    <input type="password" class="form-text" name="confirmpassword" required>
+                                    <div class="error" style="color: rgb(216, 61, 61);">{{.PasswordError}}</div>
                                 </div>
+                              
+                                <div class="form-row button-login">
+                                    <button type="submit" class="btn btn-login" style="background-color: red;">Send Otp <span
+                                            class="fas fa-arrow-right"></span></button>
+                                </div>
+                              
                                 <div class="form-row">
                                     <div class="error" style="color: rgb(216, 61, 61);">{{.StatusError}}</div>
                                 </div>

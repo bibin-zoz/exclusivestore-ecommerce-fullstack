@@ -29,6 +29,12 @@ func main() {
 	router.GET("/admin/logout", handlers.AdminLogoutHandler)
 	router.GET("/product", handlers.ProductViewhandler)
 
+	//forgotpass
+	router.GET("/forgotpass", middleware.IsLogin(), handlers.ForgotPasswordHandler)
+	router.POST("/forgotpass", middleware.IsLogin(), handlers.ForgotPasswordPostHandler)
+	router.GET("/emailverify", middleware.IsLogin(), handlers.EmailVerify)
+	router.POST("/emailverify", handlers.EmailVerifyPost)
+
 	//product
 	router.GET("/shop-products", handlers.GetProductsHandler)
 	router.POST("/shop-products", handlers.FilterProductshandler)

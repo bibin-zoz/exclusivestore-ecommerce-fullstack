@@ -13,7 +13,7 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!-- Custom Stylesheet -->
 
-       
+
         <link href="/static/admin/css/style.css" rel="stylesheet">
         <style>
             .modal-dialog {
@@ -81,7 +81,7 @@
                                                 <th>Order Date</th>
                                                 <th>payment method</th>
                                                 <th>Total Price</th>
-                                                <!-- <th>Status</th> -->
+                                                <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -97,7 +97,7 @@
 
                                                 <td>{{.Payment}}</td>
                                                 <td>${{.Total}}</td>
-                                                <!-- <td>
+                                                <td>
                                                     {{if eq .Status "pending"}}
                                                     <span class="label label-warning">{{.Status}}</span>
                                                     {{else if eq .Status "shipped"}}
@@ -109,62 +109,34 @@
                                                     {{else}}
                                                     <span class="label label-default">{{.Status}}</span>
                                                     {{end}}
-                                                </td> -->
+                                                </td>
 
                                                 <td>
                                                     <a href="/admin/manageorder?id={{.ID}}"
                                                         class="btn btn-info btn-xs">Details</a>
-                                                        <!-- {{if eq .Status "pending"}}
-                                                        <button type="button" class="btn btn-warning btn-xs cancel-btn"
-                                                        data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
-                                                        title="Cancel">
-                                                        <span class="btn-icon"><i class="fa fa-times"></i></span>
-                                                    </button>
+                                                </td>
+                                                <td>
+                                                <td class="text-center" data-title="Cancel Order">
+                                                    <select class="form-control status-select"
+                                                        data-order-id="{{.ID}}" data-product-id="">
+                                                        {{if eq .Status "delivered"}}
 
-                                                    
-                                                        {{else if eq .Status "shipped"}}
-                                                        <button type="button" class="btn btn-warning btn-xs cancel-btn"
-                                                        data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
-                                                        title="Cancel">
-                                                        <span class="btn-icon"><i class="fa fa-times"></i></span>
-                                                    </button>
+                                                        <option value="Refunded">Refunded</option>
+                                                        <option value="Returning">Refunded</option>
 
-                                                    <button type="button" class="btn btn-success btn-xs delivered-btn"
-                                                        data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
-                                                        title="Delivered">
-                                                        <span class="btn-icon"><i class="fa fa-check-circle"></i></span>
-                                                    </button>
-                                                        {{else if eq .Status "delivered"}}
-                                                        <span class="label label-success">{{.Status}}</span>
-                                                        {{else if eq .Status "cancelled"}}
-                                                       
-
-                                                    <button type="button" class="btn btn-success btn-xs delivered-btn"
-                                                        data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
-                                                        title="Delivered">
-                                                        <span class="btn-icon"><i class="fa fa-check-circle"></i></span>
-                                                    </button>
                                                         {{else}}
-                                                        <button type="button" class="btn btn-warning btn-xs cancel-btn"
-                                                        data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
-                                                        title="Cancel">
-                                                        <span class="btn-icon"><i class="fa fa-times"></i></span>
-                                                    </button>
+                                                        <option value="approved">Approved</option>
+                                                        <option value="shipped">Shipped</option>
+                                                        <option value="delivered">Delivered</option>
+                                                        <option value="refunded">Refunded</option>
 
-                                                    <button type="button" class="btn btn-success btn-xs delivered-btn"
-                                                        data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
-                                                        title="Delivered">
-                                                        <span class="btn-icon"><i class="fa fa-check-circle"></i></span>
-                                                    </button>
-                                                        {{end}} -->
 
-                                                   
+                                                        {{end}}
 
-                                                    <!-- <button type="button" class="btn btn-danger btn-xs delete-btn"
-                                                        data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
-                                                        title="Delete">
-                                                        <span class="btn-icon"><i class="fa fa-trash"></i></span>
-                                                    </button> -->
+                                                    </select>
+                                                    <button class="btn btn-primary update-status-btn btn-sm"  data-order-id="{{.ID}}" >Update  Status</button>
+
+                                                </td>
                                                 </td>
 
                                             </tr>
@@ -289,8 +261,8 @@
 
 
                         // Attach a click event handler to the button with the delete-btn class
-                       
-                        
+
+
                     });
 
 
