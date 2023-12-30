@@ -12,10 +12,12 @@
     <link href="/static/admin/plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="/static/admin/css/style.css" rel="stylesheet">
     
+    
 
 </head>
 
 <body>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     {{template "adminheader.html" .}}
     <!--**********************************
@@ -70,14 +72,14 @@
                                             <td>{{.CreatedAt.Format "2006-01-02 15:04:05"}}</td>
                                             <td>
                                                 {{if eq .Status "active"}}
-                                                <a href="/admin/update-status?user_id={{.ID}}">
+                                                <a href="/admin/customer/update-status?user_id={{.ID}}">
                                                     <button type="button"
                                                         class="btn mb-1 btn-outline-warning btn-xs"><span
                                                             class="btn-icon"><i class="fa fa-close"></i></span>block
                                                         &nbsp; </button>
                                                 </a>
                                                 {{else}}
-                                                <a href="/admin/update-status?user_id={{.ID}}">
+                                                <a href="/admin/customer/update-status?user_id={{.ID}}">
                                                     <button type="button"
                                                         class="btn mb-1 btn-outline-success btn-xs"><span
                                                             class="btn-icon"><i

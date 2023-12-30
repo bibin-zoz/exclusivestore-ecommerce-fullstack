@@ -5,15 +5,30 @@ import (
 )
 
 type Claims struct {
+	ID       uint   `json:"id"`
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	Role     string `json:"role"`
+	Status   string `json:"status"`
 	jwt.StandardClaims
 }
+type Pagination struct {
+	Offset int `json:"offset"`
+	Limit  int `json:"limit"`
+}
+
+// type AuthUserClaims struct {
+// 	Email string `json:"email"`
+// 	Role  string `json:"role"`
+// 	jwt.StandardClaims
+// }
+
 type VerifyData struct {
 	OTP string `json:"otp"`
 }
 
 type Invalid struct {
+	IDError       string
 	NameError     string
 	EmailError    string
 	NumberError   string
@@ -21,13 +36,17 @@ type Invalid struct {
 	RoleError     string
 	CommonError   string
 	LoginStatus   bool
+	AmountError   string
+	DateError     string
 	StatusError   string
 }
 
 type Compare struct {
+	ID       uint
 	Password string
 	Role     string
 	Username string
+	Email    string
 	Status   string
 }
 
@@ -43,9 +62,25 @@ type Compare struct {
 // 	Image  *string `json:"image"`
 // }
 
-// type Category struct {
-// 	gorm.Model
-// 	CategoryName string `gorm:"unique;not null"`
-// 	Status       string `gorm:"default:'listed'"`
-// 	CreatedAt    time.Time
-// }
+//	type Category struct {
+//		gorm.Model
+//		CategoryName string `gorm:"unique;not null"`
+//		Status       string `gorm:"default:'listed'"`
+//		CreatedAt    time.Time
+//	}
+
+type OrderReq struct {
+	CartID        string `json:"cartID"`
+	AddressID     string `json:"addressID"`
+	PaymentMethod string `json:"paymentMethod"`
+	CouponCode    string `json:"couponcode"`
+}
+type Updatecart struct {
+	ID       string `json:"id"`
+	Quantity string `json:"quantity"`
+}
+
+type UserRequest struct {
+	ID      int    `json:"id"`
+	Request string `json:"request"`
+}

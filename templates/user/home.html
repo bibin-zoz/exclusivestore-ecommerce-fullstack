@@ -1,259 +1,781 @@
-<!DOCTYPE html>
-<html lang="en">
-
-  <head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+{{template "userheader.html"}}
 
 
 
-    <!-- Bootstrap core CSS -->
-    <link href="/static/userhome/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<!--
-
-TemplateMo 546 Sixteen Clothing
-
-https://templatemo.com/tm-546-sixteen-clothing
-
--->
-
-    <!-- Additional CSS Files -->
-    <link rel="stylesheet" href="/static/userhome/assets/css/fontawesome.css">
-    <link rel="stylesheet" href="/static/userhome/assets/css/templatemo-sixteen.css">
-    <link rel="stylesheet" href="/static/userhome/assets/css/owl.css">
-
-  </head>
-
-  <body>
-    <style>
-         .two-line-ellipsis {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Number of lines to show */
-    -webkit-box-orient: vertical;
-  }
-    </style>
-
-    <!-- ***** Preloader Start ***** -->
-    <div id="preloader">
-        <div class="jumper">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-    </div>  
-    <!-- ***** Preloader End ***** -->
-
-    <!-- Header -->
-    <header class="">
-      <nav class="navbar navbar-expand-lg">
-        <div class="container">
-          <a class="navbar-brand" href="index.html"><h2>Lap <em>Store</em></h2></a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item active">
-                <a class="nav-link" href="index.html">Home
-                  <span class="sr-only">(current)</span>
-                </a>
-              </li> 
-              <li class="nav-item">
-                <a class="nav-link" href="products.html">Our Products</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="about.html">About Us</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="contact.html">Contact Us</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/logout">Logout</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
-
-    <!-- Page Content -->
-    <!-- Banner Starts Here -->
-    <div class="banner header-text">
-      <div class="owl-banner owl-carousel">
-        <div class="banner-item-01">
-          <div class="text-content">
-            <h4>Best Offer</h4>
-            <h2>New Arrivals On Sale</h2>
-          </div>
-        </div>
-        <div class="banner-item-02">
-          <div class="text-content">
-            <h4>Flash Deals</h4>
-            <h2>Get your best products</h2>
-          </div>
-        </div>
-        <div class="banner-item-03">
-          <div class="text-content">
-            <h4>Last Minute</h4>
-            <h2>Grab last minute deals</h2>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Banner Ends Here -->
-
-    <div class="latest-products">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="section-heading">
-              <h2>Latest Products</h2>
-              <a href="products.html">view all products <i class="fa fa-angle-right"></i></a>
-            </div>
-          </div>
-        {{range .Products}}
-          <div class="col-md-4">
-            <div class="product-item">
-                <div class="bootstrap-carousel">
-                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-                        <ol class="carousel-indicators">
-                            {{range $index, $image := .Images}}
-                            <li data-target="#carouselExampleIndicators" data-slide-to="{{$index}}" class="active"></li>
-                            {{end}}
-                        </ol>
-                        <div class="carousel-inner">
-                            {{range $index, $image := .Images}}
-                            <div class="carousel-item{{if eq $index 0}} active{{end}}">
-                                <img class="d-block w-100" src="{{$image.FilePath}}" style="width: 208px; height: 200px; object-fit: cover;">
-                            </div>
-                            {{end}}
-                        </div>
-                        <a class="carousel-control-prev" href="#carouselExampleIndicators" data-slide="prev"><span class="carousel-control-prev-icon"></span> <span class="sr-only">Previous</span> </a><a class="carousel-control-next" href="#carouselExampleIndicators"
-                            data-slide="next"><span class="carousel-control-next-icon"></span> <span class="sr-only">Next</span></a>
-                    </div>
-                </div>
-              <div class="down-content">
-                <a href="#"><h4>{{.ProductName}}</h4></a>
-                <h6>${{.Price}}</h6>
-                <p class="two-line-ellipsis">{{.ProductDetails}}</p>
-                <ul class="stars">
-                  <li><i class="fa fa-star"></i></li>
-                  <li><i class="fa fa-star"></i></li>
-                  <li><i class="fa fa-star"></i></li>
-                  <li><i class="fa fa-star"></i></li>
-                  <li><i class="fa fa-star"></i></li>
-                </ul>
-                <span>Reviews (24)</span>
-                <button><a href="/product?id={{.ID}}">View Product</a></button>
-              </div>
-            </div>
-          </div>
-          
-          {{end}}
-         
-          
-        </div>
-      </div>
-    </div>
-
-    <div class="best-features">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="section-heading">
-              <h2>About Sixteen Clothing</h2>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="left-content">
-              <h4>Looking for the best products?</h4>
-              <p><a rel="nofollow" href="https://templatemo.com/tm-546-sixteen-clothing" target="_parent">This template</a> is free to use for your business websites. However, you have no permission to redistribute the downloadable ZIP file on any template collection website. <a rel="nofollow" href="https://templatemo.com/contact">Contact us</a> for more info.</p>
-              <ul class="featured-list">
-                <li><a href="#">Lorem ipsum dolor sit amet</a></li>
-                <li><a href="#">Consectetur an adipisicing elit</a></li>
-                <li><a href="#">It aquecorporis nulla aspernatur</a></li>
-                <li><a href="#">Corporis, omnis doloremque</a></li>
-                <li><a href="#">Non cum id reprehenderit</a></li>
-              </ul>
-              <a href="about.html" class="filled-button">Read More</a>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="right-image">
-              <img src="/static/userhome/assets/images/feature-image.jpg" alt="">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
 
-    <div class="call-to-action">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="inner-content">
-              <div class="row">
-                <div class="col-md-8">
-                  <h4>Creative &amp; Unique <em>Sixteen</em> Products</h4>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque corporis amet elite author nulla.</p>
-                </div>
-                <div class="col-md-4">
-                  <a href="#" class="filled-button">Purchase Now</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    
-    <footer>
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="inner-content">
-              <p>Copyright &copy; 2020 Sixteen Clothing Co., Ltd.
-            
-            - Design: <a rel="nofollow noopener" href="https://templatemo.com" target="_blank">TemplateMo</a></p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+<!-- Slider -->
+<section class="section-slide">
+	<div class="wrap-slick1">
+		<div class="slick1">
+			<div class="item-slick1" style="background-image: url(/static/userside/images/slide-01.jpg);">
+				<div class="container h-full">
+					<div class="flex-col-l-m h-full p-t-100 p-b-30 respon5">
+						<div class="layer-slick1 animated visible-false" data-appear="fadeInDown" data-delay="0">
+							<span class="ltext-101 cl2 respon2">
+								Gaming
+							</span>
+						</div>
+
+						<div class="layer-slick1 animated visible-false" data-appear="fadeInUp" data-delay="800">
+							<h2 class="ltext-201 cl2 p-t-19 p-b-43 respon1">
+								NEW SEASON
+							</h2>
+						</div>
+
+						<div class="layer-slick1 animated visible-false" data-appear="zoomIn" data-delay="1600">
+							<a href="product.html"
+								class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
+								Shop Now
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="item-slick1" style="background-image: url(/static/userside/images/slide-02.jpg);">
+				<div class="container h-full">
+					<div class="flex-col-l-m h-full p-t-100 p-b-30 respon5">
+						<div class="layer-slick1 animated visible-false" data-appear="rollIn" data-delay="0">
+							<span class="ltext-101 cl2 respon2">
+								New Gaming Experience with
+							</span>
+						</div>
+
+						<div class="layer-slick1 animated visible-false" data-appear="lightSpeedIn" data-delay="800">
+							<h2 class="ltext-201 cl2 p-t-19 p-b-43 respon1">
+								Rtx 4080
+							</h2>
+						</div>
+
+						<div class="layer-slick1 animated visible-false" data-appear="slideInUp" data-delay="1600">
+							<a href="product.html"
+								class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
+								Shop Now
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="item-slick1" style="background-image: url(/static/userside/images/slide-03.jpg);">
+				<div class="container h-full">
+					<div class="flex-col-l-m h-full p-t-100 p-b-30 respon5">
+						<div class="layer-slick1 animated visible-false" data-appear="rotateInDownLeft" data-delay="0">
+							<span class="ltext-101 cl2 respon2">
+								Notebook Collection
+							</span>
+						</div>
+
+						<div class="layer-slick1 animated visible-false" data-appear="rotateInUpRight" data-delay="800">
+							<h2 class="ltext-201 cl2 p-t-19 p-b-43 respon1">
+								Starting at ₹21999
+							</h2>
+						</div>
+
+						<div class="layer-slick1 animated visible-false" data-appear="rotateIn" data-delay="1600">
+							<a href="product.html"
+								class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
+								Shop Now
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
 
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="static/userhome/vendor/jquery/jquery.min.js"></script>
-    <script src="/static/userhome/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Banner -->
+<!-- <div class="sec-banner bg0 p-t-80 p-b-50">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6 col-xl-4 p-b-30 m-lr-auto">
+					
+					<div class="block1 wrap-pic-w">
+						<img src="/static/userside/images/banner-01.jpg" alt="IMG-BANNER">
+
+						<a href="product.html"
+							class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
+							<div class="block1-txt-child1 flex-col-l">
+								<span class="block1-name ltext-102 trans-04 p-b-8">
+									Women
+								</span>
+
+								<span class="block1-info stext-102 trans-04">
+									Spring 2018
+								</span>
+							</div>
+
+							<div class="block1-txt-child2 p-b-4 trans-05">
+								<div class="block1-link stext-101 cl0 trans-09">
+									Shop Now
+								</div>
+							</div>
+						</a>
+					</div>
+				</div>
+
+				<div class="col-md-6 col-xl-4 p-b-30 m-lr-auto">
+					
+					<div class="block1 wrap-pic-w">
+						<img src="/static/userside/images/banner-02.jpg" alt="IMG-BANNER">
+
+						<a href="product.html"
+							class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
+							<div class="block1-txt-child1 flex-col-l">
+								<span class="block1-name ltext-102 trans-04 p-b-8">
+									Men
+								</span>
+
+								<span class="block1-info stext-102 trans-04">
+									Spring 2018
+								</span>
+							</div>
+
+							<div class="block1-txt-child2 p-b-4 trans-05">
+								<div class="block1-link stext-101 cl0 trans-09">
+									Shop Now
+								</div>
+							</div>
+						</a>
+					</div>
+				</div>
+
+				<div class="col-md-6 col-xl-4 p-b-30 m-lr-auto">
+					
+					<div class="block1 wrap-pic-w">
+						<img src="/static/userside/images/banner-03.jpg" alt="IMG-BANNER">
+
+						<a href="product.html"
+							class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
+							<div class="block1-txt-child1 flex-col-l">
+								<span class="block1-name ltext-102 trans-04 p-b-8">
+									Accessories
+								</span>
+
+								<span class="block1-info stext-102 trans-04">
+									New Trend
+								</span>
+							</div>
+
+							<div class="block1-txt-child2 p-b-4 trans-05">
+								<div class="block1-link stext-101 cl0 trans-09">
+									Shop Now
+								</div>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> -->
 
 
-    <!-- Additional Scripts -->
-    <script src="/static/userhome/assets/js/custom.js"></script>
-    <script src="/static/userhome/assets/js/owl.js"></script>
-    <script src="/static/userhome/assets/js/slick.js"></script>
-    <script src="/static/userhome/assets/js/isotope.js"></script>
-    <script src="/static/userhome/assets/js/accordions.js"></script>
+<!-- Product -->
+<section class="bg0 p-t-23 p-b-140">
+	<div class="container">
+		<div class="p-b-10">
+			<h3 class="ltext-103 cl5">
+				Product Overview
+			</h3>
+		</div>
+
+		<div class="flex-w flex-sb-m p-b-52">
+			<div class="flex-w flex-l-m filter-tope-group m-tb-10">
+				<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5 how-active1" data-filter="*">
+					All Products
+				</button>
+
+				<!-- 
+					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".women">
+						Women
+					</button>
+
+					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".men">
+						Men
+					</button>
+
+					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".bag">
+						Bag
+					</button>
+
+					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".shoes">
+						Shoes
+					</button>
+
+					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".watches">
+						Watches
+					</button> -->
+			</div>
+
+			<div class="flex-w flex-c-m m-tb-10">
+				<div class="flex-c-m stext-106 cl6 size-104 bor4 pointer hov-btn3 trans-04 m-r-8 m-tb-4 js-show-filter">
+					<i class="icon-filter cl2 m-r-6 fs-15 trans-04 zmdi zmdi-filter-list"></i>
+					<i class="icon-close-filter cl2 m-r-6 fs-15 trans-04 zmdi zmdi-close dis-none"></i>
+					Filter
+				</div>
+
+				<div class="flex-c-m stext-106 cl6 size-105 bor4 pointer hov-btn3 trans-04 m-tb-4 js-show-search">
+					<i class="icon-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-search"></i>
+					<i class="icon-close-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-close dis-none"></i>
+					Search
+				</div>
+			</div>
+
+			<!-- Search product -->
+			<div class="dis-none panel-search w-full p-t-10 p-b-15">
+				<div class="bor8 dis-flex p-l-15">
+					<button class="size-113 flex-c-m fs-16 cl2 hov-cl1 trans-04">
+						<i class="zmdi zmdi-search"></i>
+					</button>
+
+					<input class="mtext-107 cl2 size-114 plh2 p-r-15" type="text" name="search-product"
+						placeholder="Search">
+				</div>
+			</div>
+
+			<!-- Filter -->
+			<div class="dis-none panel-filter w-full p-t-10">
+				<div class="wrap-filter flex-w bg6 w-full p-lr-40 p-t-27 p-lr-15-sm">
+					<div class="filter-col1 p-r-15 p-b-27">
+						<div class="mtext-102 cl2 p-b-15">
+							Sort By
+						</div>
+
+						<ul>
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									Default
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									Popularity
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									Average rating
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04 filter-link-active">
+									Newness
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									Price: Low to High
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									Price: High to Low
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="filter-col2 p-r-15 p-b-27">
+						<div class="mtext-102 cl2 p-b-15">
+							Price
+						</div>
+
+						<ul>
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04 filter-link-active">
+									All
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									$0.00 - $50.00
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									$50.00 - $100.00
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									₹10000.00 - ₹25000.00
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									₹25000.00 - ₹50000.00
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<a href="#" class="filter-link stext-106 trans-04">
+									₹50000.00+
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="filter-col3 p-r-15 p-b-27">
+						<div class="mtext-102 cl2 p-b-15">
+							Color
+						</div>
+
+						<ul>
+							<li class="p-b-6">
+								<span class="fs-15 lh-12 m-r-6" style="color: #222;">
+									<i class="zmdi zmdi-circle"></i>
+								</span>
+
+								<a href="#" class="filter-link stext-106 trans-04">
+									Black
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<span class="fs-15 lh-12 m-r-6" style="color: #4272d7;">
+									<i class="zmdi zmdi-circle"></i>
+								</span>
+
+								<a href="#" class="filter-link stext-106 trans-04 filter-link-active">
+									Blue
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<span class="fs-15 lh-12 m-r-6" style="color: #b3b3b3;">
+									<i class="zmdi zmdi-circle"></i>
+								</span>
+
+								<a href="#" class="filter-link stext-106 trans-04">
+									Grey
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<span class="fs-15 lh-12 m-r-6" style="color: #00ad5f;">
+									<i class="zmdi zmdi-circle"></i>
+								</span>
+
+								<a href="#" class="filter-link stext-106 trans-04">
+									Green
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<span class="fs-15 lh-12 m-r-6" style="color: #fa4251;">
+									<i class="zmdi zmdi-circle"></i>
+								</span>
+
+								<a href="#" class="filter-link stext-106 trans-04">
+									Red
+								</a>
+							</li>
+
+							<li class="p-b-6">
+								<span class="fs-15 lh-12 m-r-6" style="color: #aaa;">
+									<i class="zmdi zmdi-circle-o"></i>
+								</span>
+
+								<a href="#" class="filter-link stext-106 trans-04">
+									White
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="filter-col4 p-b-27">
+						<div class="mtext-102 cl2 p-b-15">
+							Tags
+						</div>
+
+						<div class="flex-w p-t-4 m-r--5">
+							<a href="#"
+								class="flex-c-m stext-107 cl6 size-301 bor7 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5">
+								Fashion
+							</a>
+
+							<a href="#"
+								class="flex-c-m stext-107 cl6 size-301 bor7 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5">
+								Lifestyle
+							</a>
+
+							<a href="#"
+								class="flex-c-m stext-107 cl6 size-301 bor7 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5">
+								Denim
+							</a>
+
+							<a href="#"
+								class="flex-c-m stext-107 cl6 size-301 bor7 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5">
+								Streetstyle
+							</a>
+
+							<a href="#"
+								class="flex-c-m stext-107 cl6 size-301 bor7 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5">
+								Crafts
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="row isotope-grid">
+			{{range .ProductVariants}}
+			<div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
+				<!-- Block2 -->
+				<div class="block2">
+					<div class="block2-pic hov-img0" >
+						{{ if gt (len .Product.Images) 0 }}
+						{{ with index .Product.Images 0 }}
+						<img src="{{ .FilePath }}"  alt="Product Image">
+					{{ end }}
+						{{ else }}
+						<img src="/static/uploads/2_hpomen2.jpg" alt="Default Image">
+						{{ end }}
 
 
-    <script language = "text/Javascript"> 
-      cleared[0] = cleared[1] = cleared[2] = 0; //set a cleared flag for each field
-      function clearField(t){                   //declaring the array outside of the
-      if(! cleared[t.id]){                      // function makes it static and global
-          cleared[t.id] = 1;  // you could use true and false, but that's more typing
-          t.value='';         // with more chance of typos
-          t.style.color='#fff';
-          }
-      }
-    </script>
+						<a href="/product?Variant={{.Slug}}"
+							class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 ">
+							BuyNow
+						</a>
+					</div>
+					<div class="block2-txt flex-w flex-t p-t-14">
+						<div class="block2-txt-child1 flex-col-l ">
+							<a href="product-detail.html" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+								{{.Product.ProductName}}
+							</a>
+							<span class="stext-105 cl3">
+								<li>
+									Processor: {{ .Processor }}, Storage: {{ .Storage }}, RAM: {{ .Ram }}, Stock: {{ .Stock }},
+									<br>
+									{{if eq .DiscountPrice 0 }}
+									<div style="background-color: #f0f0f0; padding: 5px; display: inline-block; border-radius: 5px;">
+										
+										<span style="color: #3498db; font-weight: bold;"> Price: {{ .Price }}</span>
+									</div>
+
+									{{else}}
+									<div style="background-color: #f0f0f0; padding: 5px; display: inline-block; border-radius: 5px;">
+										
+										<span style="color: #3498db; font-weight: bold;">Discount Price: {{ .DiscountPrice }}</span>
+									</div>
+									
+									<span style="color: #e74c3c; text-decoration: line-through;">Original Price: {{ .Price }}</span>
+									
+									<br>
+									{{if ne .Product.Category.CategoryOffer.Discount 0 }}
+									<span style="color: #1961d6; ">Category Discount Price: ₹{{ .Product.Category.CategoryOffer.Discount }}</span>
+									{{end}}
+									{{if ne .Product.Discount 0 }}
+									<br>
+									<span style="color: #1961d6; ">Product Extra {{ .Product.Discount }} Off</span>
+									{{end}}
+									{{end}}
+									
+								</li>
+								
+								<h6><b>Variant:</b></h6>
+								<h6>{{.Slug}}</h6>
+							</span>
+						</div>
+						<div class="block2-txt-child2 flex-r p-t-3">
+							<a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
+								<img class="icon-heart1 dis-block trans-04"
+									src="/static/userside/images/icons/icon-heart-01.png" alt="ICON">
+								<img class="icon-heart2 dis-block trans-04 ab-t-l"
+									src="/static/userside/images/icons/icon-heart-02.png" alt="ICON">
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			{{end}}
+		</div>
 
 
-  </body>
+		<!-- Load more -->
+		<div class="flex-c-m flex-w w-full p-t-45">
+			<a href="#" class="flex-c-m stext-101 cl5 size-103 bg2 bor1 hov-btn1 p-lr-15 trans-04">
+				Load More
+			</a>
+		</div>
+	</div>
+</section>
+
+
+<!-- Footer -->
+<footer class="bg3 p-t-75 p-b-32">
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-6 col-lg-3 p-b-50">
+				<h4 class="stext-301 cl0 p-b-30">
+					Categories
+				</h4>
+
+				<ul>
+					<li class="p-b-10">
+						<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+							Women
+						</a>
+					</li>
+
+					<li class="p-b-10">
+						<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+							Men
+						</a>
+					</li>
+
+					<li class="p-b-10">
+						<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+							Shoes
+						</a>
+					</li>
+
+					<li class="p-b-10">
+						<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+							Watches
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="col-sm-6 col-lg-3 p-b-50">
+				<h4 class="stext-301 cl0 p-b-30">
+					Help
+				</h4>
+
+				<ul>
+					<li class="p-b-10">
+						<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+							Track Order
+						</a>
+					</li>
+
+					<li class="p-b-10">
+						<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+							Returns
+						</a>
+					</li>
+
+					<li class="p-b-10">
+						<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+							Shipping
+						</a>
+					</li>
+
+					<li class="p-b-10">
+						<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+							FAQs
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="col-sm-6 col-lg-3 p-b-50">
+				<h4 class="stext-301 cl0 p-b-30">
+					GET IN TOUCH
+				</h4>
+
+				<p class="stext-107 cl7 size-201">
+					Any questions? Let us know in store at 8th floor, 379 Hudson St, New York, NY 10018 or call us
+					on (+1) 96 716 6879
+				</p>
+
+				<div class="p-t-27">
+					<a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+						<i class="fa fa-facebook"></i>
+					</a>
+
+					<a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+						<i class="fa fa-instagram"></i>
+					</a>
+
+					<a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+						<i class="fa fa-pinterest-p"></i>
+					</a>
+				</div>
+			</div>
+
+			<div class="col-sm-6 col-lg-3 p-b-50">
+				<h4 class="stext-301 cl0 p-b-30">
+					Newsletter
+				</h4>
+
+				<form>
+					<div class="wrap-input1 w-full p-b-4">
+						<input class="input1 bg-none plh1 stext-107 cl7" type="text" name="email"
+							placeholder="email@example.com">
+						<div class="focus-input1 trans-04"></div>
+					</div>
+
+					<div class="p-t-18">
+						<button class="flex-c-m stext-101 cl0 size-103 bg1 bor1 hov-btn2 p-lr-15 trans-04">
+							Subscribe
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<div class="p-t-40">
+			<div class="flex-c-m flex-w p-b-18">
+				<a href="#" class="m-all-1">
+					<img src="/static/userside/images/icons/icon-pay-01.png" alt="ICON-PAY">
+				</a>
+
+				<a href="#" class="m-all-1">
+					<img src="/static/userside/images/icons/icon-pay-02.png" alt="ICON-PAY">
+				</a>
+
+				<a href="#" class="m-all-1">
+					<img src="/static/userside/images/icons/icon-pay-03.png" alt="ICON-PAY">
+				</a>
+
+				<a href="#" class="m-all-1">
+					<img src="/static/userside/images/icons/icon-pay-04.png" alt="ICON-PAY">
+				</a>
+
+				<a href="#" class="m-all-1">
+					<img src="/static/userside/images/icons/icon-pay-05.png" alt="ICON-PAY">
+				</a>
+			</div>
+
+			<p class="stext-107 cl6 txt-center">
+				<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+				Copyright &copy;
+				<script>document.write(new Date().getFullYear());</script> All rights reserved | Made with <i
+					class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com"
+					target="_blank">Colorlib</a> &amp; distributed by <a href="https://themewagon.com"
+					target="_blank">ThemeWagon</a>
+				<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+
+			</p>
+		</div>
+	</div>
+</footer>
+
+
+<!-- Back to top -->
+<div class="btn-back-to-top" id="myBtn">
+	<span class="symbol-btn-back-to-top">
+		<i class="zmdi zmdi-chevron-up"></i>
+	</span>
+</div>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/animsition/js/animsition.min.js"></script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/bootstrap/js/popper.js"></script>
+<script src="/static/userside/vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/select2/select2.min.js"></script>
+<script>
+	$(".js-select2").each(function () {
+		$(this).select2({
+			minimumResultsForSearch: 20,
+			dropdownParent: $(this).next('.dropDownSelect2')
+		});
+	})
+</script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/daterangepicker/moment.min.js"></script>
+<script src="/static/userside/vendor/daterangepicker/daterangepicker.js"></script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/slick/slick.min.js"></script>
+<script src="/static/userside/js/slick-custom.js"></script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/parallax100/parallax100.js"></script>
+<script>
+	$('.parallax100').parallax100();
+</script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/MagnificPopup/jquery.magnific-popup.min.js"></script>
+<script>
+	$('.gallery-lb').each(function () { // the containers for all your galleries
+		$(this).magnificPopup({
+			delegate: 'a', // the selector for gallery item
+			type: 'image',
+			gallery: {
+				enabled: true
+			},
+			mainClass: 'mfp-fade'
+		});
+	});
+</script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/isotope/isotope.pkgd.min.js"></script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/sweetalert/sweetalert.min.js"></script>
+<script>
+	$('.js-addwish-b2').on('click', function (e) {
+		e.preventDefault();
+	});
+
+	$('.js-addwish-b2').each(function () {
+		var nameProduct = $(this).parent().parent().find('.js-name-b2').html();
+		$(this).on('click', function () {
+			swal(nameProduct, "is added to wishlist !", "success");
+
+			$(this).addClass('js-addedwish-b2');
+			$(this).off('click');
+		});
+	});
+
+	$('.js-addwish-detail').each(function () {
+		var nameProduct = $(this).parent().parent().parent().find('.js-name-detail').html();
+
+		$(this).on('click', function () {
+			swal(nameProduct, "is added to wishlist !", "success");
+
+			$(this).addClass('js-addedwish-detail');
+			$(this).off('click');
+		});
+	});
+
+	/*---------------------------------------------*/
+
+	$('.js-addcart-detail').each(function () {
+		var nameProduct = $(this).parent().parent().parent().parent().find('.js-name-detail').html();
+		$(this).on('click', function () {
+			swal(nameProduct, "is added to cart !", "success");
+		});
+	});
+
+</script>
+<!--===============================================================================================-->
+<script src="/static/userside/vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+<script>
+	$('.js-pscroll').each(function () {
+		$(this).css('position', 'relative');
+		$(this).css('overflow', 'hidden');
+		var ps = new PerfectScrollbar(this, {
+			wheelSpeed: 1,
+			scrollingThreshold: 1000,
+			wheelPropagation: false,
+		});
+
+		$(window).on('resize', function () {
+			ps.update();
+		})
+	});
+</script>
+<!--===============================================================================================-->
+<script src="/static/userside/js/main.js"></script>
+
+</body>
 
 </html>

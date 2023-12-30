@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        .otp-container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .otp-input {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .verify-button,
+        .resend-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .verify-button:hover,
+        .resend-button:hover {
+            background-color: #2980b9;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .success-message {
+            color: #2ecc71;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        #countdown {
+            font-size: 14px;
+            margin-top: 5px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="otp-container">
+        <h2 style="color: #333;">OTP Verification</h2>
+        <form id="otpForm">
+            <label for="otp" style="font-size: 18px; color: #333;">Enter OTP:</label>
+            <input type="text" id="otp" class="otp-input" name="otp" maxlength="6" minlength="6" required>
+            <button type="button" class="verify-button" onclick="verifyOTP()">Verify OTP</button>
+            <button type="button" class="resend-button" id="resendButton" onclick="resendOTP()">Resend OTP</button>
+            <div id="countdown"></div>
+        </form>
+        <div id="errorMessage" class="error-message">{{.Message}}</div>
+        <div id="successMessage" class="success-message"></div>
+    </div>
+
+    <script>
+        var countdownValue = 60;
+        var countdownInterval;
+
+        // Call resendOTP function when the page loads
+        window.onload = function () {
+            resendOTP();
+        };
+
+        function verifyOTP() {
+            var otpValue = document.getElementById("otp").value;
+
+            // Assuming you are making an AJAX request to your server
+            fetch('/emailverify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        otp: otpValue,
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle the JSON response
+                    if (data.error) {
+                        document.getElementById("errorMessage").innerText = data.error;
+                        document.getElementById("successMessage").innerText = '';
+                    } else if (data.message) {
+                        document.getElementById("successMessage").innerText = data.message;
+                        document.getElementById("errorMessage").innerText = '';
+
+                        // If verification is successful, redirect to /login after a delay
+                        setTimeout(function () {
+                            window.location.href = '/login';
+                        }, 2000); // 2000 milliseconds (2 seconds) delay before redirecting
+                    }
+                })
+                .catch(error => {
+                    // Handle errors, including 400 Bad Request
+                    console.error('Error:', error);
+                    document.getElementById("errorMessage").innerText = 'Invalid OTP/ failed to create User';
+                    document.getElementById("successMessage").innerText = '';
+                });
+        }
+
+        function resendOTP() {
+            console.log('Resend OTP button clicked');
+            $("#resendButton").prop("disabled", true);
+
+            // Start the countdown when the Resend OTP button is clicked
+            countdownValue = 60;
+            countdownInterval = setInterval(function () {
+                countdownValue--;
+
+                if (countdownValue <= 0) {
+                    clearInterval(countdownInterval);
+                    $("#resendButton").prop("disabled", false);
+                    $("#countdown").text('');
+                } else {
+                    $("#countdown").text('Resend in ' + countdownValue + ' seconds');
+                }
+            }, 1000);
+        }
+    </script>
+
+</body>
+
+</html>

@@ -208,7 +208,7 @@
                                         <li>
                                             <a href="page-lock.html"><i class="icon-lock"></i> <span>Lock Screen</span></a>
                                         </li>
-                                        <li><a href="/logout"><i class="icon-key"></i> <span>Logout</span></a></li>
+                                        <li><a href="/admin/logout"><i class="icon-key"></i> <span>Logout</span></a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -229,13 +229,15 @@
                 <ul class="metismenu" id="menu">
                     <li class="nav-label">Dashboard</li>
                     <li>
-                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+                        <a class="has-arrow" href="/admin/home" aria-expanded="false">
                             <i class="icon-speedometer menu-icon"></i><span class="nav-text">Dashboard</span>
                         </a>
-                        <ul aria-expanded="false">
-                            <li><a href="/static/admin/index.html">Home 1</a></li>
-                            <!-- <li><a href="/static/admin/index-2.html">Home 2</a></li> -->
-                        </ul>
+                       
+                    </li>
+                    <li class="mega-menu mega-menu-sm">
+                        <a class="has-arrow" href="/admin/salesreport" aria-expanded="false">
+                            <i class="icon-grid menu-icon"></i></i><span class="nav-text">Sales Report</span>
+                        </a>
                     </li>
                   
                     <li>
@@ -244,18 +246,61 @@
                         </a>
                         <ul aria-expanded="false">
                             <li><a href="/admin/customers"><i class="icon-people"></i>Customers</a></li>
-                            <li><a href="/admin/sellers"><i class="icon-social-dropbox"></i>Sellers</a></li>
+                            
+                            
+                        </ul>
+                    </li>
+                   
+                    <li>
+                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+                            <i class="icon-user menu-icon"></i><span class="nav-text">Category</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <li class="mega-menu mega-menu-sm">
+                                <a class="has-arrow" href="/admin/categories" aria-expanded="false">
+                                    <i class="icon-grid menu-icon"></i></i><span class="nav-text">category</span>
+                                </a>
+                            </li>
+                            <li class="mega-menu mega-menu-sm">
+                                <a class="has-arrow" href="/admin/categoryoffers" aria-expanded="false">
+                                    <i class="icon-grid menu-icon"></i></i><span class="nav-text">category Offers</span>
+                                </a>
+                            </li>
+                            
+                            
+                        </ul>
+                    </li>
+                    
+
+
+                    
+                    <li>
+                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+                            <i class="icon-user menu-icon"></i><span class="nav-text">products</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <li class="mega-menu mega-menu-sm">
+                                <a class="has-arrow" href="/admin/products" aria-expanded="false">
+                                    <i class="icon-grid menu-icon"></i></i><span class="nav-text">Product</span>
+                                </a>
+                            </li>
+                            <li class="mega-menu mega-menu-sm">
+                                <a class="has-arrow" href="/admin/productoffers" aria-expanded="false">
+                                    <i class="icon-grid menu-icon"></i></i><span class="nav-text">Products Discounts</span>
+                                </a>
+                            </li>
+                            
                             
                         </ul>
                     </li>
                     <li class="mega-menu mega-menu-sm">
-                        <a class="has-arrow" href="/admin/categories" aria-expanded="false">
-                            <i class="icon-grid menu-icon"></i></i><span class="nav-text">category</span>
+                        <a class="has-arrow" href="/admin/orders" aria-expanded="false">
+                            <i class="icon-grid menu-icon"></i></i><span class="nav-text">orders</span>
                         </a>
                     </li>
                     <li class="mega-menu mega-menu-sm">
-                        <a class="has-arrow" href="/admin/products" aria-expanded="false">
-                            <i class="icon-grid menu-icon"></i></i><span class="nav-text">Products</span>
+                        <a class="has-arrow" href="/admin/coupon" aria-expanded="false">
+                            <i class="icon-grid menu-icon"></i></i><span class="nav-text">Coupons</span>
                         </a>
                     </li>
 

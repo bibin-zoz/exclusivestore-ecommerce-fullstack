@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+  	<title>Website menu 07</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="/static/user/navcss/style.css">
+    <!-- google fonts -->
+    <link href="//fonts.googleapis.com/css2?family=Jost:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="/static/user/style.css" type="text/css" media="all" />
+
+    <!-- fontawesome v5 -->
+    <script src="https://kit.fontawesome.com/af562a2a63.js" crossorigin="anonymous"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!--//google-fonts -->
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" type="/static/admin/image/png" sizes="16x16" href="images/favicon.png">
+    <!-- Custom Stylesheet -->
+    <link href="/static/admin/css/style.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #product-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .product-card {
+            margin: 10px;
+        }
+
+        #image-slider {
+            /* Add your styles for the image slider container here */
+        }
+    </style>
+
+
+	</head>
+	<body>
+        <script src="/static/user/js/jquery.min.js"></script>
+  <script src="/static/user/js/popper.js"></script> 
+  <script src="/static/user/js/bootstrap.min.js"></script>
+  <script src="/static/user/js/main.js"></script>
+	<section class="ftco-section">
+	
+	
+    <!-- END nav -->
+
+	
+
+    <section class="forms">
+        <div class="container">
+           
+            <div class="forms-grid">
+
+                <!-- login -->
+                <div class="login">
+                  
+                    <span>Forgot password</span>
+                
+                    <form method="POST" class="login-form">
+                        <fieldset>
+                            <div class="form">
+                                <div class="form-row">
+                                    <span class="fas fa-user"></span>
+                                    <label class="form-label" for="input">Email</label>
+                                    <input type="email" class="form-text" name="email" required>
+                                    <div class="error" style="color: rgb(216, 61, 61);">{{.EmailError}}</div>
+                                </div>
+                                <div class="form-row">
+                                    <span class="fas fa-user"></span>
+                                    <label class="form-label" for="input">New password</label>
+                                    <input type="password" class="form-text" name="password" required>
+                                    <div class="error" style="color: rgb(216, 61, 61);">{{.PasswordError}}</div>
+                                </div>
+                                <div class="form-row">
+                                    <span class="fas fa-user"></span>
+                                    <label class="form-label" for="input">Confirm password</label>
+                                    <input type="password" class="form-text" name="confirmpassword" required>
+                                    <div class="error" style="color: rgb(216, 61, 61);">{{.PasswordError}}</div>
+                                </div>
+                              
+                                <div class="form-row button-login">
+                                    <button type="submit" class="btn btn-login" style="background-color: red;">Send Otp <span
+                                            class="fas fa-arrow-right"></span></button>
+                                </div>
+                              
+                                <div class="form-row">
+                                    <div class="error" style="color: rgb(216, 61, 61);">{{.StatusError}}</div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <!-- //login -->
+
+                <!-- register -->
+
+            </div>
+
+        </div>
+    </section>
+
+</body>
+
+</html>

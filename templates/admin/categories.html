@@ -11,13 +11,14 @@
     <!-- Custom Stylesheet -->
     <link href="/static/admin/plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="/static/admin/css/style.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css"
-        href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    
     <!-- Toastr JS -->
 
 </head>
 
 <body>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
@@ -240,7 +241,7 @@
                 console.log('Sending AJAX request with ID:', customerId);
 
                 $.ajax({
-                    url: '/admin/categories/update-status',
+                    url: '/admin/categories',
                     type: 'PATCH',
                     contentType: 'application/json',
                     data: JSON.stringify({ id: customerId }),

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Quixlab - Bootstrap Admin Dashboard Template by Themefisher.com</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <!-- Custom Stylesheet -->
+    <link href="/static/admin/plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
+    <!-- Toastr JS -->
+
+</head>
+
+<body>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    <!-- Include your admin header template -->
+    {{template "adminheader.html" .}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <div class="content-body">
+        <div class="row page-titles mx-0">
+            <div class="col p-md-0">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Home</a></li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="topsection d-flex justify-content-between">
+                                <h4 class="card-title">Data Table</h4>
+                                <div class="bootstrap-modal">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#addCategoryModal">Add New Coupon</button>
+                                    <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog"
+                                        aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="addCategoryModalLabel">Add New Coupon
+                                                    </h5>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method="post">
+                                                        <div class="form-group">
+                                                            <label for="categoryName" class="col-form-label">Coupon
+                                                                Code:</label>
+                                                            <p id="NameError"
+                                                                class="text-danger rounded animate__animated animate__fadeIn"
+                                                                style="display: none;"></p>
+
+                                                            <input type="text" class="form-control" id="couponCode"
+                                                                name="couponCode" required>
+                                                                
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="DiscountPercentage"
+                                                                class="col-form-label">Discount Percentage:</label>
+                                                            <p id="NameError"
+                                                                class="text-danger rounded animate__animated animate__fadeIn"
+                                                                style="display: none;"></p>
+
+                                                            <input type="text" class="form-control"
+                                                                id="discountPercentage" name="discountPercentage"
+                                                                required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="MaxDiscount" class="col-form-label">MAx Discount
+                                                                :</label>
+                                                            <p id="NameError"
+                                                                class="text-danger rounded animate__animated animate__fadeIn"
+                                                                style="display: none;"></p>
+
+                                                            <input type="text" class="form-control" id="maxDiscount"
+                                                                name="maxDiscount" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="expiryDate" class="col-form-label">Expiry
+                                                                Date:</label>
+                                                            <!-- Use the "date" type for date input -->
+                                                            <input type="date" class="form-control" id="expiryDate"
+                                                                name="expiryDate" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="status" class="col-form-label">Status:</label>
+                                                            <select class="form-control" id="status" name="status"
+                                                                required>
+                                                                <option value="active">Active</option>
+                                                                <option value="inactive">inactive</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-primary"
+                                                                onclick="addCoupon()">Add New Coupon</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered zero-configuration">
+                                    <thead>
+                                        <tr>
+                                            <th>Coupon id </th>
+                                            <th>Coupon Code</th>
+                                            <th>Discount Percentage</th>
+                                            <th>Max Discount</th>
+                                            <th>status</th>
+                                            <th>Expiry date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{range .Coupons}}
+                                        <tr>
+                                            <td>{{.ID}}</td>
+                                            <td>{{.CouponCode}}</td>
+                                            <td>{{.Discount}}%</td>
+                                            <td>₹{{.MaxDiscount}}</td>
+                                            <td>
+                                                {{if eq .Status "active"}}
+                                                <span class="label label-success">{{.Status}}</span>
+                                                {{else}}
+                                                <span class="label label-danger">{{.Status}}</span>
+                                                {{end}}
+                                            </td>
+                                            <td>{{.Expiry.Format "2006-01-02 15:04:05"}}</td>
+                                            <td>
+                                                {{if eq .Status "active"}}
+                                                <!-- <a href="/admin/categories/update-status?id={{.ID}}"> -->
+                                                <!-- <button type="button" class="btn mb-1 btn-outline-warning btn-xs">
+                                                        <span class="btn-icon"><i class="fa fa-close"></i></span>block -->
+                                                <!-- <span><a href="/admin/categories/update-status?id={{.ID}}" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-pencil color-muted m-r-5"></i> </a></span> -->
+                                                <!-- <a href="#" data-toggle="tooltip" data-placement="top" title="Close"><i class="fa fa-close color-danger"></i></a>
+                                                        
+                                                 
+
+                                                <a href="/admin/categories/update-status?id={{.ID}}"
+                                                    data-toggle="tooltip" data-placement="top" title="Unlist"> -->
+                                                <button type="button"
+                                                    class="btn mb-1 btn-outline-warning btn-xs block-btn"
+                                                    data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
+                                                    title="Unlist">
+                                                    <span><i class="fa fa-close color-muted m-r-5"></i></span>
+
+                                                </button>
+                                                <!-- </a> -->
+                                                <!-- </a> -->
+                                                {{else}}
+                                                <!-- <span><a href="/admin/categories/update-status?id={{.ID}}" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash color-muted m-r-5"></i> </a></span> -->
+                                                <button type="button"
+                                                    class="btn mb-1 btn-outline-success btn-xs block-btn"
+                                                    data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
+                                                    title="list">
+                                                    <span><i class="fa fa-check color-muted m-r-5"></i></span>
+
+                                                </button>
+                                                <!-- <a href="/admin/categories/update-status?id={{.ID}}"
+                                                    data-toggle="tooltip" data-placement="top" title="List">
+                                                    <button type="button" class="btn mb-1 btn-outline-success btn-xs">
+                                                        <span><i class="fa fa-check color-muted m-r-5"></i></span>
+
+                                                    </button>
+                                                </a> -->
+                                                {{end}}
+
+                                                <button type="button"
+                                                    class="btn mb-1 btn-outline-danger btn-xs delete-btn"
+                                                    data-id="{{.ID}}" data-toggle="tooltip" data-placement="top"
+                                                    title="Delete">
+                                                    <span class="btn-icon"><i class="fa fa-trash"></i></span>
+                                                </button>
+
+
+
+                                            </td>
+                                        </tr>
+                                        {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include your footer -->
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright &copy; Designed & Developed by <a href="https://themeforest.net/user/quixlab">Quixlab</a> 2018
+            </p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="/static/admin/plugins/common/common.min.js"></script>
+    <script src="/static/admin/js/custom.min.js"></script>
+    <script src="/static/admin/js/settings.js"></script>
+    <script src="/static/admin/js/gleek.js"></script>
+    <script src="/static/admin/js/styleSwitcher.js"></script>
+    <script src="/static/admin/plugins/tables/js/jquery.dataTables.min.js"></script>
+    <script src="/static/admin/plugins/tables/js/datatable/dataTables.bootstrap4.min.js"></script>
+    <script src="/static/admin/plugins/tables/js/datatable-init/datatable-basic.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('.delete-btn').on('click', function () {
+                var couponId = $(this).data('id');
+
+
+
+                console.log('Sending AJAX request with ID:', couponId);
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You won\'t be able to revert this!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Perform the AJAX request for deletion
+                        $.ajax({
+                            url: '/admin/coupon',
+                            type: 'DELETE',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ id: couponId }),
+                            success: function (response) {
+                                console.log('Success:', response);
+
+                                // Show success toast
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: 'The Coupon has been deleted.',
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false
+                                });
+
+                                // Optionally, you can redirect the user or update the UI
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            },
+                            error: function (error) {
+                                console.error('Error:', error);
+                            }
+                        });
+                    }
+                });
+
+            });
+        });
+
+
+        async function addCoupon() {
+    // Get form data
+    var couponCode = document.getElementById('couponCode').value;
+    var discountPercentage = document.getElementById('discountPercentage').value;
+    var maxDiscount = document.getElementById('maxDiscount').value;
+    var expiry = document.getElementById('expiryDate').value;
+    var status = document.getElementById('status').value;
+
+    // Prepare form data for the POST request
+    var formData = new FormData();
+    formData.append('couponCode', couponCode);
+    formData.append('maxDiscount', maxDiscount);
+    formData.append('discountPercentage', discountPercentage);
+    formData.append('expiryDate', expiry);
+    formData.append('status', status);
+
+    try {
+        // Make a POST request to your server using jQuery AJAX
+        $.ajax({
+            url: '/admin/coupon',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (responseData) {
+                // Check if the 'redirect' property exists in the response
+                if (responseData.redirect) {
+                    // Redirect to the specified URL
+                    setTimeout(() => {
+                        window.location.href = responseData.redirect;
+                    }, 1500)
+                    toastr.success(
+                        responseData.message || 'Coupon Added',
+                        'Success',
+                        {
+                            closeButton: true,
+                            progressBar: true,
+                            timeOut: 2000,
+                        }
+                    );
+                } else {
+                    // Handle other aspects of the response if needed
+                    console.log(responseData);
+                }
+            },
+            error: function (error) {
+    console.log('Full error object:', error);
+    const errorResponse = error.responseJSON || {};
+    console.log('Error response JSON:', errorResponse);
+    const errorMessage = errorResponse.error || 'An error occurred.';
+    console.log('Error message:', errorMessage);
+    toastr.error(
+        errorMessage,
+        'Error',
+        {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000,
+        }
+    );
+    console.error('Error:', error);
+}
+
+        });
+    } catch (error) {
+        // Handle other errors, e.g., syntax errors
+        console.error('Error:', error);
+    }
+}
+
+function getValue(elementId) {
+            var element = document.getElementById(elementId);
+            if (element) {
+                return element.value;
+            } else {
+                throw new Error(`Element with ID '${elementId}' not found.`);
+            }
+        }
+
+
+    </script>
+
+</body>
+
+
+
+
+</html>

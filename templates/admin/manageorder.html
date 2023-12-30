@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<h lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Quixlab - Bootstrap Admin Dashboard Template by Themefisher.com</title>
+        <!-- Favicon icon -->
+        <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+        <!-- Add Bootstrap CSS CDN -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- Custom Stylesheet -->
+
+
+        <link href="/static/admin/css/style.css" rel="stylesheet">
+        <style>
+            .modal-dialog {
+                max-height: 90vh;
+                /* Adjust the percentage to your preference */
+                overflow-y: scroll;
+            }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    </head>
+
+    <body>
+
+
+
+
+        <!-- Include your admin header template -->
+        {{template "adminheader.html" .}}
+
+        <div class="content-body">
+            <div class="row page-titles mx-0">
+                
+            </div>
+
+            <div class="container-fluid">
+                <div class="card-body">
+                    <div class="row mb-50 mt-20 order-info-wrap">
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <span class="icon icon-sm rounded-circle bg-primary-light">
+                                    <i class="text-primary material-icons md-person"></i>
+                                </span>
+                                <div class="text">
+                                    <h6 class="mb-1">Customer</h6>
+                                    <p class="mb-1">
+                                        {{.OrderDetails.User.Username}} <br> <template class="__cf_email__"
+                                            data-cfemail="e2838e879aa2879a838f928e87cc818d8f">[email&#160;protected]</template>
+                                        <br> {{.OrderDetails.User.Number}}
+                                    </p>
+                                    <a href="#">View profile</a>
+                                </div>
+                            </article>
+                        </div> <!-- col// -->
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <span class="icon icon-sm rounded-circle bg-primary-light">
+                                    <i class="text-primary material-icons md-local_shipping"></i>
+                                </span>
+                                <div class="text">
+                                    <h6 class="mb-1">Order info</h6>
+                                    <p class="mb-1">
+                                        Shipping: Fargo express <br> Pay method: card <br> Status: new
+                                    </p>
+                                    <a href="#">Download info</a>
+                                </div>
+                            </article>
+                        </div> <!-- col// -->
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <span class="icon icon-sm rounded-circle bg-primary-light">
+                                    <i class="text-primary material-icons md-place"></i>
+                                </span>
+                                <div class="text">
+                                    <h6 class="mb-1">Deliver to</h6>
+                                    <p class="mb-1">
+                                        City: {{.OrderDetails.Address.Street}}, {{.OrderDetails.Address.City}}
+                                        <br>{{.OrderDetails.Address.State}}-{{.OrderDetails.Address.Country}}<br> Po Box
+                                        {{.OrderDetails.Address.PostalCode}}
+                                    </p>
+                                    <a href="#">View profile</a>
+                                </div>
+                            </article>
+                        </div> <!-- col// -->
+                    </div> <!-- row // -->
+                    <div class="row">
+                        <div class="col-lg-12 text-center"> <!-- Center the table -->
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th >Product Details</th>
+                                            <th >Unit Price</th>
+                                            <th width="20%">Quantity</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th width="15%">Notes:</th>
+                                            <th >Actions</th>
+                                          
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{range .Order}}
+                                        <tr>
+                                            <td>
+                                                <a class="itemside" href="#">
+                                                    <div class="left">
+                                                        {{ with index .Variant.Product.Images 0}}
+                                                        <img src="../{{ .FilePath }}" width="40" height="40"
+                                                            class="img-xs rounded-circle" alt="Item">
+                                                        {{ end }}
+                                            </td>
+
+                            </div>
+
+
+                            </a>
+                            </td>
+                            <td>
+                                <div class="right info">
+                                    <h5> {{.Variant.Product.ProductName}}</h5>
+                                    <p class="font-xs">{{.Variant.Slug}}<br> {{.Variant.Product.ProductDetails}}
+                                </div>
+                            </td>
+                            <td class="price" data-title="Price"><span>₹ {{.Price}} </span></td>
+                            <td>X {{.Quantity}}</td>
+
+                            <td class="text-center" data-title="Cart">
+                                <span>₹{{.Total}} </span>
+                            </td>
+                            <td>
+                               
+                                {{if eq .Status "pending"}}
+                                <span class="badge badge-warning">{{.Status}}</span>
+                                {{else if eq .Status "shipped"}}
+                                <span class="badge badge-info">{{.Status}}</span>
+                                {{else if eq .Status "cancelled"}}
+                                <span class="badge badge-danger">{{.Status}}</span>
+                                {{else if eq .Status "delivered"}}
+                                <span class="badge badge-success">{{.Status}}</span>
+                                {{else if eq .Status "refunded"}}
+                                <span class="badge badge-success">{{.Status}}</span>
+                                {{else}}
+                                <span class="badge badge-dark">{{.Status}}</span>
+                                {{end}}
+                            </td>
+                            <td class="text-center" data-title="Cart">
+                                <span>{{.Notes}} </span>
+                            </td>
+                            <td class="text-center" data-title="Cancel Order">
+                                <select class="form-control status-select" data-order-id="{{.OrderID}}" data-product-id="{{.ProductID}}">
+                                {{if eq .Status "delivered"}}
+                                
+                                    <option value="Refunded">Refunded</option>
+                                    <option value="Returning">Refunded</option>
+
+                                {{else}}
+                                <option value="approved">Approved</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="refunded">Refunded</option>
+
+
+                                {{end}}
+
+                               
+                                    
+                                   
+                                </select>
+                                <button class="btn btn-primary update-status-btn btn-sm" data-order-id="{{.ID}}"
+                                    data-product-id="{{.ProductID}}">Update Status</button>
+
+
+                                
+
+                            </td>
+
+                            </tr>
+
+
+                            {{end}}
+
+                            <tr>
+                                <td colspan="8">
+                                    <article class="float-end">
+                                        <dl class="dlist">
+                                            <dt>Subtotal:</dt>
+                                            <dd>₹{{.OrderDetails.Total}}</dd>
+                                        </dl>
+                                        <dl class="dlist">
+                                            <dt>Shipping cost:</dt>
+                                            <dd>Free Shipping</dd>
+                                        </dl>
+                                        <dl class="dlist">
+                                            <dt>Grand total:</dt>
+                                            <dd> <b class="h5">₹{{.OrderDetails.Total}}</b> </dd>
+                                        </dl>
+                                        <dl class="dlist">
+                                            <dt class="text-muted">Status:</dt>
+                                            <dd>
+                                                <span
+                                                    class="badge rounded-pill alert-success text-success">{{.OrderDetails.Status}}</span>
+                                            </dd>
+                                        </dl>
+                                    </article>
+                                </td>
+                            </tr>
+                            </tbody>
+                            </table>
+                        </div> <!-- table-responsive// -->
+                    </div> <!-- col// -->
+                </div>
+
+                <!-- Include your footer -->
+                <div class="footer">
+                    <div class="copyright">
+                        <p>Copyright &copy; Designed & Developed by <a
+                                href="https://themeforest.net/user/quixlab">Quixlab</a> 2018
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Add Bootstrap JS CDN -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+                <!-- Your existing scripts -->
+
+
+
+                <script>
+                    function updateStatus(orderID, newStatus) {
+                        console.log('Sending AJAX request to update status with ID:', orderID, 'to', newStatus);
+                
+                        // Perform the AJAX request for status update
+                        $.ajax({
+                            url: '/admin/orders', // Replace with the correct endpoint
+                            type: 'PATCH',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ id: orderID, status: newStatus }),
+                            success: function (response) {
+                                console.log('Success:', response);
+                
+                                // Show success toast
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Status Updated!',
+                                    text: 'The status has been updated successfully.',
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false
+                                });
+                
+                                // Optionally, you can redirect the user or update the UI
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            },
+                            error: function (error) {
+                                console.error('Error:', error);
+                            }
+                        });
+                    }
+                
+                    // Attach click event handler to update status button
+                    $('.update-status-btn').on('click', function () {
+                        var orderID = $(this).data('order-id');
+                        var statusSelect = $(this).prev('.status-select');
+                        var newStatus = statusSelect.val();
+                
+                        updateStatus(orderID, newStatus);
+                    });
+                </script>
+                
+
+                <script src="/static/admin/plugins/common/common.min.js"></script>
+                <script src="/static/admin/js/custom.min.js"></script>
+                <script src="/static/admin/js/settings.js"></script>
+                <script src="/static/admin/js/gleek.js"></script>
+                <script src="/static/admin/js/styleSwitcher.js"></script>
+
+
+    </body>
+
+    </html>

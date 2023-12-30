@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <!-- theme meta -->
+    <meta name="theme-name" content="quixlab" />
+
+    <title>Quixlab - Bootstrap Admin Dashboard Template by Themefisher.com</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/admin/images/favicon.png">
+    <!-- Pignose Calender -->
+    <link href="/static/admin/plugins/pg-calendar/css/pignose.calendar.min.css" rel="stylesheet">
+    <!-- Chartist -->
+    <link rel="stylesheet" href="/static/admin/plugins/chartist/css/chartist.min.css">
+    <link rel="stylesheet" href="/static/admin/plugins/chartist-plugin-tooltips/css/chartist-plugin-tooltip.css">
+    <!-- Custom Stylesheet -->
+    <link href="/static/admin/css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+    {{template "adminheader.html" .}}
+
+
+
+    <!--**********************************
+            Content body start
+        ***********************************-->
+    <div class="content-body">
+        <div class="btn-group mt-3 pl-4" role="group" aria-label="Data Range">
+            <button type="button" class="btn btn-secondary" id="dailyBtn">Daily</button>
+            <button type="button" class="btn btn-secondary" id="weeklyBtn">Weekly</button>
+            <button type="button" class="btn btn-secondary" id="monthlyBtn">Monthly</button>
+        </div>
+       
+        <div class="chart-wrapper w-10 col-6">
+            <canvas id="weeklyReportChart" width="400" height="200"></canvas>
+        </div>
+        
+
+        <div class="container-fluid mt-3">
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card gradient-1">
+                        <div class="card-body">
+
+                            <h3 class="card-title text-white">Total Orders</h3>
+                            <div class="d-inline-block">
+                                <h2 class="text-white" id="totalOrders"></h2>
+                                
+                            </div>
+                            <span class="float-right display-5 opacity-5"><i class="fa fa-shopping-cart"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card gradient-2">
+                        <div class="card-body">
+                            <h3 class="card-title text-white">Total Sales-Amount</h3>
+                            <div class="d-inline-block">
+                                <h2 id="totalAmount" class="text-white">0.00</h2>
+
+                                
+                            </div>
+                            <span class="float-right display-5 opacity-5"><i class="fa fa-money"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card gradient-3">
+                        <div class="card-body">
+                            <h3  class="card-title text-white">Total Delivered Orders</h3>
+                            <div class="d-inline-block">
+                                <h2 id="totalDelivered" class="text-white">0</h2>
+                               
+                            </div>
+                            <span class="float-right display-5 opacity-5"><i class="fa fa-users"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card gradient-4">
+                        <div class="card-body">
+                            <h3 class="card-title text-white">Customer Satisfaction</h3>
+                            <div class="d-inline-block">
+                                <h2 class="text-white">99%</h2>
+                                <p class="text-white mb-0">Jan - March 2019</p>
+                            </div>
+                            <span class="float-right display-5 opacity-5"><i class="fa fa-heart"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                          
+                            <div class="active-member">
+                                <div class="table-responsive">
+                                    <table class="table table-xs mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>id</th>
+                                                <th>Customers</th>
+                                                <th>Product</th>
+                                                <th>Order Date</th>
+                                                <th>Status</th>
+                                                <th>Payment Method</th>
+                                                <th>Activity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- <tr>
+                                                <td><img src="/static/admin/images/avatar/1.jpg"
+                                                        class=" rounded-circle mr-3" alt="">Sarah Smith</td>
+                                                <td>iPhone X</td>
+                                                <td>
+                                                    <span>United States</span>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <div class="progress" style="height: 6px">
+                                                            <div class="progress-bar bg-success" style="width: 50%">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td><i class="fa fa-circle-o text-success  mr-2"></i> Paid</td>
+                                                <td>
+                                                    <span>Last Login</span>
+                                                    <span class="m-0 pl-3">10 sec ago</span>
+                                                </td>
+                                            </tr> -->
+                                           
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- #/ container -->
+    </div>
+    <!--**********************************
+            Content body end
+        ***********************************-->
+
+
+    <!--**********************************
+            Footer start
+        ***********************************-->
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright &copy; Designed & Developed by <a href="https://themeforest.net/user/quixlab">Quixlab</a> 2018
+            </p>
+        </div>
+    </div>
+    <!--**********************************
+            Footer end
+        ***********************************-->
+    </div>
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+
+    <script src="/static/admin/plugins/common/common.min.js"></script>
+    <script src="/static/admin/js/custom.min.js"></script>
+    <script src="/static/admin/js/settings.js"></script>
+    <script src="/static/admin/js/gleek.js"></script>
+    <script src="/static/admin/js/styleSwitcher.js"></script>
+
+    <!-- Chartjs -->
+    <script src="/static/admin/plugins/chart.js/Chart.bundle.min.js"></script>
+    <!-- Circle progress -->
+    <script src="/static/admin/plugins/circle-progress/circle-progress.min.js"></script>
+    <!-- Datamap -->
+    <script src="/static/admin/plugins/d3v3/index.js"></script>
+    <script src="/static/admin/plugins/topojson/topojson.min.js"></script>
+    <script src="/static/admin/plugins/datamaps/datamaps.world.min.js"></script>
+    <!-- Morrisjs -->
+    <script src="/static/admin/plugins/raphael/raphael.min.js"></script>
+    <script src="/static/admin/plugins/morris/morris.min.js"></script>
+    <!-- Pignose Calender -->
+    <script src="/static/admin/plugins/moment/moment.min.js"></script>
+    <script src="/static/admin/plugins/pg-calendar/js/pignose.calendar.min.js"></script>
+    <!-- ChartistJS -->
+    <script src="/static/admin/plugins/chartist/js/chartist.min.js"></script>
+    <script src="/static/admin/plugins/chartist-plugin-tooltips/js/chartist-plugin-tooltip.min.js"></script>
+    
+    <script>
+        $(document).ready(function () {
+            var report = "daily";
+    
+            // Function to update the active button class
+            function updateActiveButton(btnId) {
+                $(".btn").removeClass("active");
+                $("#" + btnId).addClass("active");
+            }
+    
+            // Function to handle button clicks
+            function handleButtonClick(btnId, reportType) {
+                $("#" + btnId).on("click", function () {
+                    report = reportType;
+    
+                    // Update active button class
+                    updateActiveButton(btnId);
+    
+                    // Send AJAX request with the selected report type
+                    $.ajax({
+                        url: '/admin/getOrderStats?report=' + report,
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function (response) {
+                            // Handle the response and update the HTML
+                            displayReport(response);
+                            displayChart(response);
+                        },
+                        error: function (error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                });
+            }
+    
+            // Set up click handlers for each button
+            handleButtonClick("dailyBtn", "daily");
+            handleButtonClick("weeklyBtn", "weekly");
+            handleButtonClick("monthlyBtn", "monthly");
+    
+            // Initial request on page load
+            $.ajax({
+                url: '/admin/getOrderStats?report=' + report,
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    // Handle the response and update the HTML
+                    displayReport(response);
+                    displayChart(response);
+                    
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        
+    
+        function displayReport(response) {
+    var tbody = $('.table tbody');
+    tbody.empty();
+
+    // Check if WeeklyOrders property exists and is an array
+    if (!response || !Array.isArray(response.OrdersReport)) {
+        console.error('WeeklyOrders property is missing or not an array in the response:', response);
+        return;
+    }
+    
+
+    var weeklyOrders = response.OrdersReport;
+    var totalAmount = 0.00;
+
+    // Check if weeklyOrders is empty
+    if (weeklyOrders.length === 0) {
+        // Display a message for no data found
+        tbody.append('<tr><td colspan="6">No data found</td></tr>');
+        // Update the totalAmount display with 0.00
+        document.getElementById("totalAmount").textContent = "₹ 0.00";
+        document.getElementById("totalOrders").textContent = "0.00";
+        
+        return;
+    }
+
+    // Update the totalAmount display
+    
+    totalOrders = response.TotalOrders;
+    totalAmount = response.TotalAmount;
+    totalDelivered = response.TotalDelivered;
+    document.getElementById("totalAmount").textContent = "₹" + totalAmount;
+    document.getElementById("totalOrders").textContent = totalOrders;
+    document.getElementById("totalDelivered").textContent = totalDelivered;
+
+    // Iterate through the response and append rows to the tbody
+    weeklyOrders.forEach(function (order) {
+        var row = $('<tr>');
+
+        // Append data to each cell in the row
+        row.append('<td>' + order.orderID+ '</td>');
+        row.append('<td>' + (order.Products && order.Products.User ? order.Products.User.Username : 'N/A') + '</td>');
+        row.append('<td>' + order.Variant.slug + '</td>');
+        row.append('<td>' + new Date(order.CreatedAt).toLocaleDateString() + '</td>');
+
+        row.append('<td>' + order.status + '</td>');
+        row.append('<td>' + order.Products.payment + '</td>');
+        row.append('<td>' + order.Total + '</td>');
+       
+        tbody.append(row);
+    });
+}
+function displayChart(response) {
+    const orders = response.OrdersReport;
+
+    
+    if (!Array.isArray(orders) || orders.length === 0) {
+        console.error('Invalid or empty orders data:', orders);
+        return;
+    }
+
+ 
+    const uniqueDates = new Set();
+
+
+    orders.forEach(order => {
+        const date = new Date(order.CreatedAt);
+        const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+
+      
+        uniqueDates.add(formattedDate);
+    });
+
+    const labels = Array.from(uniqueDates);
+
+ 
+    const aggregatedData = {};
+
+    orders.forEach(order => {
+        const date = new Date(order.CreatedAt);
+        const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+
+        if (aggregatedData[formattedDate]) {
+            aggregatedData[formattedDate] += order.quantity;
+        } else {
+            aggregatedData[formattedDate] = order.quantity;
+        }
+    });
+
+  
+    const data = labels.map(date => aggregatedData[date] || 0);
+
+
+    console.log('Labels:', labels);
+    console.log('Data:', data);
+
+
+    const canvas = document.getElementById('weeklyReportChart');
+
+
+    if (canvas.chart) {
+        canvas.chart.destroy();
+    }
+
+
+    const ctx = canvas.getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Order Quantity',
+                data: data,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            tooltips: {}
+        }
+    });
+
+ 
+    canvas.chart = myChart;
+}
+
+});
+
+    </script>
+    
+
+
+    <script src="/static/admin/js/dashboard/dashboard-1.js"></script>
+
+</body>
+
+</html>

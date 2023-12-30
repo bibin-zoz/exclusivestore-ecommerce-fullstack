@@ -196,12 +196,12 @@ img {
 						
 						<div class="preview-pic tab-content">
                             {{range $index, $image := .Product.Images}}
-                                <div class="tab-pane {{if eq $index 0}} active{{end}}" id="pic-{{.ID}}"><img src="{{.FilePath}}" /></div>
+                                <div class="tab-pane {{if eq $index 0}} active{{end}}" id="pic-{{.ID}}"><img src="{{.FilePath}}" style="max-width:600px;max-width:600px;"/></div>
                             {{end}}
                         </div>
                         <ul class="preview-thumbnail nav nav-tabs">
                             {{range $index, $image := .Product.Images}}
-                                <li class="{{if eq $index 0}} active{{end}}"><a data-target="#pic-{{.ID}}" data-toggle="tab"><img src="{{.FilePath}}" /></a></li>
+                                <li class="{{if eq $index 0}} active{{end}}"><a data-target="#pic-{{.ID}}" data-toggle="tab"><img src="{{.FilePath}} "  /></a></li>
                             {{end}}
                         </ul>
     

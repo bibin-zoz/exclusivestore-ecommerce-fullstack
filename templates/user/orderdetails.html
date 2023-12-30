@@ -1,0 +1,574 @@
+{{template "userheader.html"}}
+
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Order
+                <span></span> track
+            </div>
+        </div>
+    </div>
+    <section class="content-main p-30 mx-5">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Order detail</h2>
+                <p>Details for Order ID: {{.OrderDetails.ID}}</p>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                        <span>
+                            <i class="material-icons md-calendar_today"></i> <b>{{ .OrderDetails.CreatedAt.Format
+                                "Monday, January 2, 2006" }}</b>
+                        </span> <br>
+                        <small class="text-muted">Order ID: {{.OrderDetails.ID}}</small>
+                    </div>
+                    <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                        <!--   <Di class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
+                            <option>Change status</option>
+                            <option>Awaiting payment</option>
+                            <option>Confirmed</option>
+                            <option>Shipped</option>
+                            <option>Delivered</option>
+                        </Di>
+                        <a class="btn btn-primary" href="#">Save</a> -->
+                       {{ if  eq .OrderDetails.Status "delivered"}}
+                        <button  id="pdfButton" class="btn btn-secondary print ms-2" >Print</button>
+                        <a href="/download?id={{.OrderDetails.ID}}"  target="_blank"  class="btn btn-secondary print ms-2" >Print</a>
+                        {{end}}
+                    </div>
+
+                </div>
+            </header> <!-- card-header end// -->
+            <div class="card-body" id="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-person"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Customer</h6>
+                                <p class="mb-1">
+                                    {{.OrderDetails.User.Username}} <br> 
+                                    <br> {{.OrderDetails.User.Number}}
+                                </p>
+                                <a href="#">View profile</a>
+                            </div>
+                        </article>
+                    </div> <!-- col// -->
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-local_shipping"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Order info</h6>
+                                <p class="mb-1">
+                                    Shipping: Fargo express <br> Pay method: card <br> Status: new
+                                </p>
+                                <a href="#">Download info</a>
+                            </div>
+                        </article>
+                    </div> <!-- col// -->
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-place"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Deliver to</h6>
+                                <p class="mb-1">
+                                    City: {{.OrderDetails.Address.Street}}, {{.OrderDetails.Address.City}}
+                                    <br>{{.OrderDetails.Address.State}}-{{.OrderDetails.Address.Country}}<br> Po Box
+                                    {{.OrderDetails.Address.PostalCode}}
+                                </p>
+                                <a href="#">View profile</a>
+                            </div>
+                        </article>
+                    </div> <!-- col// -->
+                </div> <!-- row // -->
+                <div class="row">
+                    <div class="col-lg-12 text-center"> <!-- Center the table -->
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th width="10%">Product</th>
+                                        <th width="20%">Product Details</th>
+                                        <th width="20%">Unit Price</th>
+                                        <th width="20%">Quantity</th>
+                                        <th width="10%">Total</th>
+                                        <th>Status</th>
+                                        <th width="10%">sdsd</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{range .Order}}<!-- Modal for Return Details -->
+                                    <div class="modal fade" id="returnModal" tabindex="-1" role="dialog"
+                                        aria-labelledby="returnModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="returnModalLabel">Return Details</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Input fields for return details -->
+                                                    <label for="returnReason">Return Reason:</label>
+                                                    <input type="text" class="form-control" id="returnReason"
+                                                        placeholder="Enter return reason" required>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Close</button>
+                                                        <button class="btn btn-primary" id="submitReturn" data-id="{{.ID}}">Submit Return</button>
+            
+                                                        Return</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <tr>
+                                        <td>
+                                            <a class="itemside" href="#">
+                                                <div class="left">
+                                                    {{ with index .Variant.Product.Images 0}}
+                                                    <img src="{{ .FilePath }}" width="40" height="40"
+                                                        class="img-xs rounded-circle" alt="Item">
+                                                    {{ end }}
+                                        </td>
+
+                        </div>
+
+
+                        </a>
+                        </td>
+                        <td>
+                            <div class="right info">
+                                <h5> {{.Variant.Product.ProductName}}</h5>
+                                <p class="font-xs">{{.Variant.Slug}}<br> {{.Variant.Product.ProductDetails}}
+                            </div>
+                        </td>
+                        <td class="price" data-title="Price"><span>₹ {{.Price}} </span></td>
+                        <td>X {{.Quantity}}</td>
+
+                        <td class="text-center" data-title="Cart">
+                            <span>₹{{.Total}} </span>
+                        </td>
+                        <td>
+                            {{if eq .Status "pending"}}
+                            <span class="badge badge-warning">{{.Status}}</span>
+                            {{else if eq .Status "shipped"}}
+                            <span class="badge badge-info">{{.Status}}</span>
+                            {{else if eq .Status "delivered"}}
+                            <span class="badge badge-success">{{.Status}}</span>
+                            {{else if eq .Status "cancelled"}}
+                            <span class="badge badge-danger">{{.Status}}</span>
+                            {{else}}
+                            <span class="badge badge-dark">{{.Status}}</span>
+                            {{end}}
+                        </td>
+                        <td class="text-center" data-title="Cancel Order">
+
+                            {{if eq .Status "delivered"}}
+                            <button class="btn btn-danger return-order-btn btn-sm" data-order-id="{{.OrderID}}"
+                                data-variant-id="{{.VariantID}}"> Return</button>
+                            {{else if eq .Status "pending"}}
+                            <button class="btn-danger cancel-order-btn btn-sm" data-order-id="{{.OrderID}}"
+                                data-variant-id="{{.VariantID}}">Cancel</button>
+
+
+                            {{else}}
+                            <button class="btn btn-dark cancel-order-btn btn-sm" data-order-id="{{.OrderID}}"
+                                data-variant-id="{{.VariantID}}" disabled>Cancel</button>
+                            {{end}}
+                        </td>
+
+                        </tr>
+
+
+                        {{end}}
+
+                        <tr>
+                            <td colspan="7">
+                                <article class="float-end">
+                                    <dl class="dlist">
+                                        <dt>Subtotal:</dt>
+                                        <dd>₹{{.OrderDetails.Total}}</dd>
+                                    </dl>
+                                    <dl class="dlist">
+                                        <dt>Shipping cost:</dt>
+                                        <dd>Free Shipping</dd>
+                                    </dl>
+                                    <dl class="dlist">
+                                        <dt>Grand total:</dt>
+                                        <dd> <b class="h5">₹{{.OrderDetails.Total}}</b> </dd>
+                                    </dl>
+                                    <dl class="dlist">
+                                        <dt class="text-muted">Status:</dt>
+                                        <dd>
+                                            <span
+                                                class="badge rounded-pill alert-success text-success">{{.OrderDetails.Status}}</span>
+                                        </dd>
+                                    </dl>
+                                </article>
+                            </td>
+                        </tr>
+                        </tbody>
+                        </table>
+                        
+
+                    </div> <!-- table-responsive// -->
+                </div> <!-- col// -->
+            </div>
+        </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+    </section>
+</main>
+<footer class="main">
+   
+    <section class="section-padding footer-mid">
+        <div class="container pt-15 pb-20">
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="widget-about font-md mb-md-5 mb-lg-0">
+                        <div class="logo logo-width-1 wow fadeIn animated">
+                            <a href="index.html"><img src="static/evara/assets/imgs/theme/logo.svg" alt="logo"></a>
+                        </div>
+                        <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
+                        <p class="wow fadeIn animated">
+                            <strong>Address: </strong>562 Wellington Road, Street 32, San Francisco
+                        </p>
+                        <p class="wow fadeIn animated">
+                            <strong>Phone: </strong>+01 2222 365 /(+91) 01 2345 6789
+                        </p>
+                        <p class="wow fadeIn animated">
+                            <strong>Hours: </strong>10:00 - 18:00, Mon - Sat
+                        </p>
+                        <h5 class="mb-10 mt-30 fw-600 text-grey-4 wow fadeIn animated">Follow Us</h5>
+                        <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0">
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                            <a href="#"><img src="static/evara/assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <h5 class="widget-title wow fadeIn animated">About</h5>
+                    <ul class="footer-list wow fadeIn animated mb-sm-5 mb-md-0">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Delivery Information</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms &amp; Conditions</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Support Center</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2  col-md-3">
+                    <h5 class="widget-title wow fadeIn animated">My Account</h5>
+                    <ul class="footer-list wow fadeIn animated">
+                        <li><a href="#">Sign In</a></li>
+                        <li><a href="#">View Cart</a></li>
+                        <li><a href="#">My Wishlist</a></li>
+                        <li><a href="#">Track My Order</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Order</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="widget-title wow fadeIn animated">Install App</h5>
+                    <div class="row">
+                        <div class="col-md-8 col-lg-12">
+                            <p class="wow fadeIn animated">From App Store or Google Play</p>
+                            <div class="download-app wow fadeIn animated">
+                                <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active"
+                                        src="static/evara/assets/imgs/theme/app-store.jpg" alt=""></a>
+                                <a href="#" class="hover-up"><img src="static/evara/assets/imgs/theme/google-play.jpg"
+                                        alt=""></a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
+                            <p class="mb-20 wow fadeIn animated">Secured Payment Gateways</p>
+                            <img class="wow fadeIn animated" src="static/evara/assets/imgs/theme/payment-method.png"
+                                alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="container pb-20 wow fadeIn animated">
+        <div class="row">
+            <div class="col-12 mb-20">
+                <div class="footer-bottom"></div>
+            </div>
+            <div class="col-lg-6">
+                <p class="float-md-left font-sm text-muted mb-0">&copy; 2021, <strong class="text-brand">Evara</strong>
+                    - HTML Ecommerce Template </p>
+            </div>
+            <div class="col-lg-6">
+                <p class="text-lg-end text-start font-sm text-muted mb-0">
+                    Designed by <a href="http://alithemes.com/" target="_blank">Alithemes.com</a>. All rights reserved
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- Preloader Start -->
+<div id="preloader-active">
+    <div class="preloader d-flex align-items-center justify-content-center">
+        <div class="preloader-inner position-relative">
+            <div class="text-center">
+                <h5 class="mb-5">Now Loading</h5>
+                <div class="loader">
+                    <div class="bar bar1"></div>
+                    <div class="bar bar2"></div>
+                    <div class="bar bar3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Vendor JS-->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<!-- print-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script>
+    $(document).ready(function ($) {
+          $(document).on('click', '#pdfButton', function (event) {
+             console.log("jjjjjjjj");
+              var element = document.getElementById('card-body');
+              let randomNumber = Math.floor(Math.random() * (10000000000 - 1)) + 1;
+              var opt = {
+                  margin: 0,
+                  filename: 'invoice' + randomNumber + '.pdf',
+                  html2canvas: { scale: 10 },
+                  jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+              };
+  
+              html2pdf().set(opt).from(element).save();
+      
+          });
+      });
+    </script>
+<script>
+    $(document).ready(function () {
+      
+        $('.return-order-btn').click(function () {
+       
+            $('#returnModal').modal('show');
+        });
+
+        $('#returnModal button[data-dismiss="modal"]').click(function () {
+            $('#returnModal').modal('hide');
+        });
+
+        $('#submitReturn').click(function () {
+            // Get return details from the input field
+            const returnReason = $('#returnReason').val();
+            const orderId = $('#submitReturn').data('id');
+            console.log(orderId);
+
+            $.ajax({
+    url: '/order',
+    type: 'PUT',
+    dataType: 'json',
+    data: JSON.stringify({ id: orderId, request: returnReason }),
+    contentType: 'application/json',
+    success: function (response) {
+        console.log('Success:', response);
+        // Display success message with SweetAlert
+        Swal.fire({
+            icon: 'success',
+            title: 'Return Request Successful',
+            text: 'Your return request has been processed successfully.',
+        });
+    },
+    error: function (error) {
+        console.error('Error:', error);
+        // Display error message with SweetAlert
+        Swal.fire({
+            icon: 'error',
+            title: 'Return Request Error',
+            text: error.responseJSON ? error.responseJSON.error : 'An error occurred while processing your return request. Please try again.',
+        });
+    }
+});
+
+
+
+
+            console.log(returnReason)
+            $('#returnModal').modal('hide');
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.cancel-order-btn').on('click', function () {
+            var orderID = $(this).data('order-id');
+            var variantID = $(this).data('variant-id');
+
+            // Display SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // User confirmed, send an AJAX request to cancel the order
+                    $.ajax({
+                        url: '/cancelitem',
+                        type: 'PATCH',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            orderId: orderID,
+                            variantID: variantID
+                        }),
+                        success: function (response) {
+                            console.log('Order canceled successfully:', response);
+
+                            // Display SweetAlert success message
+                            Swal.fire({
+                                title: 'Cancelled!',
+                                text: 'Your order has been cancelled.',
+                                icon: 'success'
+                            }).then(() => {
+                                // You can add any additional logic or UI updates here
+                                window.location.reload();
+                            });
+                        },
+                        error: function (error) {
+                            console.error('Error canceling order:', error);
+
+                            // Display SweetAlert error message
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Failed to cancel the order. Please try again.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+<script>
+
+    $.ajax({
+        url: '/useraddress',
+        type: 'GET',
+        dataType: 'json',
+        success: function (userAddresses) {
+            // Handle the response and update the HTML
+            displayAddresses(userAddresses);
+        },
+        error: function (error) {
+            console.error('Error fetching store addresses:', error);
+        }
+    });
+
+
+    // Function to display store addresses inside #addressBlocks div
+    function displayAddresses(userAddresses) {
+        var addressBlocks = $('#addressBlocks');
+
+        // Clear previous content
+        addressBlocks.empty();
+
+        // Loop through each address and create a new block
+        userAddresses.forEach(function (userAddress) {
+            var addressBlock = `
+                        <div class="col-lg-6">
+                            <div class="card mb-3 mb-lg-0">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Billing Address</h5>
+                                </div>
+                                <div class="card-body">
+                                    <address>
+                                        ${userAddress.street}, ${userAddress.city}, ${userAddress.state} <br>
+                                        ${userAddress.postalcode} <br>
+                                        ${userAddress.country} <br>
+                                        ${userAddress.phone_number} <br>
+                                        <button type="button"
+                                        data-id="${userAddress.ID}" class="text-muted ad-delete-btn"><i class="fi-rs-trash"></i></button>
+                                    </address>
+                                    <a href="#" class="btn-small">Edit</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+            addressBlocks.append(addressBlock);
+        });
+    }
+</script>
+<script>
+
+    $(document).ready(function () {
+
+        $('.delete-btn').on('click', function () {
+            var variantID = $(this).data('id');
+
+            console.log('Sending AJAX request with ID:', productID);
+
+            $.ajax({
+                url: '/cart',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: variantID }),
+                success: function (response) {
+                    console.log('Success:', response);
+                    window.location.reload();
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+
+</script>
+<script src="static/evara/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+<script src="static/evara/assets/js/vendor/jquery-3.6.0.min.js"></script>
+<script src="static/evara/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+<script src="static/evara/assets/js/vendor/bootstrap.bundle.min.js"></script>
+<script src="static/evara/assets/js/plugins/slick.js"></script>
+<script src="static/evara/assets/js/plugins/jquery.syotimer.min.js"></script>
+<script src="static/evara/assets/js/plugins/wow.js"></script>
+<script src="static/evara/assets/js/plugins/jquery-ui.js"></script>
+<script src="static/evara/assets/js/plugins/perfect-scrollbar.js"></script>
+<script src="static/evara/assets/js/plugins/magnific-popup.js"></script>
+<script src="static/evara/assets/js/plugins/select2.min.js"></script>
+<script src="static/evara/assets/js/plugins/waypoints.js"></script>
+<script src="static/evara/assets/js/plugins/counterup.js"></script>
+<script src="static/evara/assets/js/plugins/jquery.countdown.min.js"></script>
+<script src="static/evara/assets/js/plugins/images-loaded.js"></script>
+<script src="static/evara/assets/js/plugins/isotope.js"></script>
+<script src="static/evara/assets/js/plugins/scrollup.js"></script>
+<script src="static/evara/assets/js/plugins/jquery.vticker-min.js"></script>
+<!-- Template  JS -->
+<script src="static/evara/assets/js/main.js"></script>
+<script src="static/evara/assets/js/shop.js"></script>
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/shop-cart.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:26:06 GMT -->
+
+</html>
