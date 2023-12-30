@@ -594,5 +594,5 @@ func UpdatePasswordHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "password updated successfully"})
 }
