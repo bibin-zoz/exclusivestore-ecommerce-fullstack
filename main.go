@@ -2,7 +2,8 @@ package main
 
 import (
 	db "ecommercestore/database"
-	handlers "ecommercestore/handlers"
+	adminhandlers "ecommercestore/handlers/admin_handler"
+	handlers "ecommercestore/handlers/user_handler"
 	"ecommercestore/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,7 @@ func main() {
 	router.POST("/login", handlers.LoginPost)
 	router.GET("/home", middleware.LoginAuth(), handlers.HomeHandler)
 	router.GET("/logout", handlers.LogoutHandler)
-	router.GET("/admin/logout", handlers.AdminLogoutHandler)
+	router.GET("/admin/logout", adminhandlers.AdminLogoutHandler)
 	router.GET("/product", handlers.ProductViewhandler)
 
 	//forgotpass
@@ -73,23 +74,23 @@ func main() {
 	router.GET("/referalvalidate", handlers.ReferalValidatehandler)
 
 	//admin
-	router.GET("/admin/login", handlers.AdminLogin)
-	router.POST("/admin/login", handlers.AdminLoginPost)
-	router.GET("/admin/home", middleware.AdminAuth(), handlers.AdminHome)
+	router.GET("/admin/login", adminhandlers.AdminLogin)
+	router.POST("/admin/login", adminhandlers.AdminLoginPost)
+	router.GET("/admin/home", middleware.AdminAuth(), adminhandlers.AdminHome)
 
 	//sales report
-	router.GET("/admin/salesreport", middleware.AdminAuth(), handlers.SalesReporthandler)
+	router.GET("/admin/salesreport", middleware.AdminAuth(), adminhandlers.SalesReporthandler)
 
 	//customers
-	router.GET("/admin/customers", middleware.AdminAuth(), handlers.CustomerHandler)
-	router.DELETE("/admin/customers", middleware.AdminAuth(), handlers.DeleteCustomerHandler)
-	router.GET("/admin/customer/update-status", middleware.AdminAuth(), handlers.UpdateStatusHandler)
+	router.GET("/admin/customers", middleware.AdminAuth(), adminhandlers.CustomerHandler)
+	router.DELETE("/admin/customers", middleware.AdminAuth(), adminhandlers.DeleteCustomerHandler)
+	router.GET("/admin/customer/update-status", middleware.AdminAuth(), adminhandlers.UpdateStatusHandler)
 
 	//category
-	router.GET("/admin/categories", middleware.AdminAuth(), handlers.Categoryhandler)
-	router.PATCH("/admin/categories", middleware.AdminAuth(), handlers.UpdateCategoryStatus)
-	router.POST("/admin/categories", middleware.AdminAuth(), handlers.CategoryPost)
-	router.DELETE("/admin/categories", middleware.AdminAuth(), handlers.DeleteCategoryHandler)
+	router.GET("/admin/categories", middleware.AdminAuth(), adminhandlers.Categoryhandler)
+	router.PATCH("/admin/categories", middleware.AdminAuth(), adminhandlers.UpdateCategoryStatus)
+	router.POST("/admin/categories", middleware.AdminAuth(), adminhandlers.CategoryPost)
+	router.DELETE("/admin/categories", middleware.AdminAuth(), adminhandlers.DeleteCategoryHandler)
 
 	//categoryoffers
 	router.GET("/admin/categoryoffers", middleware.AdminAuth(), handlers.CategoryOffershandler)
@@ -97,25 +98,25 @@ func main() {
 	router.DELETE("/admin/categoryoffers", middleware.AdminAuth(), handlers.DeleteCategoryOfferHandler)
 
 	//Products
-	router.GET("/admin/products", middleware.AdminAuth(), handlers.ProductsHandler)
-	router.POST("/admin/product", middleware.AdminAuth(), handlers.AddProduct)
-	router.PATCH("/admin/products", middleware.AdminAuth(), handlers.UpdateProductStatus)
-	router.DELETE("/admin/products", middleware.AdminAuth(), handlers.DeleteProductHandler)
+	router.GET("/admin/products", middleware.AdminAuth(), adminhandlers.ProductsHandler)
+	router.POST("/admin/product", middleware.AdminAuth(), adminhandlers.AddProduct)
+	router.PATCH("/admin/products", middleware.AdminAuth(), adminhandlers.UpdateProductStatus)
+	router.DELETE("/admin/products", middleware.AdminAuth(), adminhandlers.DeleteProductHandler)
 
 	//product edit
-	router.GET("/admin/product", middleware.AdminAuth(), handlers.ProductDetailsHandler)
-	router.PUT("/admin/product", middleware.AdminAuth(), handlers.ProductUpdateHandler)
+	router.GET("/admin/product", middleware.AdminAuth(), adminhandlers.ProductDetailsHandler)
+	router.PUT("/admin/product", middleware.AdminAuth(), adminhandlers.ProductUpdateHandler)
 
 	//product offers
 	router.GET("/admin/productoffers", middleware.AdminAuth(), handlers.ProductOffersHandler)
 
 	//orders
 
-	router.GET("/admin/orders", middleware.AdminAuth(), handlers.UserOrdersHandler)
-	router.GET("/admin/manageorder", middleware.AdminAuth(), handlers.ManageOrderHandler)
-	router.PATCH("/admin/orders", middleware.AdminAuth(), handlers.UpdateOrderStatusHandler)
+	router.GET("/admin/orders", middleware.AdminAuth(), adminhandlers.UserOrdersHandler)
+	router.GET("/admin/manageorder", middleware.AdminAuth(), adminhandlers.ManageOrderHandler)
+	router.PATCH("/admin/orders", middleware.AdminAuth(), adminhandlers.UpdateOrderStatusHandler)
 
-	router.GET("/admin/getOrderStats", middleware.AdminAuth(), handlers.GetOrderStats)
+	router.GET("/admin/getOrderStats", middleware.AdminAuth(), adminhandlers.GetOrderStats)
 
 	//user dashboard
 	router.GET("/userdashboard", middleware.LoginAuth(), handlers.UserDashboardHandler)

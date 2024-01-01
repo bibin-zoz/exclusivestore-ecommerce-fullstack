@@ -16,6 +16,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type DeleteRequest struct {
+	ID int `json:"id"`
+}
 type UserDetails struct {
 	Username        string
 	Email           string
@@ -205,6 +208,11 @@ func SignupPost(c *gin.Context) {
 
 	if user.Password == "" {
 		errors.PasswordError = "Password should not be empty"
+		c.HTML(http.StatusBadRequest, "signup.html", errors)
+		return
+	}
+	if len(user.Password) < 6 {
+		errors.PasswordError = "Password length should be 6 "
 		c.HTML(http.StatusBadRequest, "signup.html", errors)
 		return
 	}
