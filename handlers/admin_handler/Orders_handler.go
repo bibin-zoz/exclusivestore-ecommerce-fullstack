@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -79,62 +78,6 @@ func UpdateOrderStatusHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Status updated successfully"})
-}
-func GetOrderStats(c *gin.Context) {
-	report := c.Query("report")
-	fmt.Println("report", report)
-
-	var (
-		orders         []models.OrderProducts
-		count          int64
-		totalAmount    float64
-		totalDelivered int64
-	)
-
-	// Set the time range based on the report type
-	var timeRange time.Time
-	switch report {
-	case "daily":
-		timeRange = time.Now().AddDate(0, 0, -1)
-	case "weekly":
-		timeRange = time.Now().AddDate(0, 0, -7)
-	case "monthly":
-		timeRange = time.Now().AddDate(0, -1, 0)
-	default:
-		c.JSON(http.StatusBadRequest, gin.H{"error": "badrequest"})
-		return
-	}
-
-	err := db.DB.Preload("Variant").Preload("Variant.Product").Preload("OrderDetails").
-		Preload("OrderDetails.User").Where("status <> 'cancelled' AND created_at > ?", timeRange).Order("created_at DESC").Find(&orders).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching orders"})
-		return
-	}
-
-	if err := db.DB.Debug().Table("orders").Where("status <> 'cancelled' AND created_at > ?", timeRange).Count(&count).Error; err != nil {
-		fmt.Println("Error checking table count:", err)
-		return
-	}
-
-	if err := db.DB.Debug().Table("order_products").Where("status = 'delivered' AND created_at > ?", timeRange).Count(&totalDelivered).Error; err != nil {
-		fmt.Println("Error checking table count:", err)
-		return
-	}
-
-	if count > 0 {
-		if result := db.DB.Table("orders").Where("status <> 'cancelled' AND created_at > ?", timeRange).
-			Select("SUM(Total) as total_amount").Scan(&totalAmount); result.Error != nil {
-			fmt.Println("Error calculating sum:", result.Error)
-			return
-		}
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"OrdersReport":   orders,
-		"TotalAmount":    totalAmount,
-		"TotalOrders":    count,
-		"TotalDelivered": totalDelivered,
-	})
 }
 
 func ManageOrderHandler(c *gin.Context) {

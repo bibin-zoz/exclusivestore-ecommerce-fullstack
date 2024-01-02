@@ -27,6 +27,41 @@
     <link href="/static/admin/css/style.css" rel="stylesheet">
 
     <style>
+      
+      .register-form {
+        margin-top: 0;
+        padding: 5px;
+    }
+
+    .form {
+        margin-top: 5px;
+    }
+
+    .form-row {
+        margin-top: 0px;
+    }
+        .form-selector {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .form-selector a {
+            color: white; /* Text color */
+            background-color: red; /* Background color */
+            padding: 10px 20px; /* Padding */
+            margin: 0 10px; /* Margin between buttons */
+            text-decoration: none; /* Remove underline */
+            border-radius: 5px; /* Rounded corners */
+        }
+
+        .form-selector a.active {
+            background-color: #333; /* Change color for active button */
+        }
+
+        .login {
+            text-align: center;
+        }
         body {
             background-color: #f4f4f4;
             font-family: 'Arial', sans-serif;
@@ -45,31 +80,8 @@
             margin: 10px;
         }
 
-       
-
-        .forms-grid {
-            margin-top: 4rem;
-        }
-
-        .register {
-            margin-top: 0;
-        }
-
-        .register-form {
-            margin-top: 0;
-        }
-
-        .form-row {
-            margin-top: 0;
-        }
-
-        .button-login {
-            margin-top: 0;
-        }
-
-        .btn-create,
-        .btn-validate {
-            margin-top: 0.5rem;
+        #image-slider {
+            /* Add your styles for the image slider container here */
         }
     </style>
 </head>
@@ -81,49 +93,25 @@
   <script src="/static/user/js/main.js"></script>
 	<section class="ftco-section">
 	
-		<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-	    <div class="container-fluid">
-	    
-	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-	        <span class="fa fa-bars"></span> Menu
-	      </button>
-	      <div class="collapse navbar-collapse" id="ftco-nav">
-	        <ul class="navbar-nav m-auto">
-	        	<li class="nav-item active"><a href="#" class="nav-link">Home</a></li>
-	        	
-	        	<li class="nav-item"><a href="#" class="nav-link">Work</a></li>
-	        	<li class="nav-item"><a href="#" class="nav-link">Blog</a></li>
-	          <li class="nav-item"><a href="#" class="nav-link">Contact</a></li>
-			  {{if .LoginStatus}}
-			  <li class="nav-item"><a href="/logout" class="nav-link">Logout</a></li>
-			 
-			  {{else}}
-			  <li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Get Full Access</a>
-				<div class="dropdown-menu" aria-labelledby="dropdown04">
-					<a class="dropdown-item" href="/signup">SignUp</a>
-				  <a class="dropdown-item" href="/login">Login</a>
-				</div>
-			  </li>
-			  {{end}}
-
-	        </ul>
-	      </div>
-	    </div>
-	  </nav>
+	
     <!-- END nav -->
 
 	
 
     <section class="forms">
+        <div class="form-selector">
+            <a href="/login" class="form-selector login-selector " id="loginButton">Login</a>
+            <a href="/signup" class="form-selector register-selector active" id="signupButton">Register</a>
+        </div>
         <div class="container">
             
-            <div class="forms-grid mt-4">
+            <div class="forms-grid mt-10">
 
                 
 
                 <!-- register -->
-                <div class="register  mt-0">
+                <div class="register  mt-0 pt-0">
+                    
                     <span class="fas fa-user-circle"></span>
                     <strong>Create account!</strong>
                     <form method="POST" action="/signup" class="register-form mt-0">
@@ -182,13 +170,13 @@
                         </fieldset>
                         </form>
 
-                        <span class="create-account">Or create account using social media!</span>
+                        <!-- <span class="create-account">Or create account using social media!</span>
 
                         <div class="social-media">
                             <a href="#facebook" class="fb"><span class="fab fa-facebook"></span></a>
                             <a href="#twitter" class="tw"><span class="fab fa-twitter"></span></a>
                             <a href="#pinterest" class="pi"><span class="fab fa-pinterest"></span></a>
-                        </div>
+                        </div> -->
                 </div>
                 <!-- //register -->
             </div>

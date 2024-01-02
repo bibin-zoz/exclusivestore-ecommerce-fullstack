@@ -36,10 +36,10 @@
                             <option>Delivered</option>
                         </Di>
                         <a class="btn btn-primary" href="#">Save</a> -->
-                       {{ if  eq .OrderDetails.Status "delivered"}}
+                       
                         <button  id="pdfButton" class="btn btn-secondary print ms-2" >Print</button>
                         <a href="/download?id={{.OrderDetails.ID}}"  target="_blank"  class="btn btn-secondary print ms-2" >Print</a>
-                        {{end}}
+                       
                     </div>
 
                 </div>

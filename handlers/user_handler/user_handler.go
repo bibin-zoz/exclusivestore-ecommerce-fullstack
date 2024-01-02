@@ -332,8 +332,16 @@ func HomeHandler(c *gin.Context) {
 		return
 	}
 
+	var data models.Invalid
+	data.LoginStatus = true
+	_, err := c.Cookie("adminAuth")
+	if err != nil {
+		data.LoginStatus = false
+	}
+
 	c.HTML(http.StatusOK, "home.html", gin.H{
 		// "Productvariants": ProductVariants,
+		"IsLogin":         data.LoginStatus,
 		"ProductVariants": products,
 	})
 }
@@ -603,4 +611,7 @@ func UpdatePasswordHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "password updated successfully"})
+}
+func PageNotfoundHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "page-404.html", nil)
 }
