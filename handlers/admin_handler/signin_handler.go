@@ -88,7 +88,7 @@ func AdminLoginPost(c *gin.Context) {
 	}
 	userDetailsJSON := helpers.CreateJson(UserLoginDetails)
 
-	c.SetCookie("adminAuth", string(userDetailsJSON), 0, "/admin", "exclusivestore.xyz", true, true)
+	c.SetCookie("adminAuth", string(userDetailsJSON), 0, "/admin", "", true, true)
 
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
@@ -101,7 +101,7 @@ func AdminLogoutHandler(c *gin.Context) {
 
 	// Clear the adminAuth cookie
 
-	c.SetCookie("adminAuth", "", -1, "/admin", "exclusivestore.xyz", false, true)
+	c.SetCookie("adminAuth", "", -1, "/admin", "", false, true)
 
 	// Redirect to the login page
 	c.Redirect(http.StatusSeeOther, "/admin/login")

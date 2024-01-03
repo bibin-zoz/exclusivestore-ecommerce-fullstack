@@ -55,7 +55,7 @@ func AdminAuth() gin.HandlerFunc {
 
 			} else {
 
-				c.SetCookie("adminAuth", "", -1, "/admin", "exclusivestore.xyz", true, true)
+				c.SetCookie("adminAuth", "", -1, "/admin", "", true, true)
 				accessToken, err := helpers.GenerateAccessToken(*claims)
 				if err != nil {
 					log.Println("Error creating access token token:", err)
@@ -70,7 +70,7 @@ func AdminAuth() gin.HandlerFunc {
 				}
 				userDetailsJSON := helpers.CreateJson(UserAuth)
 
-				c.SetCookie("adminAuth", string(userDetailsJSON), 0, "/admin", "exclusivestore.xyz", true, true)
+				c.SetCookie("adminAuth", string(userDetailsJSON), 0, "/admin", "", true, true)
 			}
 
 		}

@@ -144,7 +144,7 @@ func CouponValidatehandler(c *gin.Context) {
 	fmt.Println("maxDiscount:", maxDiscount)
 	fmt.Println("(float64(discountPercentage)/cart.Total)*100", (float64(discountPercentage)/cart.Total)*100)
 
-	c.SetCookie("couponcode", CouponCode, 0, "/", "exclusivestore.xyz", true, true)
+	c.SetCookie("couponcode", CouponCode, 0, "/", "", true, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"Message":       fmt.Sprintf("%d%% upto %d Applied", couponDetails.Discount, couponDetails.MaxDiscount),
@@ -155,7 +155,7 @@ func CouponValidatehandler(c *gin.Context) {
 }
 
 func RemoveCouponHandler(c *gin.Context) {
-	c.SetCookie("couponcode", "", -1, "/", "exclusivestore.xyz", false, true)
+	c.SetCookie("couponcode", "", -1, "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Coupon removed successfully"})
 }

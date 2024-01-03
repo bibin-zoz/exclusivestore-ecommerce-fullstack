@@ -108,7 +108,7 @@ func LoginPost(c *gin.Context) {
 	}
 	userDetailsJSON := helpers.CreateJson(UserLoginDetails)
 
-	c.SetCookie("auth", string(userDetailsJSON), 0, "/", "exclusivestore.xyz", true, true)
+	c.SetCookie("auth", string(userDetailsJSON), 0, "/", "", true, true)
 
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
@@ -350,7 +350,7 @@ func HomeHandler(c *gin.Context) {
 func LogoutHandler(c *gin.Context) {
 	fmt.Println("user logut")
 
-	c.SetCookie("auth", "", -1, "/", "exclusivestore.xyz", false, true)
+	c.SetCookie("auth", "", -1, "/", "", false, true)
 
 	c.Redirect(http.StatusSeeOther, "/login")
 }
