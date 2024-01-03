@@ -81,7 +81,7 @@
                                                 <th>Order Date</th>
                                                 <th>payment method</th>
                                                 <th>Total Price</th>
-                                                <th>Status</th>
+                                               
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -97,46 +97,14 @@
 
                                                 <td>{{.Payment}}</td>
                                                 <td>${{.Total}}</td>
-                                                <td>
-                                                    {{if eq .Status "pending"}}
-                                                    <span class="label label-warning">{{.Status}}</span>
-                                                    {{else if eq .Status "shipped"}}
-                                                    <span class="label label-primary">{{.Status}}</span>
-                                                    {{else if eq .Status "delivered"}}
-                                                    <span class="label label-success">{{.Status}}</span>
-                                                    {{else if eq .Status "cancelled"}}
-                                                    <span class="label label-danger">{{.Status}}</span>
-                                                    {{else}}
-                                                    <span class="label label-default">{{.Status}}</span>
-                                                    {{end}}
-                                                </td>
+                                               
 
                                                 <td>
                                                     <a href="/admin/manageorder?id={{.ID}}"
                                                         class="btn btn-info btn-xs">Details</a>
                                                 </td>
                                                 <td>
-                                                <td class="text-center" data-title="Cancel Order">
-                                                    <select class="form-control status-select"
-                                                        data-order-id="{{.ID}}" data-product-id="">
-                                                        {{if eq .Status "delivered"}}
-
-                                                        <option value="Refunded">Refunded</option>
-                                                        <option value="Returning">Refunded</option>
-
-                                                        {{else}}
-                                                        <option value="approved">Approved</option>
-                                                        <option value="shipped">Shipped</option>
-                                                        <option value="delivered">Delivered</option>
-                                                        <option value="refunded">Refunded</option>
-
-
-                                                        {{end}}
-
-                                                    </select>
-                                                    <button class="btn btn-primary update-status-btn btn-sm"  data-order-id="{{.ID}}" >Update  Status</button>
-
-                                                </td>
+                                              
                                                 </td>
 
                                             </tr>
