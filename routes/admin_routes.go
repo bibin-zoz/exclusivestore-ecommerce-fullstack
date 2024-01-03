@@ -10,8 +10,8 @@ import (
 
 func AdminRoutes(r *gin.Engine) {
 	r.GET("/admin/logout", adminhandlers.AdminLogoutHandler)
-	r.GET("/admin/login", middleware.IsLogin(), adminhandlers.AdminLogin)
-	r.POST("/admin/login", middleware.IsLogin(), adminhandlers.AdminLoginPost)
+	r.GET("/admin/login", adminhandlers.AdminLogin)
+	r.POST("/admin/login", adminhandlers.AdminLoginPost)
 
 	adminGroup := r.Group("/admin")
 	adminGroup.Use(middleware.AdminAuth())
