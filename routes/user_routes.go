@@ -17,8 +17,8 @@ func UserRoutes(r *gin.Engine) {
 		userGroup.POST("/signup", handlers.SignupPost)
 		//login
 		userGroup.GET("/login", middleware.IsLogin(), handlers.LoginHandler)
-		userGroup.POST("/login", handlers.LoginPost)
-		userGroup.POST("/logout", handlers.LogoutHandler)
+		userGroup.POST("/login", middleware.IsLogin(), handlers.LoginPost)
+		userGroup.GET("/logout", handlers.LogoutHandler)
 		//verify
 		userGroup.GET("/verify", middleware.IsLogin(), handlers.VerifyHandler)
 		userGroup.POST("/verify", handlers.VerifyPost)
@@ -35,7 +35,7 @@ func UserRoutes(r *gin.Engine) {
 		userGroup.GET("/home", middleware.LoginAuth(), handlers.HomeHandler)
 		userGroup.GET("/", handlers.HomeHandler)
 		//product
-		userGroup.GET("/product", handlers.ProductViewhandler)
+		userGroup.GET("/product", middleware.LoginAuth(), handlers.ProductViewhandler)
 		userGroup.GET("/shop-products", middleware.LoginAuth(), handlers.GetProductsHandler)
 		userGroup.POST("/shop-products", middleware.LoginAuth(), handlers.FilterProductshandler)
 
@@ -46,12 +46,12 @@ func UserRoutes(r *gin.Engine) {
 		// payment routes
 		userGroup.POST("/onlinepay", handlers.CreateRazorpayOrder)
 
-        //cart
+		//cart
 		userGroup.GET("/cart", middleware.LoginAuth(), handlers.GetCarthandler)
 		userGroup.POST("/cart", middleware.LoginAuth(), handlers.AddToCarthandler)
 		userGroup.PATCH("/cart", middleware.LoginAuth(), handlers.UpdateQuantityHandler)
 		userGroup.DELETE("/cart", middleware.LoginAuth(), handlers.DeleteCartHandler)
-		
+
 		//order
 		userGroup.GET("/order", middleware.LoginAuth(), handlers.GetOrdershandler)
 		userGroup.POST("/order", middleware.LoginAuth(), handlers.OrderPlacehandler)

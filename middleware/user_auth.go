@@ -59,7 +59,7 @@ func LoginAuth() gin.HandlerFunc {
 				return
 
 			} else {
-				c.SetCookie("auth", "", -1, "/", "localhost", true, true)
+				c.SetCookie("auth", "", -1, "/", "exclusivestore.xyz", true, true)
 				accessToken, err := helpers.GenerateAccessToken(*claims)
 				if err != nil {
 					log.Println("Error creating access token token:", err)
@@ -74,7 +74,7 @@ func LoginAuth() gin.HandlerFunc {
 				}
 				userDetailsJSON := helpers.CreateJson(UserAuth)
 
-				c.SetCookie("auth", string(userDetailsJSON), 0, "/", "localhost", true, true)
+				c.SetCookie("auth", string(userDetailsJSON), 0, "/", "exclusivestore.xyz", true, true)
 			}
 
 		}

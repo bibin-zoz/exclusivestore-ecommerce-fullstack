@@ -39,7 +39,7 @@ func CreateToken(user models.Claims, expireTime time.Time) (string, error) {
 	}
 	return signedToken, nil
 
-	// c.SetCookie("token", signedToken, int(expirationTime.Unix()), "/", "localhost", false, true)
+	// c.SetCookie("token", signedToken, int(expirationTime.Unix()), "/", "exclusivestore.xyz", false, true)
 
 	// c.Status(http.StatusOK)
 

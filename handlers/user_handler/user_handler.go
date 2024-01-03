@@ -108,7 +108,7 @@ func LoginPost(c *gin.Context) {
 	}
 	userDetailsJSON := helpers.CreateJson(UserLoginDetails)
 
-	c.SetCookie("auth", string(userDetailsJSON), 0, "/", "localhost", true, true)
+	c.SetCookie("auth", string(userDetailsJSON), 0, "/", "exclusivestore.xyz", true, true)
 
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
@@ -334,11 +334,12 @@ func HomeHandler(c *gin.Context) {
 
 	var data models.Invalid
 	data.LoginStatus = true
-	_, err := c.Cookie("adminAuth")
+	_, err := c.Cookie("auth")
 	if err != nil {
 		data.LoginStatus = false
+		fmt.Println("err")
 	}
-
+	fmt.Println("islogin", data.LoginStatus)
 	c.HTML(http.StatusOK, "home.html", gin.H{
 		// "Productvariants": ProductVariants,
 		"IsLogin":         data.LoginStatus,
@@ -349,7 +350,7 @@ func HomeHandler(c *gin.Context) {
 func LogoutHandler(c *gin.Context) {
 	fmt.Println("user logut")
 
-	c.SetCookie("auth", "", -1, "/", "localhost", false, true)
+	c.SetCookie("auth", "", -1, "/", "exclusivestore.xyz", false, true)
 
 	c.Redirect(http.StatusSeeOther, "/login")
 }
