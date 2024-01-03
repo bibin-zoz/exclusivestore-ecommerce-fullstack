@@ -9,7 +9,7 @@ import (
 )
 
 func AdminRoutes(r *gin.Engine) {
-	r.GET("/admin/logout", adminhandlers.AdminLogin)
+	r.GET("/admin/logout", adminhandlers.AdminLogoutHandler)
 	r.GET("/admin/login", middleware.IsLogin(), adminhandlers.AdminLogin)
 	r.POST("/admin/login", middleware.IsLogin(), adminhandlers.AdminLoginPost)
 
