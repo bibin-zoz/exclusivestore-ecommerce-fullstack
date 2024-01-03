@@ -191,7 +191,6 @@ func SalesReportDownloadhandler(c *gin.Context) {
 		}
 	}
 
-	// Add the fetched information to the PDF
 	pdf.Ln(10)
 
 	// Monthly Report

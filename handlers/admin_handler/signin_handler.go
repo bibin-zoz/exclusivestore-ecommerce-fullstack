@@ -93,17 +93,17 @@ func AdminLoginPost(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Header("Expires", "0")
 
-	// Redirect to home only after successful token generation
+	
 	c.Redirect(http.StatusFound, "/admin/home")
 }
 func AdminLogoutHandler(c *gin.Context) {
 	fmt.Println("admin logout")
 
-	// Clear the adminAuth cookie
+	
 
 	c.SetCookie("adminAuth", "", -1, "/admin", "", false, true)
 
-	// Redirect to the login page
+
 	c.Redirect(http.StatusSeeOther, "/admin/login")
 }
 
