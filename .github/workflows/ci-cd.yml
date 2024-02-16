@@ -1,0 +1,38 @@
+name: CI CD -Zhooze
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.x'
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: go test -v ./...
+        
+    - name: Deploy to AWS EC2
+      uses: appleboy/ssh-action@master
+      with:
+          host: ${{secrets.EC2_PUBLIC_IP}}
+          username: ubuntu
+          key: ${{secrets.EC2_SSH_KEY}}
+          script: |
+            echo "Connected to AWS EC2 instance"
+            cd Zhooze-Ecommerce_CleanArchitecture
+            git pull
+            go build -o api ./cmd/api
+            sudo systemctl restart myapp.service
