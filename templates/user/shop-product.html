@@ -337,15 +337,15 @@
         </div>
     </div>
 </div>
-<!-- Vendor JS-->
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
-    // Event handler for filter button click
+   
     $('#filterBtn').on('click', function() {
-        // Make a POST Ajax request with updated filters
+       
         $.ajax({
             url: '/shop-products',
             type: 'POST',
@@ -357,7 +357,7 @@
                 category: getSelectedFilters('category')
             },
             success: function(response) {
-                // Update product display with new data
+                
                 displayProducts(response.ProductVariants);
                 console.log(response.ProductVariants);
             },
@@ -367,7 +367,7 @@
         });
     });
 
-    // Function to get selected filters
+  
     function getSelectedFilters(filterName) {
         var selectedFilters = $('input[name="' + filterName + '"]:checked').map(function() {
             return this.value;
@@ -376,14 +376,14 @@
         return selectedFilters.join(',');
     }
 
-    // Function to display products in the container
+   
     function displayProducts(products) {
         var productContainer = $('#product-container');
 
-        // Clear existing products
+       
         productContainer.empty();
 
-        // Iterate through products and append HTML to container
+        
         $.each(products, function(index, product) {
             console.log(product)
             
