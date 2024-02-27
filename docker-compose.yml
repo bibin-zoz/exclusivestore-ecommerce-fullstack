@@ -1,6 +1,8 @@
 version: '3'
 services:
- ecommercestore:
+
+  ecommercestore:
+    image: ecommercestore:latest
     build:
       context: .
     depends_on:
@@ -22,5 +24,3 @@ services:
       POSTGRES_PASSWORD: 8596
     ports:
       - "5432:5432"
-
- 

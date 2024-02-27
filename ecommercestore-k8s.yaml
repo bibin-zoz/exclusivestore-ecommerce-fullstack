@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecommercestore-deployment
+  labels:
+    app: ecommercestore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecommercestore
+  template:
+    metadata:
+      labels:
+        app: ecommercestore
+    spec:
+      containers:
+      - name: ecommercestore
+        image: bibinzoz/ecommercestore:latest
+        ports:
+        - containerPort: 8080
+        env:
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: postgres-user
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: postgres-password
+          - name: DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: postgres-db
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: postgres-host
+          - name: DB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: postgres-port
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecommercestore-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: ecommercestore
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30001  
