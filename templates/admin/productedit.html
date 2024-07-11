@@ -104,6 +104,7 @@
                                         <label class="col-lg-4 col-form-label" for="categoryID">Category Name
                                             <span class="text-danger">*</span></label>
                                         <div class="col-lg-6">
+                                            
                                             <select class="form-control" id="categoryID" name="categoryID">
                                                 {{range .Category}}
                                                 {{ if eq .ID $.Product.CategoryID }}
