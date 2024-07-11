@@ -32,7 +32,8 @@ jobs:
           key: ${{secrets.EC2_SSH_KEY}}
           script: |
             echo "Connected to AWS EC2 instance"
-            cd GO-GIN-POSTGRES-EOMMERCE-WEB-STACK
+            cd exclusivestore-ecommerce-fullstack
             git pull
-            go build -o api ./cmd/api
-            sudo systemctl restart lapstore.service
+            go build -o api ./
+            sudo systemctl restart exclusivestore.service
+
