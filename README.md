@@ -18,7 +18,7 @@ Welcome to the E-commerce project developed with Go lang and Gin framework. This
 
 ## Introduction
 
-This E-commerce project is a comprehensive solution that allows users to browse products, manage their shopping carts, and securely complete transactions. The implementation follows the MVC architecture, providing a well-organized structure for easy development and maintenance.
+This E-commerce project is a comprehensive solution that allows users to browse products, manage their shopping carts, and securely complete transactions. The implementation follows the MVC architecture, providing a well-organized structure for easy development and maintenance.  
 
 ## Features
 
